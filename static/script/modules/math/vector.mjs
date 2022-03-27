@@ -1,3 +1,5 @@
+import { lerp } from "./math.mjs";
+
 export default class Vector {
   constructor(x = 0, y = 0) {
     this.x = x;
@@ -22,6 +24,16 @@ export default class Vector {
 
   get clone() {
     return new Vector(this.x, this.y);
+  }
+
+  /**
+   * Linearly interpolate between a and b.
+   * @param {Vector} a
+   * @param {Vector} b 
+   * @param {number} t Amount to interpolate [0-1] 
+   */
+  static lerp(a, b, t) {
+    return new Vector(lerp(a.x, b.x, t), lerp(a.y, b.y, t));
   }
 
   /**
