@@ -18,10 +18,10 @@ export default class Renderer {
     this.#w = canvas.width;
     this.#h = canvas.height;
 
-    this.conformToParent();
     window.addEventListener("resize", () => {
       this.conformToParent();
     });
+    this.conformToParent();
 
   }
   
@@ -35,7 +35,7 @@ export default class Renderer {
       h = w * 0.5625;
     }
     // TODO: this will not work if w < h
-    this.setSize(w, w * 0.5625); // 16:9 ratio
+    this.setSize(w, h); // 16:9 ratio
   }
 
   setSize(width, height) {
