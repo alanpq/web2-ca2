@@ -10,8 +10,8 @@ export default class Player {
   }
 
   tick(dt) {
-    this.#virtualPos = this.#position;
-    this.#position.y += input.buttonDown("down") * PHYSICS_INTER * 10;
+    this.#position.x += input.axis("horizontal") * PHYSICS_INTER * 100;
+    this.#position.y -= input.axis("vertical") * PHYSICS_INTER * 100;
   }
 
   /**
@@ -20,7 +20,7 @@ export default class Player {
    * @param {number} dt Delta-time in seconds 
    */
   render(ctx, dt) {
-    this.#virtualPos = Vector.lerp(this.#virtualPos, this.#position, dt);
+    this.#virtualPos = Vector.lerp(this.#virtualPos, this.#position, 0.4);
     ctx.fillRect(this.#virtualPos.x, this.#virtualPos.y, 5, 5);
   }
 }
