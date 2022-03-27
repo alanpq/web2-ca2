@@ -1,9 +1,16 @@
 import Vector from "./math/vector.mjs";
+import * as input from "./input.mjs";
+import { PHYSICS_INTER } from "./game.mjs";
 
 export default class Player {
+  #prevPos = new Vector(); // previous position for interpolation
   #position = new Vector();
   constructor () {
 
+  }
+
+  tick(dt) {
+    this.#position.y += input.buttonDown("down") * PHYSICS_INTER * 10;
   }
 
   /**

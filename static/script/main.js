@@ -4,7 +4,11 @@ import Game from './modules/game.mjs';
 import Vector from './modules/math/vector.mjs';
 import Renderer from './modules/renderer.mjs';
 
-const renderer = new Renderer(document.getElementById("canvas"));
+import * as input from './modules/input.mjs';
+
+const canvas = document.getElementById("canvas");
+const renderer = new Renderer(canvas);
+input.init(canvas);
 
 spa.initSPA(
   document.querySelector("nav"),
@@ -24,3 +28,5 @@ spa.addEventListener("game", "open", async () => {
 spa.addEventListener("game", "close", () => {
   game.destroy();
 });
+spa.goto('game');
+renderer.conformToParent();
