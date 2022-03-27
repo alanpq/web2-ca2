@@ -15,6 +15,11 @@ const buttons = {
   "right": {state: 0, keys: ["d"]},
 }
 
+const axes = {
+  "vertical": ["up", "down"],
+  "horizontal": ["right", "left"],
+}
+
 /** lookup from physical key -> virtual button */
 const buttonsRev = {};
 
@@ -46,7 +51,6 @@ export const init = (el) => {
   // add any key pressed/releases to the queue
   window.addEventListener("keydown", (e) => {
     keyQueue.push([e.key, true]);
-    console.debug(e.key);
   })
   window.addEventListener("keyup", (e) => {
     keyQueue.push([e.key, false]);
@@ -71,8 +75,19 @@ export const tick = () => {
 /**
  * Get if a button is currently held down
  * @param {string} btn Button name
+ * @returns {boolean}
  */
-export const buttonDown = (btn) => {
+export const button = (btn) => {
   if(!buttons[btn]) return false;
-  return buttons[btn].state;
+  return buttons[btn].state > 1;
+}
+
+/**
+ * 
+ * @param {string} axis Name of input axis
+ * @returns {number} Value of input axis
+ */
+export const axis = (axis) => {
+  if(!axes[axis]) return console.error("Invalid input axis", axis);
+  return button(axes[axis][0]) - button(axes[axis][1]);
 }
