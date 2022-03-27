@@ -3,6 +3,7 @@ import Renderer from "./renderer.mjs";
 import { addEventListener } from "./spa.mjs";
 
 import * as input from './input.mjs';
+import * as ui from './ui/ui.mjs';
 
 /** Physics tick rate, in hz */
 export const PHYSICS_RATE = 20;
@@ -71,9 +72,25 @@ export default class Game {
     ctx.fillRect(0,0, this.#renderer.w, this.#renderer.h);
 
     ctx.fillStyle = "white";
-
-    ctx.fillText(`frametime: ${(dt*1000).toFixed(3)}`, 0, 10);
-    ctx.fillText(`frametime: ${(this.#time*1000).toFixed(3)}`, 0, 20);
+    ctx.font = "20px monospace";
+    ui.startVertical();
+    ui.text(ctx, `frametime: ${(dt*1000).toFixed(3)}`);
+    ui.text(ctx,  'hello');
+    ui.text(ctx,  'hello');
+    ui.text(ctx,  'hello');
+    ui.text(ctx,  'hello');
+    ui.startHorizontal();
+    ui.text(ctx,  'a');
+    ui.text(ctx,  'b');
+    ui.text(ctx,  'c');
+    ui.endHorizontal();
+    ui.text(ctx,  'hello');
+    ui.text(ctx,  'hello');
+    ui.text(ctx,  'hello');
+    ui.text(ctx,  'hello');
+    ui.text(ctx,  'hello');
+    ui.text(ctx,  'hello');
+    ui.endVertical();
     this.#player.render(ctx, dt);
 
     const mouse = input.mouse();
