@@ -1,12 +1,12 @@
 import Player from "./player.mjs";
+import Renderer from "./renderer.mjs";
 import { addEventListener } from "./spa.mjs";
 
 export default class Game {
   #loaded = false;
-  /** @type {HTMLCanvasElement} */
-  #canvas;
-  /** @type {CanvasRenderingContext2D} */
-  #ctx;
+  /** @type {Renderer} */
+  #renderer;
+
   #player = new Player();
 
   // DT calculation
@@ -16,9 +16,8 @@ export default class Game {
     return this.#loaded;
   }
 
-  constructor(canvas) {
-    this.#canvas = canvas;
-    this.#ctx = canvas.getContext('2d');
+  constructor(renderer) {
+    this.#renderer = renderer;
   }
 
   async load() {
@@ -29,7 +28,7 @@ export default class Game {
   }
 
   start() {
-    window.requestAnimationFrame(this.#render.bind(this));
+    window.requestAnimationFrame(this.#draw.bind(this));
   }
 
   destroy() {
@@ -43,21 +42,22 @@ export default class Game {
    * Render a frame.
    * @param {DOMHighResTimeStamp} now 
    */
-  #render(now) {
+  #draw(now) {
     if(!this.#then) {
       this.#then = now;
     }
     const dt = (now-this.#then)/1000;
-    this.#ctx.fillStyle = "black";
-    this.#ctx.fillRect(0,0, this.#canvas.width, this.#canvas.height);
+    const ctx = this.#renderer.ctx;
+    ctx.fillStyle = "black";
+    ctx.fillRect(0,0, this.#renderer.w, this.#renderer.h);
 
-    this.#ctx.fillStyle = "white";
+    ctx.fillStyle = "white";
 
-    this.#ctx.fillText(`frametime: ${(dt*1000).toFixed(3)}`, 0, 10);
-    // this.#player.render(this.#ctx, dt);
+    ctx.fillText(`frametime: ${(dt*1000).toFixed(3)}`, 0, 10);
+    // this.#player.render(ctx, dt);
 
     this.#then = now;
-    window.requestAnimationFrame(this.#render.bind(this));
+    window.requestAnimationFrame(this.#draw.bind(this));
   }
 
   /**
