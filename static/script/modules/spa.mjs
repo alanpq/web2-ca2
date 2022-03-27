@@ -7,13 +7,17 @@
  */
 
 /**
+ * @typedef PageEvent
+ * @type {"open" | "close"}
+ */
+
+/**
  * @typedef PageListeners
  * @type {object}
  * @property {Function[]} open Listeners for page open
  * @property {Function[]} close Listeners for page close
  */
 /** @type {{[id: string]: PageListeners}} */
-const listeners = {};
 
 /**
  * @typedef SPAState
@@ -23,27 +27,30 @@ const listeners = {};
  * 
  * @property {string} curPage
  * @property {{[id: string]: Page}} pages
+ * @property {{[id: string]: PageListeners}} listeners
  */
 
 /** @type {SPAState} */
 const spa = {
   curPage: null,
   pages: {},
+  listeners: {},
 }
 
 /**
  * Listens to page event
  * @param {string} page Name of page to listen to
- * @param {string} page Name of event to listen for
+ * @param {PageEvent} event Name of event to listen for
  * @param {Function} cb Listener callback.
  */
 export const addEventListener = (page, event, cb) => {
-
+  if(!(page in spa.listeners)) return;
+  spa.listeners[page][event].push(cb);
 }
 
 const emitClose = (id) => {
-  if(!(id in listeners)) return;
-  listeners[id].close.forEach((fn) => {
+  if(!(id in spa.listeners)) return console.error(id, "not found in listeners!", spa.listeners);
+  spa.listeners[id].close.forEach((fn) => {
     fn(id);
   })
 }
@@ -53,10 +60,11 @@ const emitClose = (id) => {
  * @param {string} id Page ID
  */
 const awaitOpen = async (id) => {
-  if(!(id in listeners)) return;
-  Promise.allSettled(listeners[id].open.map((fn) => {
+  if(!(id in spa.listeners)) return console.error(id,"not found in listeners!", spa.listeners);
+  const a = Promise.allSettled(spa.listeners[id].open.map((fn) => {
     return fn(id);
   }))
+  await a;
 }
 
 /**
@@ -74,10 +82,10 @@ export const goto = async (href) => {
   }
   spa.curPage = href;
 
-  spa.pages[href].el.className = "";
-
+  
   await awaitOpen(href); // wait for all open listeners to resolve
-
+  
+  spa.pages[href].el.className = "";
   spa.root.className = "";
 }
 
@@ -107,10 +115,11 @@ export const initSPA = (nav, root) => {
       el,
       link: null,
     };
+    spa.listeners[el.id] = {
+      open: [],
+      close: [],
+    }
   }
-
-  if(children.length > 0)
-    goto(children[0].id);
 
   children = nav.children;
   for(let i = 0; i < children.length; i++) {
