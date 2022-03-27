@@ -48,7 +48,7 @@ const keys = {};
 
 // we gather all key changes that happen in the current frame,
 // to be applied for the start of the next.
-const keyQueue = []; 
+let keyQueue = []; 
 
 
 /**
@@ -65,9 +65,11 @@ export const init = (el) => {
 
   // add any key pressed/releases to the queue
   window.addEventListener("keydown", (e) => {
+    if(!buttonsRev[e.key]) return;
     keyQueue.push([e.key, true]);
   })
   window.addEventListener("keyup", (e) => {
+    if(!buttonsRev[e.key]) return;
     keyQueue.push([e.key, false]);
   })
   el.addEventListener("mousemove", (e) => {
@@ -115,7 +117,9 @@ export const tick = () => {
   keyQueue.forEach(([key, down]) => {
     // only positive of type coersion
     keys[key] = (down * 2) + 1; // 3 if true, 1 if false
+    buttons[buttonsRev[key]].state = keys[key];
   });
+  keyQueue = [];
 }
 
 /**
@@ -126,6 +130,24 @@ export const tick = () => {
 export const button = (btn) => {
   if(!buttons[btn]) return false;
   return buttons[btn].state > 1;
+}
+/**
+ * Get if a button is has been pressed
+ * @param {string} btn Button name
+ * @returns {boolean}
+ */
+export const buttonDown = (btn) => {
+  if(!buttons[btn]) return false;
+  return buttons[btn].state == 3;
+}
+/**
+ * Get if a button is has been pressed
+ * @param {string} btn Button name
+ * @returns {boolean}
+ */
+export const buttonUp = (btn) => {
+  if(!buttons[btn]) return false;
+  return buttons[btn].state == 1;
 }
 
 /**
