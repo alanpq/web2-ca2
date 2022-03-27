@@ -76,6 +76,9 @@ export default class Game {
     ctx.fillText(`frametime: ${(this.#time*1000).toFixed(3)}`, 0, 20);
     this.#player.render(ctx, dt);
 
+    const mouse = input.mouse();
+    ctx.fillRect(mouse.x - 5, mouse.y - 5, 10, 10);
+
     this.#then = now;
     window.requestAnimationFrame(this.#draw.bind(this));
     input.tick();

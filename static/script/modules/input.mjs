@@ -4,6 +4,9 @@
  * @prop {0|1|2|3} state The state of the button
  * @prop {string[]} keys The physical keys that map to this button.
  */
+
+import Vector from "./math/vector.mjs";
+
 /**
  * Definition of virtual button inputs and their mapped keys
  * @type {{[button: string]: Button}}
@@ -24,11 +27,22 @@ const axes = {
 const buttonsRev = {};
 
 /**
- * Key map
- * 0 - up
- * 1 - just released
- * 2 - down
- * 3 - just pressed
+ * Same state as {@link keyMap}
+ */
+const mouseState = {
+  pos: new Vector(),
+  left: 0,
+  right: 0,
+};
+/** mouse state that should be applied just before the next frame */
+let futureMouseState = {left: 0, right: 0};
+
+/**
+ * @name keyMap
+ * 0: up,
+ * 1: just released,
+ * 2: down,
+ * 3: just pressed
  */
 const keys = {};
 
@@ -55,6 +69,17 @@ export const init = (el) => {
   window.addEventListener("keyup", (e) => {
     keyQueue.push([e.key, false]);
   })
+  el.addEventListener("mousemove", (e) => {
+    mouseState.pos.x = e.offsetX;
+    mouseState.pos.y = e.offsetY;
+  });
+
+  el.addEventListener("mousedown", (e) => {
+    futureMouseState = true;
+  })
+  window.addEventListener("mouseup", (e) => {
+    futureMouseState = false;
+  })
 }
 
 export const tick = () => {
@@ -66,6 +91,14 @@ export const tick = () => {
       buttons[buttonsRev[key]].state = keys[key];
     })
   });
+
+  // do the same thing with the mouse
+  if(mouseState.left % 2 != 0) mouseState.left -= 1;
+  if(mouseState.right % 2 != 0) mouseState.right -= 1;
+
+  mouseState.left = futureMouseState.left;
+  mouseState.right = futureMouseState.right;
+
   keyQueue.forEach(([key, down]) => {
     // only positive of type coersion
     keys[key] = (down * 2) + 1; // 3 if true, 1 if false
@@ -90,4 +123,17 @@ export const button = (btn) => {
 export const axis = (axis) => {
   if(!axes[axis]) return console.error("Invalid input axis", axis);
   return button(axes[axis][0]) - button(axes[axis][1]);
+}
+
+/** Get current mouse position */
+export const mouse = () => {
+  return mouseState.pos;
+}
+/** Get if left mouse button is held */
+export const leftMouse = () => {
+  return mouseState.left > 1;
+}
+/** Get if right mouse button is held */
+export const rightMouse = () => {
+  return mouseState.right > 1;
 }
