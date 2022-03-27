@@ -12,6 +12,7 @@
     // much like the last ca, this smells
     const URL_BASE = "{{url_for('static', filename='')}}".replace("/static/", "");
   </script>
+  <script defer type="module" src="{{url_for('static', filename='script/main.js')}}"></script>
   {% block head %}
   {% endblock %}
 </head>

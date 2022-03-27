@@ -1,8 +1,15 @@
 {% extends '_base.html' %}
 
 {% block head %}
+<header>
+  <h1>Web Dev CA2</h1>
+</header>
 {% endblock %}
 
 {% block content %}
-
+<main class="loading">
+  {% include 'partials/_game.html' %}
+  {% include 'partials/_rank.html' %}
+  {% include 'partials/_help.html' %}
+</main>
 {% endblock %}
