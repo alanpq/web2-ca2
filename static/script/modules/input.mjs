@@ -35,7 +35,7 @@ const mouseState = {
   right: 0,
 };
 /** mouse state that should be applied just before the next frame */
-let futureMouseState = {left: 0, right: 0};
+let futureMouseState = {left: false, right: false};
 
 /**
  * @name keyMap
@@ -49,6 +49,7 @@ const keys = {};
 // we gather all key changes that happen in the current frame,
 // to be applied for the start of the next.
 const keyQueue = []; 
+
 
 /**
  * 
@@ -73,13 +74,23 @@ export const init = (el) => {
     mouseState.pos.x = e.offsetX;
     mouseState.pos.y = e.offsetY;
   });
-
+  
+  // prevent context menu when clicking on canvas
+  el.addEventListener("contextmenu", (e) => {e.preventDefault()});
   el.addEventListener("mousedown", (e) => {
-    futureMouseState = true;
+    if (e.button == 0) {
+      futureMouseState.left = true;
+    } else if (e.button == 2) {
+      futureMouseState.right = true;
+    }
   })
   window.addEventListener("mouseup", (e) => {
-    futureMouseState = false;
-  })
+    if (e.button == 0) {
+      futureMouseState.left = false;
+    } else if (e.button == 2) {
+      futureMouseState.right = false;
+    }
+  });
 }
 
 export const tick = () => {
@@ -91,13 +102,15 @@ export const tick = () => {
       buttons[buttonsRev[key]].state = keys[key];
     })
   });
-
   // do the same thing with the mouse
   if(mouseState.left % 2 != 0) mouseState.left -= 1;
   if(mouseState.right % 2 != 0) mouseState.right -= 1;
 
-  mouseState.left = futureMouseState.left;
-  mouseState.right = futureMouseState.right;
+  if (futureMouseState.left != null)
+    mouseState.left = (futureMouseState.left * 2) + 1;
+  if (futureMouseState.right != null)
+    mouseState.right = (futureMouseState.right * 2) + 1;
+  futureMouseState = {left: null, right: null};
 
   keyQueue.forEach(([key, down]) => {
     // only positive of type coersion
@@ -136,4 +149,20 @@ export const leftMouse = () => {
 /** Get if right mouse button is held */
 export const rightMouse = () => {
   return mouseState.right > 1;
+}
+/** Get if left mouse button has just been pressed */
+export const leftMouseDown = () => {
+  return mouseState.left == 3;
+}
+/** Get if right mouse button has just been pressed */
+export const rightMouseDown = () => {
+  return mouseState.right == 3;
+}
+/** Get if left mouse button has just been released */
+export const leftMouseUp = () => {
+  return mouseState.left == 1;
+}
+/** Get if right mouse button has just been released */
+export const rightMouseUp = () => {
+  return mouseState.right == 1;
 }

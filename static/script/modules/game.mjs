@@ -77,6 +77,12 @@ export default class Game {
     this.#player.render(ctx, dt);
 
     const mouse = input.mouse();
+    if(input.leftMouse()) {
+      ctx.fillStyle = "red";
+    }
+    if(input.rightMouse()) {
+      ctx.fillStyle = "blue";
+    }
     ctx.fillRect(mouse.x - 5, mouse.y - 5, 10, 10);
 
     this.#then = now;
