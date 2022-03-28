@@ -1,6 +1,6 @@
 import Vector from "./math/vector.mjs";
 import * as input from "./input.mjs";
-import { PHYSICS_INTER } from "./game.mjs";
+import { PHYSICS_INTER } from "./renderer.mjs";
 
 export default class Player {
   #virtualPos = new Vector(); // virtual position for interpolation
@@ -16,10 +16,11 @@ export default class Player {
 
   /**
    * Render the player.
-   * @param {CanvasRenderingContext2D} ctx 2D Context
    * @param {number} dt Delta-time in seconds 
+   * @param {CanvasRenderingContext2D} ctx 2D Context
    */
-  render(ctx, dt) {
+  render(dt, ctx) {
+    ctx.fillStyle="white";
     this.#virtualPos = Vector.lerp(this.#virtualPos, this.#position, 0.4);
     ctx.fillRect(this.#virtualPos.x, this.#virtualPos.y, 5, 5);
   }

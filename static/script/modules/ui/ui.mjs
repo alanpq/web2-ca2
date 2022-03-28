@@ -67,24 +67,24 @@ export default class UI {
     this.ctx.font = "20px monospace";
     const pctx = this.top();
     const metrics = this.ctx.measureText(text);
-    const w = metrics.width + textPadding.left + textPadding.right;
+    const w = metrics.width + this.textPadding.left + this.textPadding.right;
     const h = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
-              + textPadding.top + textPadding.bottom;
+              + this.textPadding.top + this.textPadding.bottom;
     if(pctx.horizontal) { // horizontal flow
-      this.ctx.fillText(text, pctx.x + pctx.width + textPadding.left, pctx.y + textPadding.top);
+      this.ctx.fillText(text, pctx.x + pctx.width + this.textPadding.left, pctx.y + this.textPadding.top);
       pctx.width += w;
       pctx.height = Math.max(pctx.height, h);
     } else { // vertical flow
       if(pctx.height == 0) pctx.height = h;
-      this.ctx.fillText(text, pctx.x + textPadding.left, pctx.y + pctx.height + textPadding.top);
+      this.ctx.fillText(text, pctx.x + this.textPadding.left, pctx.y + pctx.height + this.textPadding.top);
       pctx.width = Math.max(pctx.width, w);
       pctx.height += h;
     }
   }
 
   startVertical() {
-    const pctx = top();
-    posStack.push({
+    const pctx = this.top();
+    this.posStack.push({
       horizontal: false,
       width: 0,
       height: 0,
@@ -94,8 +94,8 @@ export default class UI {
   }
 
   startHorizontal() {
-    const pctx = top();
-    posStack.push({
+    const pctx = this.top();
+    this.posStack.push({
       horizontal: true,
       width: 0,
       height: 0,
@@ -105,19 +105,19 @@ export default class UI {
   }
   // TODO: max depth on queue to prevent memory leak if you forget an end call
   endVertical() {
-    const old = posStack.pop();
+    const old = this.posStack.pop();
     if(old.horizontal)
       throw new Error("Unmatched horizontal flow! Tried to end vertical when a horizontal has not yet been closed.")
-    const n = top();
+    const n = this.top();
     n.x += old.width;
     n.y += old.height;
   }
   
   endHorizontal() {
-    const old = posStack.pop();
+    const old = this.posStack.pop();
     if(!old.horizontal)
       throw new Error("Unmatched vertical flow! Tried to end horizontal when a vertical has not yet been closed.")
-    const n = top();
+    const n = this.top();
     n.height += old.height;
   }
 
@@ -126,7 +126,7 @@ export default class UI {
    * @returns {PositioningContext}
    */
   top() {
-    if(posStack.length == 0) {
+    if(this.posStack.length == 0) {
       return {
         horizontal: false,
         width: 0,
@@ -135,7 +135,7 @@ export default class UI {
         y: 0,
       }
     }
-    return posStack[posStack.length-1];
+    return this.posStack[this.posStack.length-1];
   }
 }
 

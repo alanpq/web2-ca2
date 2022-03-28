@@ -1,14 +1,8 @@
 import Player from "./player.mjs";
-import Renderer from "./renderer.mjs";
-import { addEventListener } from "./spa.mjs";
+import Renderer, { PHYSICS_INTER } from "./renderer.mjs";
 
 import * as input from './input.mjs';
-import * as ui from './ui/ui.mjs';
 
-/** Physics tick rate, in hz */
-export const PHYSICS_RATE = 20;
-/** Physics tick interval, in seconds */
-export const PHYSICS_INTER = 1/PHYSICS_RATE;
 
 export default class Game {
   #loaded = false;
@@ -17,18 +11,15 @@ export default class Game {
 
   #player = new Player();
 
-  // DT calculation
-  #then;
-  #time = 0; // time collector to be eaten by physics tick
-
   get loaded() {
     return this.#loaded;
   }
 
   constructor(renderer) {
     this.#renderer = renderer;
-    console.debug("PHYSICS_RATE", PHYSICS_RATE);
-    console.debug("PHYSICS_INTER", PHYSICS_INTER);
+    this.#renderer.onDraw = this.draw.bind(this);
+    this.#renderer.onTick = this.tick.bind(this);
+    this.#renderer.onUI = this.ui.bind(this);
   }
 
   async load() {
@@ -40,7 +31,6 @@ export default class Game {
 
   start() {
     this.#renderer.conformToParent();
-    window.requestAnimationFrame(this.#draw.bind(this));
   }
 
   destroy() {
@@ -51,60 +41,52 @@ export default class Game {
   ////// ACTUAL GAME STUFF
 
   /**
-   * Render a frame.
-   * @param {DOMHighResTimeStamp} now 
+   * 
+   * @param {number} dt Deltatime in seconds
+   * @param {UI} ui UI Object
    */
-  #draw(now) {
-    if(!this.#then) {
-      this.#then = now;
-    }
-    const dt = (now-this.#then)/1000;
-    this.#time += dt;
-    // has enough time passed for physics tick?
-    if (this.#time > PHYSICS_INTER) {
-      this.#time -= PHYSICS_INTER; // consume time taken by the tick
-      this.#tick();
-    }
-
-
-    const ctx = this.#renderer.ctx;
-    ctx.fillStyle = "black";
-    ctx.fillRect(0,0, this.#renderer.w, this.#renderer.h);
-
-    ctx.fillStyle = "white";
-    ctx.font = "20px monospace";
+  ui(dt, ui) { 
+    ui.font.color = "white";
+    ui.font.size = 20;
+    ui.font.family = "monospace";
     ui.startVertical();
-    ui.text(ctx, `frametime: ${(dt*1000).toFixed(3)}`);
-    ui.text(ctx,  'hello');
-    ui.text(ctx,  'hello');
-    ui.text(ctx,  'hello');
-    ui.text(ctx,  'hello');
+    ui.text(`frametime: ${(dt*1000).toFixed(3)}`);
+    ui.text('hello');
+    ui.text('hello');
+    ui.text('hello');
+    ui.text('hello');
     ui.startHorizontal();
-    ui.text(ctx,  'a');
-    ui.text(ctx,  'b');
-    ui.text(ctx,  'c');
+    ui.text('a');
+    ui.text('b');
+    ui.text('c');
     ui.endHorizontal();
-    ui.text(ctx,  'hello');
-    ui.text(ctx,  'hello');
-    ui.text(ctx,  'hello');
-    ui.text(ctx,  'hello');
-    ui.text(ctx,  'hello');
-    ui.text(ctx,  'hello');
+    ui.text('hello');
+    ui.text('hello');
+    ui.text('hello');
+    ui.text('hello');
+    ui.text('hello');
+    ui.text('hello');
     ui.endVertical();
-    this.#player.render(ctx, dt);
+  }
 
+  /**
+   * Render a frame.
+   * @param {number} dt
+   * @param {CanvasRenderingContext2D} ctx 
+   */
+  draw(dt, ctx) {
+    this.#player
+      .render(dt, ctx);
+
+    ctx.fillStyle="white";
     const mouse = input.mouse();
     ctx.fillRect(mouse.x - 5, mouse.y - 5, 10, 10);
-
-    this.#then = now;
-    window.requestAnimationFrame(this.#draw.bind(this));
-    input.tick();
   }
 
   /**
    * Do a physics tick.
    */
-  #tick() {
+  tick() {
     this.#player.tick(PHYSICS_INTER);
   }
 }

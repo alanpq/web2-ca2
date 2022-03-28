@@ -1,28 +1,70 @@
+import UI from './ui/ui.mjs';
+import * as input from './input.mjs';
+
+
+/** Physics tick rate, in hz */
+export const PHYSICS_RATE = 20;
+/** Physics tick interval, in seconds */
+export const PHYSICS_INTER = 1/PHYSICS_RATE;
+
+
 export default class Renderer {
   /** @type {HTMLCanvasElement} */
   #canvas;
-
+  /** @type {CanvasRenderingContext2D} */
+  #ctx;
   #w;
   #h;
-  
-  
-  /** @type {CanvasRenderingContext2D} */
-  ctx;
+  get width() { return this.#w; }
+  get height() { return this.#h; }
 
+  /** @type {UI} */
+  #ui;
+
+  // DT calculation
+  #then;
+  #time = 0; // time collector to be eaten by physics tick
+  onDraw;
+  onTick;
+  onUI;
   /**
    * @param {HTMLCanvasElement} canvas 
    */
   constructor(canvas) {
     this.#canvas = canvas;
-    this.ctx = canvas.getContext('2d');
     this.#w = canvas.width;
     this.#h = canvas.height;
+
+    this.#ctx = canvas.getContext('2d');
+    this.#ui = new UI(this.#ctx);
+    
+    console.debug("PHYSICS_RATE", PHYSICS_RATE);
+    console.debug("PHYSICS_INTER", PHYSICS_INTER);
 
     window.addEventListener("resize", () => {
       this.conformToParent();
     });
-    this.conformToParent();
+    window.requestAnimationFrame(this.#loop.bind(this));
+  }
 
+  #loop(now) {
+    if(!this.#then) {
+      this.#then = now;
+    }
+    const dt = (now-this.#then)/1000;
+    this.#time += dt;
+    // has enough time passed for physics tick?
+    if (this.#time > PHYSICS_INTER) {
+      this.#time -= PHYSICS_INTER; // consume time taken by the tick
+      if(this.onTick) this.onTick(dt);
+    }
+    this.#ctx.fillStyle = "black";
+    this.#ctx.fillRect(0,0, this.width, this.height);
+    if(this.onUI) this.onUI(dt, this.#ui);
+    if(this.onDraw) this.onDraw(dt, this.#ctx);
+    this.#then = now;
+    input.tick();
+    window.requestAnimationFrame(this.#loop.bind(this));
   }
   
   conformToParent() {
@@ -43,12 +85,5 @@ export default class Renderer {
     this.#h = height || this.#h;
     this.#canvas.width = this.#w;
     this.#canvas.height = this.#h;
-  }
-
-  get w() {
-    return this.#w;
-  }
-  get h() {
-    return this.#h;
   }
 }
