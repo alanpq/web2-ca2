@@ -1,8 +1,8 @@
+import { FONTS, PHYSICS_INTER } from "./constants.mjs";
 import Player from "./player.mjs";
 import Renderer from "./renderer.mjs";
 
-import * as input from './input/mod.mjs';
-import { FONTS, PHYSICS_INTER } from "./constants.mjs";
+import { World } from "./world.mjs";
 
 
 export default class Game {
@@ -10,7 +10,8 @@ export default class Game {
   /** @type {Renderer} */
   #renderer;
 
-  #player = new Player();
+  #player;
+  #world;
 
   get loaded() {
     return this.#loaded;
@@ -18,9 +19,16 @@ export default class Game {
 
   constructor(renderer) {
     this.#renderer = renderer;
-    this.#renderer.onDraw = this.draw.bind(this);
-    this.#renderer.onTick = this.tick.bind(this);
-    this.#renderer.onUI = this.ui.bind(this);
+
+    this.#player = new Player();
+    this.#world = new World();
+
+
+    this.#renderer.listen(
+      (dt, ctx) => {this.draw(dt, ctx)},
+      (dt) => {this.tick(dt)},
+      (dt, ui) => {this.ui(dt, ui)},
+    )
   }
 
   async load() {
@@ -59,6 +67,7 @@ export default class Game {
    * @param {CanvasRenderingContext2D} ctx 
    */
   draw(dt, ctx) {
+    this.#world.render(dt, ctx);
     this.#player
       .render(dt, ctx);
   }
@@ -66,7 +75,7 @@ export default class Game {
   /**
    * Do a physics tick.
    */
-  tick() {
+  tick(dt) {
     this.#player.tick(PHYSICS_INTER);
     this.#renderer.camera.position = this.#player.position;
   }

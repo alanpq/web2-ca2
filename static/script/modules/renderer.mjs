@@ -43,6 +43,12 @@ export default class Renderer {
     window.requestAnimationFrame(this.#loop.bind(this));
   }
 
+  listen(draw, tick, ui) {
+    this.onDraw = draw;
+    this.onTick = tick;
+    this.onUI = ui;
+  }
+
   #loop(now) {
     if(!this.#then) {
       this.#then = now;
@@ -52,7 +58,7 @@ export default class Renderer {
     // has enough time passed for physics tick?
     if (this.#time > PHYSICS_INTER) {
       this.#time -= PHYSICS_INTER; // consume time taken by the tick
-      if(this.onTick) this.onTick(dt);
+      if(this.onTick) this.onTick(PHYSICS_INTER);
     }
     this.#ctx.resetTransform();
     this.#ctx.fillStyle = "black";
@@ -60,10 +66,12 @@ export default class Renderer {
     if(this.onUI) this.onUI(dt, this.#ui);
     this.camera.setTransform(this.#ctx);
     if(this.onDraw) this.onDraw(dt, this.#ctx);
-    this.#then = now;
-    input.tick();
+
+
     this.camera.tick(dt);
+    input.tick();
     window.requestAnimationFrame(this.#loop.bind(this));
+    this.#then = now;
   }
   
   conformToParent() {

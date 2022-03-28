@@ -22,7 +22,7 @@ export default class Player {
    * @param {CanvasRenderingContext2D} ctx 2D Context
    */
   render(dt, ctx) {
-    ctx.fillStyle="white";
+    ctx.fillStyle = "white";
     this.#virtualPos = Vector.lerp(this.#virtualPos, this.#position, 0.4);
     ctx.fillRect(this.#virtualPos.x, this.#virtualPos.y, 5, 5);
   }
