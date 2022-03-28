@@ -56,15 +56,21 @@ export class World {
     return this.getChunk(p[0], p[1]);
   }
 
-  probeTileFromWorld(x,y) {
-    const t = worldToTile([x,y]);
+  /**
+   * 
+   * @param {Vector} pos 
+   * @returns {DetailedTile}
+   */
+  probeTileFromWorld(pos) {
+    const t = worldToTile([pos.x,pos.y]);
     const c = this.getChunk(...tileToChunk(t));
     if(!c) return {tile: null};
     const xx = t[0] - c.x * CHUNK_SIZE;
     const yy = t[1] - c.y * CHUNK_SIZE;
     return {tile: c.getTile(t[0], t[1]),
+      chunk: c,
       x: xx, y: yy,
-      worldX: t[0], worldY: t[1] 
+      worldX: t[0], worldY: t[1]
     };
   }
 
@@ -72,6 +78,17 @@ export class World {
     return this.probeTileFromWorld(x,y).tile;
   }
 }
+
+/**
+ * @typedef DetailedTile
+ * @type {object}
+ * @prop {Tile} tile the tile
+ * @prop {Chunk} chunk chunk the tile is from
+ * @prop {number} x tile-space x relative to chunk
+ * @prop {number} y tile-space y relative to chunk
+ * @prop {number} worldX tile-space x relative to origin
+ * @prop {number} worldY tile-space y relative to origin
+ */
 
 /** 
  * @typedef Tile
@@ -103,7 +120,7 @@ class Chunk {
     this.y = y;
 
     for(let i = 0; i < CHUNK_AREA; i++) {
-      this.#map[i] = TILES.VOID + Math.floor(Math.random() * 2);
+      this.#map[i] = TILES.FLOOR + (Math.random() < 0.1);
     }
   }
   /**
@@ -119,10 +136,24 @@ class Chunk {
                     TILE_SIZE+1, TILE_SIZE+1);
     }
   }
-
+/**
+   * 
+   * @param {number} x
+   * @param {number} y
+   * @returns {Tile}
+   */
   getTile(x, y) {
     const i = y * CHUNK_SIZE + x;
-    if(i > CHUNK_AREA) return null;
+    return this.getTileFromIdx(i);
+  }
+
+  /**
+   * 
+   * @param {number} i 
+   * @returns {Tile}
+   */
+  getTileFromIdx(i) {
+    if(i < 0 || i >= CHUNK_AREA) return null;
     return this.#map[i];
   }
 }

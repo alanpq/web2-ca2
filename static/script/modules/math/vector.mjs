@@ -19,7 +19,7 @@ export default class Vector {
    * @returns {number}
    */
   get magnitude() {
-    return Math.sqrt(this.sqrMagnitude());
+    return Math.sqrt(this.sqrMagnitude);
   }
 
   get clone() {
@@ -43,6 +43,7 @@ export default class Vector {
   add(b) {
     this.x += b.x;
     this.y += b.y;
+    return this;
   }
 
   /**
@@ -66,13 +67,14 @@ export default class Vector {
   sub(b) {
     this.x -= b.x;
     this.y -= b.y;
+    return this;
   }
   /**
    * Returns a - b.
    * @param {Vector} a
    * @param {Vector} b
    */
-  static add(a, b) {
+  static sub(a, b) {
     return new Vector(a.x - b.x, a.y - b.y);
   }
 
@@ -83,6 +85,7 @@ export default class Vector {
   scale(b) {
     this.x *= b.x;
     this.y *= b.y;
+    return this;
   }
 
   /**
@@ -92,6 +95,7 @@ export default class Vector {
   mul(v) {
     this.x *= v;
     this.y *= v;
+    return this;
   }
 
 }

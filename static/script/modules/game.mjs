@@ -2,7 +2,11 @@ import { FONTS, PHYSICS_INTER } from "./constants.mjs";
 import Player from "./player.mjs";
 import Renderer from "./renderer.mjs";
 
+import * as input from './input/mod.mjs';
+
 import { CHUNK_SIZE, TILE_SIZE, World } from "./world.mjs";
+import { findPath, idxToPos } from "./ai/pathfinding.mjs";
+import Vector from "./math/vector.mjs";
 
 
 export default class Game {
@@ -62,18 +66,49 @@ export default class Game {
     ui.endVertical();
   }
 
+  
+  /** @type {import("./world.mjs").DetailedTile} */
+  #a;
+  /** @type {import("./world.mjs").DetailedTile} */
+  #b;
+  #path;
   /**
-   * Render a frame.
-   * @param {number} dt
-   * @param {CanvasRenderingContext2D} ctx 
-   */
+  * Render a frame.
+  * @param {number} dt
+  * @param {CanvasRenderingContext2D} ctx 
+  */
   draw(dt, ctx) {
     this.#world.render(dt, ctx);
-    const tile = this.#world.probeTileFromWorld(this.#player.position.x, this.#player.position.y);
-    if(tile) {
+    
+    this.#a = this.#world.probeTileFromWorld(this.#player.position);
+    if(this.#a) {
       ctx.fillStyle = "rgba(255,0,0,0.2)";
-      ctx.fillRect(tile.worldX*TILE_SIZE, tile.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+      ctx.fillRect(this.#a.worldX*TILE_SIZE, this.#a.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+    this.#b = this.#world.probeTileFromWorld(this.#renderer.camera.screenToWorld(input.mouse()))
+    if(this.#b) {
+      ctx.fillStyle = "rgba(0,0,255,0.2)";
+      ctx.fillRect(this.#b.worldX*TILE_SIZE, this.#b.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    if(input.leftMouseDown()) {
+      this.#path = findPath(this.#world, this.#a, this.#b);
+      console.debug(this.#path);
+    }
+
+    if(this.#path) {
+      for(let i = this.#path.length-1; i >= 1; i--) {
+        ctx.strokeStyle = "green";
+        ctx.beginPath();
+        const off = new Vector(this.#a.chunk.x + 0.5, this.#a.chunk.y + 0.5);
+        const aa = idxToPos(this.#path[i]).add(off).mul(TILE_SIZE);
+        const bb = idxToPos(this.#path[i-1]).add(off).mul(TILE_SIZE);
+        ctx.moveTo(aa.x, aa.y);
+        ctx.lineTo(bb.x, bb.y);
+        ctx.stroke();
+      }
+    }
+    
     this.#player
       .render(dt, ctx);
   }
