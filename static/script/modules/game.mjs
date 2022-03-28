@@ -1,7 +1,8 @@
 import Player from "./player.mjs";
-import Renderer, { PHYSICS_INTER } from "./renderer.mjs";
+import Renderer from "./renderer.mjs";
 
 import * as input from './input.mjs';
+import { FONTS, PHYSICS_INTER } from "./constants.mjs";
 
 
 export default class Game {
@@ -46,8 +47,7 @@ export default class Game {
    */
   ui(dt, ui) { 
     ui.font.color = "white";
-    ui.font.size = 20;
-    ui.font.family = "monospace";
+    ui.font.family = FONTS.MONO;
     ui.startVertical();
     ui.text(`frametime: ${(dt*1000).toFixed(3)}`);
     ui.text('hello');

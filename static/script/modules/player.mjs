@@ -1,6 +1,6 @@
 import Vector from "./math/vector.mjs";
 import * as input from "./input.mjs";
-import { PHYSICS_INTER } from "./renderer.mjs";
+import { PHYSICS_INTER } from "./constants.mjs";
 
 export default class Player {
   #virtualPos = new Vector(); // virtual position for interpolation

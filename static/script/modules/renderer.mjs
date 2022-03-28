@@ -1,12 +1,6 @@
 import UI from './ui/ui.mjs';
 import * as input from './input.mjs';
-
-
-/** Physics tick rate, in hz */
-export const PHYSICS_RATE = 20;
-/** Physics tick interval, in seconds */
-export const PHYSICS_INTER = 1/PHYSICS_RATE;
-
+import { PHYSICS_INTER } from './constants.mjs';
 
 export default class Renderer {
   /** @type {HTMLCanvasElement} */
@@ -37,9 +31,6 @@ export default class Renderer {
 
     this.#ctx = canvas.getContext('2d');
     this.#ui = new UI(this.#ctx);
-    
-    console.debug("PHYSICS_RATE", PHYSICS_RATE);
-    console.debug("PHYSICS_INTER", PHYSICS_INTER);
 
     window.addEventListener("resize", () => {
       this.conformToParent();
