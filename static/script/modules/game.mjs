@@ -1,7 +1,7 @@
 import Player from "./player.mjs";
 import Renderer from "./renderer.mjs";
 
-import * as input from './input.mjs';
+import * as input from './input/mod.mjs';
 import { FONTS, PHYSICS_INTER } from "./constants.mjs";
 
 
@@ -50,21 +50,6 @@ export default class Game {
     ui.font.family = FONTS.MONO;
     ui.startVertical();
     ui.text(`frametime: ${(dt*1000).toFixed(3)}`);
-    ui.text('hello');
-    ui.text('hello');
-    ui.text('hello');
-    ui.text('hello');
-    ui.startHorizontal();
-    ui.text('a');
-    ui.text('b');
-    ui.text('c');
-    ui.endHorizontal();
-    ui.text('hello');
-    ui.text('hello');
-    ui.text('hello');
-    ui.text('hello');
-    ui.text('hello');
-    ui.text('hello');
     ui.endVertical();
   }
 

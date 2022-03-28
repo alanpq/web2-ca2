@@ -1,4 +1,4 @@
-import { lerp } from "./math.mjs";
+import { lerp } from "./mod.mjs";
 
 export default class Vector {
   constructor(x = 0, y = 0) {

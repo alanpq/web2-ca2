@@ -1,5 +1,5 @@
 import Vector from "./math/vector.mjs";
-import * as input from "./input.mjs";
+import * as input from "./input/mod.mjs";
 import { PHYSICS_INTER } from "./constants.mjs";
 
 export default class Player {

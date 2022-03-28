@@ -4,7 +4,7 @@ import Game from './modules/game.mjs';
 import Vector from './modules/math/vector.mjs';
 import Renderer from './modules/renderer.mjs';
 
-import * as input from './modules/input.mjs';
+import * as input from './modules/input/mod.mjs';
 
 const canvas = document.getElementById("canvas");
 const renderer = new Renderer(canvas);
