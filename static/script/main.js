@@ -28,5 +28,6 @@ spa.addEventListener("game", "open", async () => {
 spa.addEventListener("game", "close", () => {
   game.destroy();
 });
-spa.goto('game');
-renderer.conformToParent();
+spa.goto('game').then(() => {
+  renderer.conformToParent();
+})

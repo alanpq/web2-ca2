@@ -30,7 +30,6 @@ export default class Game {
   }
 
   start() {
-    this.#renderer.conformToParent();
   }
 
   destroy() {
