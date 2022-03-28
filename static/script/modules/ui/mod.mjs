@@ -49,7 +49,7 @@ export default class UI {
     color: "white",
   };
   get fontString () {
-    return `${font.size}${font.unit} ${font.family}`;
+    return `${this.font.size}${this.font.unit} ${this.font.family}`;
   }
 
   constructor(ctx) {
@@ -63,8 +63,8 @@ export default class UI {
    */
   text(text) {
     //TODO: multiline text
-    this.ctx.fillStyle = "white";
-    this.ctx.font = "20px monospace";
+    this.ctx.fillStyle = this.font.color;
+    this.ctx.font = this.fontString;
     const pctx = this.top();
     const metrics = this.ctx.measureText(text);
     const w = metrics.width + this.textPadding.left + this.textPadding.right;
