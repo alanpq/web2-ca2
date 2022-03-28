@@ -9,6 +9,8 @@ export default class Player {
 
   }
 
+  get position (){return this.#position;}
+
   tick(dt) {
     this.#position.x += input.axis("horizontal") * PHYSICS_INTER * 100;
     this.#position.y -= input.axis("vertical") * PHYSICS_INTER * 100;

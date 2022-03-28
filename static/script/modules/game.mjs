@@ -61,10 +61,6 @@ export default class Game {
   draw(dt, ctx) {
     this.#player
       .render(dt, ctx);
-
-    ctx.fillStyle="white";
-    const mouse = input.mouse();
-    ctx.fillRect(mouse.x - 5, mouse.y - 5, 10, 10);
   }
 
   /**
@@ -72,5 +68,6 @@ export default class Game {
    */
   tick() {
     this.#player.tick(PHYSICS_INTER);
+    this.#renderer.camera.position = this.#player.position;
   }
 }

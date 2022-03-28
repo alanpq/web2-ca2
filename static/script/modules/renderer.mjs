@@ -1,6 +1,7 @@
 import UI from './ui/mod.mjs';
 import * as input from './input/mod.mjs';
 import { PHYSICS_INTER } from './constants.mjs';
+import { Camera } from './camera.mjs';
 
 export default class Renderer {
   /** @type {HTMLCanvasElement} */
@@ -11,6 +12,8 @@ export default class Renderer {
   #h;
   get width() { return this.#w; }
   get height() { return this.#h; }
+
+  camera;
 
   /** @type {UI} */
   #ui;
@@ -32,6 +35,8 @@ export default class Renderer {
     this.#ctx = canvas.getContext('2d');
     this.#ui = new UI(this.#ctx);
 
+    this.camera = new Camera();
+
     window.addEventListener("resize", () => {
       this.conformToParent();
     });
@@ -49,12 +54,15 @@ export default class Renderer {
       this.#time -= PHYSICS_INTER; // consume time taken by the tick
       if(this.onTick) this.onTick(dt);
     }
+    this.#ctx.resetTransform();
     this.#ctx.fillStyle = "black";
     this.#ctx.fillRect(0,0, this.width, this.height);
     if(this.onUI) this.onUI(dt, this.#ui);
+    this.camera.setTransform(this.#ctx);
     if(this.onDraw) this.onDraw(dt, this.#ctx);
     this.#then = now;
     input.tick();
+    this.camera.tick(dt);
     window.requestAnimationFrame(this.#loop.bind(this));
   }
   
