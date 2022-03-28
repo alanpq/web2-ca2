@@ -2,7 +2,7 @@ import { FONTS, PHYSICS_INTER } from "./constants.mjs";
 import Player from "./player.mjs";
 import Renderer from "./renderer.mjs";
 
-import { World } from "./world.mjs";
+import { CHUNK_SIZE, TILE_SIZE, World } from "./world.mjs";
 
 
 export default class Game {
@@ -58,6 +58,7 @@ export default class Game {
     ui.font.family = FONTS.MONO;
     ui.startVertical();
     ui.text(`frametime: ${(dt*1000).toFixed(3)}`);
+    ui.text(`p: ${this.#player.position.toString()}`);
     ui.endVertical();
   }
 
@@ -68,6 +69,11 @@ export default class Game {
    */
   draw(dt, ctx) {
     this.#world.render(dt, ctx);
+    const tile = this.#world.probeTileFromWorld(this.#player.position.x, this.#player.position.y);
+    if(tile) {
+      ctx.fillStyle = "rgba(255,0,0,0.2)";
+      ctx.fillRect(tile.worldX*TILE_SIZE, tile.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
     this.#player
       .render(dt, ctx);
   }
