@@ -114,7 +114,7 @@ export default class UI {
     }
     this.ctx.fillStyle = this.font.color;
     this.ctx.font = this.fontString;
-    this.ctx.fillText(label, rect.left + this.font.size * 1.2, rect.top + mText.actualBoundingBoxAscent)
+    this.ctx.fillText(label, rect.left + this.font.size * 1.4, rect.top + mText.actualBoundingBoxAscent)
     if(parent.horizontal) {
       parent.height = Math.max(parent.height, rect.height);
       parent.width += rect.width;
