@@ -1,11 +1,11 @@
 import Vector from "../math/vector.mjs"
 import { CHUNK_AREA, CHUNK_SIZE, TILES, World } from "../world.mjs"
 
-const neighborMap = [
-  [-1, 0],
-  [1, 0],
+const horizontals = [
   [0, -1],
   [0, 1],
+  [-1, 0],
+  [1, 0],
 ];
 
 const diagonals = [
@@ -30,18 +30,6 @@ const heur = (a,b) => {
   // TODO: see if sqrMag or mag is better
 }
 
-const lowestFscore = (set) => {
-  let minScore = Number.POSITIVE_INFINITY;
-  let minN = -1;
-  for (const n of set.entries()) {
-    if(n[1] < minScore) {
-      minScore = n[1];
-      minN = n[0];
-    }
-  }
-  return minN;
-}
-
 const constructPath = (cameFrom, cur) => {
   const path = [cur];
   let c = cur + 0;
@@ -54,9 +42,23 @@ const constructPath = (cameFrom, cur) => {
 
 
 
+// manhatten distance
 const dist = (a, b) => {
-  // FIXME: implement
-  return Vector.sub(idxToPos(b),idxToPos(a)).magnitude;
+  const aa = idxToPos(a);
+  const bb = idxToPos(b);
+  return Math.abs(aa.x-bb.x) + Math.abs(aa.y-bb.y);
+}
+
+export const debug = {
+  order: {},
+  i: 0,
+  cameFrom: {},
+  gScore: {},
+  fScore: {},
+}
+
+export const drawDebug = (ctx) => {
+
 }
 
 /**
@@ -69,7 +71,7 @@ export const findPath = (world, a, b) => {
   // FIXME: implement cross-chunk pathing
   // FIXME: find the bug causing weird detours
   if(a.chunk != b.chunk) return console.error("Pathfinding does not yet work across chunks!");
-
+  if(b.tile != TILES.FLOOR) return null;
   const c = a.chunk;
 
   const aIdx = a.x + a.y * CHUNK_SIZE;
@@ -87,15 +89,19 @@ export const findPath = (world, a, b) => {
   gScore[aIdx] = 0;
 
   // undefined == infinity here
-  const fScore = {};
-  fScore[aIdx] = 0;
+  // estimated cost of total path if going through [n]
+  const fScore = {}; // fScore[n] = gScore[n] + dist(n, goal)
+  fScore[aIdx] = dist(aIdx, bIdx);
+
+  debug.i = 0;
+  debug.order = {};
 
   const neighborsOf = (tile) => {
     if(tile < 0 || tile >= CHUNK_AREA) return;
     // FIXME: implement
     const lst = [];
     const t = idxToPos(tile);
-    neighborMap.forEach(([xo, yo]) => {
+    horizontals.forEach(([xo, yo]) => {
       const n = xo + yo * CHUNK_SIZE;
       const x = t.x + xo;
       const y = t.y + yo;
@@ -117,34 +123,51 @@ export const findPath = (world, a, b) => {
       lst.push(tile+n);
     })
     return lst;
-    
+  }
+  const lowestFscore = (set) => {
+    let minScore = Number.POSITIVE_INFINITY;
+    let minN = -1;
+    for (const n of set.values()) {
+      if(fScore[n] < minScore) {
+        minScore = fScore[n];
+        minN = n;
+      }
+    }
+    console.debug(set, minN)
+    return minN;
   }
   let counter = 0;
   while (openSet.size > 0) {
     counter += 1;
-    if(counter > 500) {
+    if(counter > CHUNK_AREA * 4) {
       console.error('potential infinite loop!');
       break;
     }
     //TODO: use priority queue or min-heap to bring this down to O(logn)
     const cur = lowestFscore(openSet);
+    debug.cameFrom = cameFrom;
+    debug.fScore = fScore;
+    debug.gScore = gScore;
     if (cur == bIdx) return constructPath(cameFrom, cur);
 
     openSet.delete(cur);
     
     const neighbors = neighborsOf(cur, openSet);
     neighbors.forEach(neighbor => {
-      const cG = gScore[cur];
-      const d = dist(cur, neighbor);
-      const tentGScore = cG + d;
-      const nG = gScore[neighbor] == undefined ? Number.POSITIVE_INFINITY : gScore[neighbor];
-      if (tentGScore < nG ) {
+      const tentGScore = gScore[cur] + 1;//dist(cur, neighbor);
+      if (gScore[neighbor] == undefined || tentGScore < gScore[neighbor] ) {
+        if(!debug.order[neighbor])
+          debug.order[neighbor] = debug.i;
+        debug.i += 1;
         cameFrom[neighbor] = cur;
         gScore[neighbor] = tentGScore;
-        fScore[neighbor] = tentGScore + heur(aIdx, neighbor);
-        if(!openSet.has(neighbor)) openSet.add(neighbor);
+        fScore[neighbor] = tentGScore + dist(neighbor, bIdx);
+        openSet.add(neighbor);
       }
     })
   }
+  debug.cameFrom = cameFrom;
+  debug.fScore = fScore;
+  debug.gScore = gScore;
   return null;
 }

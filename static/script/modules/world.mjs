@@ -1,4 +1,4 @@
-export const CHUNK_SIZE = 10;
+export const CHUNK_SIZE = 30;
 export const CHUNK_AREA = CHUNK_SIZE*CHUNK_SIZE;
 
 export const TILE_SIZE = 32;
@@ -120,7 +120,7 @@ class Chunk {
     this.y = y;
 
     for(let i = 0; i < CHUNK_AREA; i++) {
-      this.#map[i] = TILES.FLOOR + (Math.random() < 0.1);
+      this.#map[i] = TILES.FLOOR + (Math.random() < 0.2);
     }
   }
   /**
