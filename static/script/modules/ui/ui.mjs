@@ -76,12 +76,12 @@ export default class UI {
    * @param {string} text 
    */
   text(text) {
-    this.ctx.save();
-    //TODO: multiline text
     const parent = this.top();
+    this.ctx.save();
     this.#prepareFont();
+    //TODO: multiline text
     const mText = this.ctx.measureText(text);
-    const rect = parent.computeWidgetRect(
+    const rect = parent.computeWidgetRect( // TODO: think widget rect should be actual bounding box, clip rect should be its own thing
       mText.width + this.textPadding.left + this.textPadding.right,
       mText.actualBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top + this.textPadding.bottom,
     );
@@ -103,13 +103,17 @@ export default class UI {
    * @returns {boolean}
    */
   checkbox(value, label) {
-    this.ctx.save();
     const parent = this.top();
+    this.ctx.save();
+    this.#prepareFont();
+    
+    const padding = this.font.size * 0.2;
     const mText = this.ctx.measureText(label);
     const rect = parent.computeWidgetRect(
-      this.font.size + 5 + mText.width,
-      this.font.size * 1.1,
+      this.font.size + padding*3 + mText.width,
+      this.font.size + padding*2,
     );
+    this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
     this.#clipRect(rect);
     const hit = rect.containsPoint(input.mouse());
     input.setMouseEat(hit);
@@ -118,21 +122,22 @@ export default class UI {
     this.ctx.strokeStyle = "#302f30";
     this.ctx.lineWidth = 0.5;
 
-    const box = new Vector(rect.left + this.font.size * 0.1, rect.top);
+    const box = new Vector(rect.left + padding, rect.top + padding);
     this.ctx.fillRect  (box.x, box.y, this.font.size, this.font.size);
     this.ctx.strokeRect(box.x, box.y, this.font.size, this.font.size);
 
     if(value) {
+      const tickPadding = this.font.size*0.25;
       this.ctx.fillStyle = "#1B1B1B";
-      const padding = this.font.size*0.25;
-      this.ctx.fillRect(box.x+padding, box.y+padding, this.font.size-padding*2, this.font.size-padding*2);
+      this.ctx.fillRect(box.x+tickPadding, box.y+tickPadding,
+                        this.font.size-tickPadding*2, this.font.size-tickPadding*2);
     }
 
-    this.#prepareFont();
+    this.ctx.fillStyle = this.font.color;
     this.ctx.fillText(
       label,
-      rect.left + this.font.size * 1.4,
-      rect.top + mText.actualBoundingBoxAscent,
+      box.x + this.font.size + padding,
+      rect.top + mText.actualBoundingBoxAscent + padding,
     );
 
     parent.expand(rect);
