@@ -10,6 +10,9 @@ export default class Vector {
     return `(${this.x}, ${this.y})`;
   }
 
+  static zero = new Vector();
+  static one = new Vector(1,1);
+
   /** Get the square magnitude of the vector.
    * @returns {number}
    */
@@ -23,7 +26,7 @@ export default class Vector {
     return Math.sqrt(this.sqrMagnitude);
   }
 
-  get clone() {
+  clone() {
     return new Vector(this.x, this.y);
   }
 
@@ -97,6 +100,14 @@ export default class Vector {
     this.x *= v;
     this.y *= v;
     return this;
+  }
+  /**
+   * Returns v * n
+   * @param {Vector} v Vector to multiply.
+   * @param {number} n Scalar to multiply.
+   */
+   static mul(v, n) {
+    return new Vector(v.x*n, v.y*n);
   }
 
 }
