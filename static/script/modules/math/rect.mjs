@@ -10,6 +10,10 @@ export default class Rect {
     this.#height = height;
   }
 
+  toString() {
+    return `Rect:((${this.#left}, ${this.#top}), ${this.#width}x${this.#height})`;
+  }
+
   get top() {return this.#top}
   get right() {return this.#left + this.#width}
   get bottom() {return this.#top + this.#height}
