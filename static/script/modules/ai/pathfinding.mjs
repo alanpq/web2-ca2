@@ -125,7 +125,6 @@ export const findPath = (world, a, b) => {
         minN = n;
       }
     }
-    console.debug(set, minN)
     return minN;
   }
   let counter = 0;

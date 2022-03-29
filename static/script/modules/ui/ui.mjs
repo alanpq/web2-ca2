@@ -129,6 +129,7 @@ export default class UI {
       this.font.size * 1.1,
     );
     const hit = rect.containsPoint(input.mouse());
+    input.setMouseEat(hit);
     this.ctx.fillStyle = hit ? "#C5C5C5": "#F3F3F3";
     this.ctx.strokeStyle = "#302f30";
     this.ctx.lineWidth = 0.5;
@@ -145,7 +146,7 @@ export default class UI {
     this.ctx.fillText(label, rect.left + this.font.size * 1.4, rect.top + mText.actualBoundingBoxAscent);
 
     expandPositioningContext(parent, rect);
-    return value ^ (hit && input.leftMouseDown());
+    return value ^ (hit && input.leftMouseDown(true));
   }
 
   startVertical() {

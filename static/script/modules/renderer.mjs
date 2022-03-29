@@ -23,6 +23,7 @@ export default class Renderer {
   #time = 0; // time collector to be eaten by physics tick
   onDraw;
   onTick;
+  onPhysics;
   onUI;
   /**
    * @param {HTMLCanvasElement} canvas 
@@ -43,10 +44,11 @@ export default class Renderer {
     window.requestAnimationFrame(this.#loop.bind(this));
   }
 
-  listen(draw, tick, ui) {
+  listen(draw, ui, tick, physics) {
     this.onDraw = draw;
-    this.onTick = tick;
     this.onUI = ui;
+    this.onTick = tick;
+    this.onPhysics = physics;
   }
 
   #loop(now) {
@@ -58,7 +60,7 @@ export default class Renderer {
     // has enough time passed for physics tick?
     if (this.#time > PHYSICS_INTER) {
       this.#time -= PHYSICS_INTER; // consume time taken by the tick
-      if(this.onTick) this.onTick(PHYSICS_INTER);
+      if(this.onPhysics) this.onPhysics(PHYSICS_INTER);
     }
     this.#ctx.resetTransform();
     this.#ctx.fillStyle = "black";
@@ -68,6 +70,7 @@ export default class Renderer {
     this.#ctx.resetTransform();
     if(this.onUI) this.onUI(dt, this.#ui);
 
+    if(this.onTick) this.onTick(dt);
 
     this.camera.tick(dt);
     input.tick();

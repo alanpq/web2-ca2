@@ -75,8 +75,9 @@ export default class Game {
 
     this.#renderer.listen(
       (dt, ctx) => {this.draw(dt, ctx)},
-      (dt) => {this.tick(dt)},
       (dt, ui) => {this.ui(dt, ui)},
+      (dt) => {this.tick(dt)},
+      (dt) => {this.physics(dt)},
     )
   }
 
@@ -128,19 +129,8 @@ export default class Game {
   */
   draw(dt, ctx) {
     this.#world.render(dt, ctx);
-    
-    this.#a = this.#world.probeTileFromWorld(this.#player.position);
-    this.#b = this.#world.probeTileFromWorld(this.#renderer.camera.screenToWorld(input.mouse()))
 
-    if(input.leftMouseDown()) {
-      this.#path = findPath(this.#world, this.#a, this.#b);
-      console.debug(this.#path);
-    }
-    if(input.rightMouseDown()) {
-      this.#neighborSrc = this.#b;
-      this.#neighbors = neighborsOf(this.#b.x + this.#b.y*CHUNK_SIZE, this.#b.chunk);
-      console.debug(ctx.fillStyle);
-    }
+    
     if(this.#neighborSrc != null) {
       ctx.fillStyle = "rgba(255,255,0,0.2)";
       for(const n of this.#neighbors) {
@@ -197,7 +187,7 @@ export default class Game {
       ctx.fillStyle = "rgba(255,0,0,0.2)";
       ctx.fillRect(this.#a.worldX*TILE_SIZE, this.#a.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
-    if(this.#b) {
+    if(this.#b && !input.isMouseEaten()) {
       ctx.fillStyle = "rgba(0,0,255,0.2)";
       ctx.fillRect(this.#b.worldX*TILE_SIZE, this.#b.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
@@ -207,10 +197,25 @@ export default class Game {
   }
 
   /**
-   * Do a physics tick.
+   * Do a tick.
    */
   tick(dt) {
-    this.#player.tick(PHYSICS_INTER);
+    this.#a = this.#world.probeTileFromWorld(this.#player.position);
+    this.#b = this.#world.probeTileFromWorld(this.#renderer.camera.screenToWorld(input.mouse()))
+    if(input.leftMouseDown()) {
+      this.#path = findPath(this.#world, this.#a, this.#b);
+    }
+    if(input.rightMouseDown()) {
+      this.#neighborSrc = this.#b;
+      this.#neighbors = neighborsOf(this.#b.x + this.#b.y*CHUNK_SIZE, this.#b.chunk);
+    }
+
     this.#renderer.camera.position = this.#player.position;
+  }
+  /**
+   * Do a fixed rate physics tick.
+   */
+  physics(dt) {
+    this.#player.tick(dt);
   }
 }

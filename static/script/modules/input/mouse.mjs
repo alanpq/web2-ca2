@@ -7,6 +7,7 @@ const mouseState = {
   pos: new Vector(),
   left: 0,
   right: 0,
+  eaten: false, // hack: whether the mouse has been eaten (used by the ui)
 };
 /** mouse state that should be applied just before the next frame */
 let futureMouseState = {left: false, right: false};
@@ -47,31 +48,39 @@ export const tick = () => {
   futureMouseState = {left: null, right: null};
 }
 
+export const setMouseEat = (eaten) => {
+  mouseState.eaten = eaten;
+}
+
+export const isMouseEaten = () => mouseState.eaten;
+
 /** Get current mouse position */
 export const mouse = () => {
   return mouseState.pos;
 }
 /** Get if left mouse button is held */
-export const leftMouse = () => {
-  return mouseState.left > 1;
+export const leftMouse = (ignoreEat = false) => {
+  return (mouseState.left > 1) && (!mouseState.eaten ^ ignoreEat);
 }
 /** Get if right mouse button is held */
-export const rightMouse = () => {
-  return mouseState.right > 1;
+export const rightMouse = (ignoreEat = false) => {
+  return (mouseState.right > 1) && (!mouseState.eaten ^ ignoreEat);
 }
 /** Get if left mouse button has just been pressed */
-export const leftMouseDown = () => {
-  return mouseState.left == 3;
+export const leftMouseDown = (ignoreEat = false) => {
+  if((mouseState.left == 3))
+    console.log(mouseState);
+  return (mouseState.left == 3) && (!mouseState.eaten ^ ignoreEat);
 }
 /** Get if right mouse button has just been pressed */
-export const rightMouseDown = () => {
-  return mouseState.right == 3;
+export const rightMouseDown = (ignoreEat = false) => {
+  return (mouseState.right == 3) && (!mouseState.eaten ^ ignoreEat);
 }
 /** Get if left mouse button has just been released */
-export const leftMouseUp = () => {
-  return mouseState.left == 1;
+export const leftMouseUp = (ignoreEat = false) => {
+  return (mouseState.left == 1) && (!mouseState.eaten ^ ignoreEat);
 }
 /** Get if right mouse button has just been released */
-export const rightMouseUp = () => {
-  return mouseState.right == 1;
+export const rightMouseUp = (ignoreEat = false) => {
+  return (mouseState.right == 1) && (!mouseState.eaten ^ ignoreEat);
 }
