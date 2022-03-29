@@ -15,20 +15,12 @@ const diagonals = [
   [-1, 1],
 ];
 
-// a* implemented with the help of https://en.wikipedia.org/wiki/A*_search_algorithm
-
 /**
  * 
  * @param {number} idx 
  * @returns {Vector}
  */
 export const idxToPos = (idx) => new Vector(idx % CHUNK_SIZE, Math.floor(idx / CHUNK_SIZE));
-
-// a* heuristic
-const heur = (a,b) => {
-  return Vector.sub(idxToPos(b),idxToPos(a)).magnitude;
-  // TODO: see if sqrMag or mag is better
-}
 
 const constructPath = (cameFrom, cur) => {
   const path = [cur];
@@ -40,9 +32,8 @@ const constructPath = (cameFrom, cur) => {
   return path;
 }
 
-
-
 // manhatten distance
+// TODO: investigate octile distance
 const dist = (a, b) => {
   const aa = idxToPos(a);
   const bb = idxToPos(b);
@@ -61,6 +52,7 @@ export const drawDebug = (ctx) => {
 
 }
 
+// a* implemented with the help of https://en.wikipedia.org/wiki/A*_search_algorithm
 /**
  * Find the shortest path between two tiles.
  * @param {World} world
@@ -69,7 +61,7 @@ export const drawDebug = (ctx) => {
  */
 export const findPath = (world, a, b) => {
   // FIXME: implement cross-chunk pathing
-  // FIXME: find the bug causing weird detours
+  // TODO: do bi-directional pathing to exit impossible paths earlier
   if(a.chunk != b.chunk) return console.error("Pathfinding does not yet work across chunks!");
   if(b.tile != TILES.FLOOR) return null;
   const c = a.chunk;
