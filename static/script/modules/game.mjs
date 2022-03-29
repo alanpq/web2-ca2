@@ -8,49 +8,7 @@ import { CHUNK_AREA, CHUNK_SIZE, TILES, TILE_SIZE, World } from "./world.mjs";
 import { debug, findPath, idxToPos } from "./ai/pathfinding.mjs";
 import Vector from "./math/vector.mjs";
 import UI from './ui/ui.mjs';
-
-const horizontals = [
-  [0, -1],
-  [0, 1],
-  [-1, 0],
-  [1, 0],
-];
-
-const diagonals = [
-  [-1, -1],
-  [1, 1],
-  [1, -1],
-  [-1, 1],
-];
-
-const neighborsOf = (tile,c) => {
-  if(tile < 0 || tile >= CHUNK_AREA) return;
-  // FIXME: implement
-  const lst = [];
-  const t = idxToPos(tile);
-  horizontals.forEach(([xo, yo]) => {
-    const n = xo + yo * CHUNK_SIZE;
-    const x = t.x + xo;
-    const y = t.y + yo;
-    if(x < 0 || x >= CHUNK_SIZE) return;
-    if(y < 0 || y >= CHUNK_SIZE) return;
-    if(c.getTile(x, y) == TILES.WALL) return;
-    lst.push(tile+n);
-  });
-  // diagonals.forEach(([xo, yo]) => {
-  //   const n = xo + yo * CHUNK_SIZE;
-  //   const x = t.x + xo;
-  //   const y = t.y + yo;
-  //   if(x < 0 || x >= CHUNK_SIZE) return;
-  //   if(y < 0 || y >= CHUNK_SIZE) return;
-  //   if(c.getTile(x, y) == TILES.WALL) return;
-  //   if(c.getTile(x, t.y) == TILES.WALL && c.getTile(t.x, y) == TILES.WALL) {
-  //     return;
-  //   }
-  //   lst.push(tile+n);
-  // })
-  return lst;
-}
+import Rect from "./math/rect.mjs";
 
 export default class Game {
   #loaded = false;
@@ -107,11 +65,15 @@ export default class Game {
   ui(dt, ui) { 
     ui.font.color = "white";
     ui.font.family = FONTS.MONO;
+    ui.startArea(new Rect(
+      50, 50, 50, 50,
+    ));
     ui.startVertical();
     ui.text(`frametime: ${(dt*1000).toFixed(3)}`);
     ui.text(`p: ${this.#player.position.toString()}`);
     this.#debug = ui.checkbox(this.#debug, "pathfinding debug mode");
     ui.endVertical();
+    ui.endArea();
   }
 
   
@@ -120,8 +82,6 @@ export default class Game {
   /** @type {import("./world.mjs").DetailedTile} */
   #b;
   #path;
-  #neighbors = [];
-  #neighborSrc = null;
   /**
   * Render a frame.
   * @param {number} dt
@@ -129,15 +89,6 @@ export default class Game {
   */
   draw(dt, ctx) {
     this.#world.render(dt, ctx);
-
-    
-    if(this.#neighborSrc != null) {
-      ctx.fillStyle = "rgba(255,255,0,0.2)";
-      for(const n of this.#neighbors) {
-        const p = idxToPos(n);
-        ctx.fillRect(p.x*TILE_SIZE, p.y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
-      }
-    }
 
     if(this.#path) {
       const off = new Vector(this.#a.chunk.x + 0.5, this.#a.chunk.y + 0.5);
@@ -204,10 +155,6 @@ export default class Game {
     this.#b = this.#world.probeTileFromWorld(this.#renderer.camera.screenToWorld(input.mouse()))
     if(input.leftMouseDown()) {
       this.#path = findPath(this.#world, this.#a, this.#b);
-    }
-    if(input.rightMouseDown()) {
-      this.#neighborSrc = this.#b;
-      this.#neighbors = neighborsOf(this.#b.x + this.#b.y*CHUNK_SIZE, this.#b.chunk);
     }
 
     this.#renderer.camera.position = this.#player.position;

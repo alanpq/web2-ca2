@@ -90,7 +90,6 @@ export const findPath = (world, a, b) => {
 
   const neighborsOf = (tile) => {
     if(tile < 0 || tile >= CHUNK_AREA) return;
-    // FIXME: implement
     const lst = [];
     const t = idxToPos(tile);
     horizontals.forEach(([xo, yo]) => {
