@@ -68,8 +68,6 @@ export const rightMouse = (ignoreEat = false) => {
 }
 /** Get if left mouse button has just been pressed */
 export const leftMouseDown = (ignoreEat = false) => {
-  if((mouseState.left == 3))
-    console.log(mouseState);
   return (mouseState.left == 3) && (!mouseState.eaten ^ ignoreEat);
 }
 /** Get if right mouse button has just been pressed */
