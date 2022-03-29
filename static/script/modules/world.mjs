@@ -1,3 +1,4 @@
+'use strict';
 export const CHUNK_SIZE = 30;
 export const CHUNK_AREA = CHUNK_SIZE*CHUNK_SIZE;
 

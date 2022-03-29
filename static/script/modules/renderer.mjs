@@ -1,3 +1,4 @@
+'use strict';
 import UI from './ui/ui.mjs';
 import * as input from './input/mod.mjs';
 import { PHYSICS_INTER } from './constants.mjs';

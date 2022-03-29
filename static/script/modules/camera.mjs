@@ -1,3 +1,4 @@
+'use strict';
 import Vector from "./math/vector.mjs";
 
 export class Camera {

@@ -1,3 +1,4 @@
+'use strict';
 export {button, buttonDown, buttonUp} from "./keyboard.mjs";
 export {
   setMouseEat, isMouseEaten,

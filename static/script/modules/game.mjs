@@ -1,5 +1,6 @@
+'use strict';
 import { FONTS, PHYSICS_INTER } from "./constants.mjs";
-import Player from "./player.mjs";
+import Player from "./player/player.mjs";
 import Renderer from "./renderer.mjs";
 
 import * as input from './input/mod.mjs';

@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Interpolate between a and b. NOTE: at t=1, floating point error will make the result != b.
  * @param {number} a

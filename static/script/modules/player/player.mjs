@@ -1,12 +1,16 @@
-import Vector from "./math/vector.mjs";
-import * as input from "./input/mod.mjs";
-import { PHYSICS_INTER } from "./constants.mjs";
+'use strict';
+import Vector from "../math/vector.mjs";
+import * as input from "../input/mod.mjs";
+import { PHYSICS_INTER } from "../constants.mjs";
+import { Flags, registerDebug } from "../ui/debug.mjs";
+
+import * as debug from './debug.mjs';
 
 export default class Player {
   #virtualPos = new Vector(); // virtual position for interpolation
   #position = new Vector();
   constructor () {
-
+    registerDebug(Flags.PLAYER, "draw", debug.draw.bind(this));
   }
 
   get position (){return this.#position;}

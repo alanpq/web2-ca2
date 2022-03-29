@@ -1,3 +1,4 @@
+'use strict';
 import * as spa from './modules/spa.mjs';
 import Game from './modules/game.mjs';
 

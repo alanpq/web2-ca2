@@ -1,3 +1,4 @@
+'use strict';
 /** Physics tick rate, in hz */
 export const PHYSICS_RATE = 20;
 /** Physics tick interval, in seconds */

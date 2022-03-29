@@ -1,3 +1,4 @@
+'use strict';
 import * as input from '../../input/mod.mjs';
 import Vector from '../../math/vector.mjs';
 import { TILE_SIZE } from '../../world.mjs';

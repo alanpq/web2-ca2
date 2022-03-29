@@ -1,3 +1,4 @@
+'use strict';
 import Vector from "../../math/vector.mjs"
 import { CHUNK_AREA, CHUNK_SIZE, TILES, World } from "../../world.mjs"
 import { state } from "./debug.mjs";

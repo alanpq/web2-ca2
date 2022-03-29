@@ -1,4 +1,4 @@
-
+'use strict';
 
 import Rect from "../math/rect.mjs";
 import Vector from "../math/vector.mjs";

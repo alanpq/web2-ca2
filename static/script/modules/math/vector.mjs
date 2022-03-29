@@ -1,3 +1,4 @@
+'use strict';
 import { lerp } from "./mod.mjs";
 
 export default class Vector {

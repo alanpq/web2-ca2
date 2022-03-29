@@ -1,3 +1,4 @@
+'use strict';
 // super basic ui inspired by imgui
 
 import Rect from "../math/rect.mjs";

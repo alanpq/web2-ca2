@@ -1,3 +1,4 @@
+'use strict';
 import { buttons } from "./mod.mjs";
 /**
  * @typedef Button

@@ -1,3 +1,4 @@
+'use strict';
 import { FONTS } from "../constants.mjs";
 import Rect from "../math/rect.mjs";
 import UI from "./ui.mjs";
