@@ -5,10 +5,11 @@ import Renderer from "./renderer.mjs";
 import * as input from './input/mod.mjs';
 
 import { CHUNK_AREA, CHUNK_SIZE, TILES, TILE_SIZE, World } from "./world.mjs";
-import { debug, findPath, idxToPos } from "./ai/pathfinding.mjs";
+import * as pathfinding from "./ai/pathfinding/pathfinding.mjs";
 import Vector from "./math/vector.mjs";
 import UI from './ui/ui.mjs';
 import Rect from "./math/rect.mjs";
+import { ui, setFlag, getFlag, registerDebug, Flags } from "./ui/debug.mjs";
 
 export default class Game {
   #loaded = false;
@@ -30,6 +31,9 @@ export default class Game {
     this.#renderer.camera.position = this.#player.position;
     this.#world = new World();
 
+    pathfinding.debug.state.world = this.#world;
+    pathfinding.debug.state.renderer = this.#renderer;
+
 
     this.#renderer.listen(
       (dt, ctx) => {this.draw(dt, ctx)},
@@ -44,6 +48,8 @@ export default class Game {
     console.debug("Loading game...");
 
     this.#loaded = true;
+    registerDebug(Flags.PATHFINDING, "draw", pathfinding.debug.draw);
+    registerDebug(Flags.PATHFINDING, "tick", pathfinding.debug.tick);
   }
 
   start() {
@@ -56,24 +62,26 @@ export default class Game {
 
   ////// ACTUAL GAME STUFF
 
-  #debug = false;
+  #debug = true; // FIXME: make this false by default before prod
   /**
    * 
    * @param {number} dt Deltatime in seconds
    * @param {UI} ui UI Object
    */
-  ui(dt, ui) { 
-    ui.font.color = "white";
-    ui.font.family = FONTS.MONO;
-    ui.startArea(new Rect(
-      50, 50, 500, 50,
-    ));
-    ui.startVertical();
-    ui.text(`frametime: ${(dt*1000).toFixed(3)}`);
-    ui.text(`p: ${this.#player.position.toString()}`);
-    this.#debug = ui.checkbox(this.#debug, "pathfinding debug mode");
-    ui.endVertical();
-    ui.endArea();
+  ui(dt, ui) {
+    // debugMenu(dt, ui);
+
+    if(this.#debug) {
+      ui.font.color = "white";
+      ui.font.family = FONTS.MONO;
+      ui.startArea(new Rect(0,0, ui.ctx.canvas.width, ui.ctx.canvas.height));
+      ui.startVertical();
+      ui.text(`frametime: ${(dt*1000).toFixed(3)}`);
+      ui.text(`p: ${this.#player.position.toString()}`);
+      setFlag(Flags.PATHFINDING, ui.checkbox(getFlag(Flags.PATHFINDING), "pathfinding debug mode"));
+      ui.endVertical();
+      ui.endArea();
+    }
   }
 
   
@@ -89,59 +97,6 @@ export default class Game {
   */
   draw(dt, ctx) {
     this.#world.render(dt, ctx);
-
-    if(this.#path) {
-      const off = new Vector(this.#a.chunk.x + 0.5, this.#a.chunk.y + 0.5);
-      const half_tile = TILE_SIZE/2;
-      Object.entries(debug.order).forEach(([k,v]) => {
-        const aa = idxToPos(k).mul(TILE_SIZE);
-        const bb = idxToPos(v).mul(TILE_SIZE);
-        ctx.fillStyle = `rgba(255, ${Math.floor((1 - (v / debug.i))*255)}, 0, .2)`; // 0 - 140
-        ctx.fillRect(aa.x, aa.y, TILE_SIZE, TILE_SIZE);
-      });
-      Object.entries(debug.gScore).forEach(([k,v]) => {
-        const aa = idxToPos(k).mul(TILE_SIZE);
-        ctx.font = "10px monospace";
-        ctx.fillStyle = "black"; // 0 - 140
-        ctx.fillText(v, aa.x, aa.y+10);
-      });
-      Object.entries(debug.fScore).forEach(([k,v]) => {
-        const aa = idxToPos(k).mul(TILE_SIZE);
-        ctx.font = "10px monospace";
-        ctx.fillStyle = "gray"; // 0 - 140
-        const metrics = ctx.measureText(v);
-        ctx.fillText(v, aa.x, aa.y+TILE_SIZE-2);
-      });
-      Object.entries(debug.cameFrom).forEach(([k, v]) => {
-        if(v == null) return;
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "blue";
-        ctx.beginPath();
-        const aa = idxToPos(k).add(off).mul(TILE_SIZE);
-        const bb = idxToPos(v).add(off).mul(TILE_SIZE);
-        ctx.moveTo(aa.x, aa.y);
-        ctx.lineTo(bb.x, bb.y);
-        ctx.stroke();
-      });
-      for(let i = this.#path.length-1; i >= 1; i--) {
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "green";
-        ctx.beginPath();
-        const aa = idxToPos(this.#path[i]).add(off).mul(TILE_SIZE);
-        const bb = idxToPos(this.#path[i-1]).add(off).mul(TILE_SIZE);
-        ctx.moveTo(aa.x, aa.y);
-        ctx.lineTo(bb.x, bb.y);
-        ctx.stroke();
-      }
-    }
-    if(this.#a) {
-      ctx.fillStyle = "rgba(255,0,0,0.2)";
-      ctx.fillRect(this.#a.worldX*TILE_SIZE, this.#a.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-    if(this.#b && !input.isMouseEaten()) {
-      ctx.fillStyle = "rgba(0,0,255,0.2)";
-      ctx.fillRect(this.#b.worldX*TILE_SIZE, this.#b.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
     
     this.#player
       .render(dt, ctx);
@@ -151,10 +106,8 @@ export default class Game {
    * Do a tick.
    */
   tick(dt) {
-    this.#a = this.#world.probeTileFromWorld(this.#player.position);
-    this.#b = this.#world.probeTileFromWorld(this.#renderer.camera.screenToWorld(input.mouse()))
-    if(input.leftMouseDown()) {
-      this.#path = findPath(this.#world, this.#a, this.#b);
+    if(input.buttonDown("debug")) {
+      this.#debug ^= true;
     }
 
     this.#renderer.camera.position = this.#player.position;

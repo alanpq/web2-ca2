@@ -1,5 +1,8 @@
-import Vector from "../math/vector.mjs"
-import { CHUNK_AREA, CHUNK_SIZE, TILES, World } from "../world.mjs"
+import Vector from "../../math/vector.mjs"
+import { CHUNK_AREA, CHUNK_SIZE, TILES, World } from "../../world.mjs"
+import { state } from "./debug.mjs";
+
+export * as debug from './debug.mjs';
 
 const horizontals = [
   [0, -1],
@@ -40,24 +43,12 @@ const dist = (a, b) => {
   return Math.abs(aa.x-bb.x) + Math.abs(aa.y-bb.y);
 }
 
-export const debug = {
-  order: {},
-  i: 0,
-  cameFrom: {},
-  gScore: {},
-  fScore: {},
-}
-
-export const drawDebug = (ctx) => {
-
-}
-
 // a* implemented with the help of https://en.wikipedia.org/wiki/A*_search_algorithm
 /**
  * Find the shortest path between two tiles.
  * @param {World} world
- * @param {import("../world.mjs").DetailedTile} a 
- * @param {import("../world.mjs").DetailedTile} b 
+ * @param {import("../../world.mjs").DetailedTile} a 
+ * @param {import("../../world.mjs").DetailedTile} b 
  */
 export const findPath = (world, a, b) => {
   // FIXME: implement cross-chunk pathing
@@ -85,8 +76,8 @@ export const findPath = (world, a, b) => {
   const fScore = {}; // fScore[n] = gScore[n] + dist(n, goal)
   fScore[aIdx] = dist(aIdx, bIdx);
 
-  debug.i = 0;
-  debug.order = {};
+  state.i = 0;
+  state.order = {};
 
   const neighborsOf = (tile) => {
     if(tile < 0 || tile >= CHUNK_AREA) return;
@@ -135,9 +126,9 @@ export const findPath = (world, a, b) => {
     }
     //TODO: use priority queue or min-heap to bring this down to O(logn)
     const cur = lowestFscore(openSet);
-    debug.cameFrom = cameFrom;
-    debug.fScore = fScore;
-    debug.gScore = gScore;
+    state.cameFrom = cameFrom;
+    state.fScore = fScore;
+    state.gScore = gScore;
     if (cur == bIdx) return constructPath(cameFrom, cur);
 
     openSet.delete(cur);
@@ -146,9 +137,9 @@ export const findPath = (world, a, b) => {
     neighbors.forEach(neighbor => {
       const tentGScore = gScore[cur] + 1;//dist(cur, neighbor);
       if (gScore[neighbor] == undefined || tentGScore < gScore[neighbor] ) {
-        if(!debug.order[neighbor])
-          debug.order[neighbor] = debug.i;
-        debug.i += 1;
+        if(!state.order[neighbor])
+          state.order[neighbor] = state.i;
+        state.i += 1;
         cameFrom[neighbor] = cur;
         gScore[neighbor] = tentGScore;
         fScore[neighbor] = tentGScore + dist(neighbor, bIdx);
@@ -156,8 +147,8 @@ export const findPath = (world, a, b) => {
       }
     })
   }
-  debug.cameFrom = cameFrom;
-  debug.fScore = fScore;
-  debug.gScore = gScore;
+  state.cameFrom = cameFrom;
+  state.fScore = fScore;
+  state.gScore = gScore;
   return null;
 }

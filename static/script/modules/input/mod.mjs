@@ -21,6 +21,7 @@ export const buttons = {
   "left": {state: 0, keys: ["a"]},
   "down": {state: 0, keys: ["s"]},
   "right": {state: 0, keys: ["d"]},
+  "debug": {state: 0, keys: ["`"]},
 }
 
 const axes = {

@@ -2,7 +2,7 @@ import UI from './ui/ui.mjs';
 import * as input from './input/mod.mjs';
 import { PHYSICS_INTER } from './constants.mjs';
 import { Camera } from './camera.mjs';
-
+import * as debug from './ui/debug.mjs';
 export default class Renderer {
   /** @type {HTMLCanvasElement} */
   #canvas;
@@ -67,10 +67,14 @@ export default class Renderer {
     this.#ctx.fillRect(0,0, this.width, this.height);
     this.camera.setTransform(this.#ctx);
     if(this.onDraw) this.onDraw(dt, this.#ctx);
+    debug.draw(dt, this.#ctx);
+    
     this.#ctx.resetTransform();
     if(this.onUI) this.onUI(dt, this.#ui);
+    debug.ui(dt, this.#ui);
 
     if(this.onTick) this.onTick(dt);
+    debug.tick(dt);
 
     this.camera.tick(dt);
     input.tick();
