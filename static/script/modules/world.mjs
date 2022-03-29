@@ -1,5 +1,5 @@
 'use strict';
-export const CHUNK_SIZE = 30;
+export const CHUNK_SIZE = 20;
 export const CHUNK_AREA = CHUNK_SIZE*CHUNK_SIZE;
 
 export const TILE_SIZE = 32;
