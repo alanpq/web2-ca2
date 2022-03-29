@@ -173,6 +173,7 @@ export default class Game {
       });
       Object.entries(debug.cameFrom).forEach(([k, v]) => {
         if(v == null) return;
+        ctx.lineWidth = 1;
         ctx.strokeStyle = "blue";
         ctx.beginPath();
         const aa = idxToPos(k).add(off).mul(TILE_SIZE);
@@ -182,6 +183,7 @@ export default class Game {
         ctx.stroke();
       });
       for(let i = this.#path.length-1; i >= 1; i--) {
+        ctx.lineWidth = 2;
         ctx.strokeStyle = "green";
         ctx.beginPath();
         const aa = idxToPos(this.#path[i]).add(off).mul(TILE_SIZE);
