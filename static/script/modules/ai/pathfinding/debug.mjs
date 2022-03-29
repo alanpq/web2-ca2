@@ -74,8 +74,14 @@ export const draw = (dt, ctx) => {
     ctx.fillStyle = "rgba(255,0,0,0.2)";
     ctx.fillRect(state.a.worldX*TILE_SIZE, state.a.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
-  if(state.b && !input.isMouseEaten()) {
+  if(state.b) {
     ctx.fillStyle = "rgba(0,0,255,0.2)";
     ctx.fillRect(state.b.worldX*TILE_SIZE, state.b.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  }
+
+  const t = state.world.probeTileFromWorld(state.renderer.camera.screenToWorld(input.mouse()));
+  if(t && !input.isMouseEaten()) {
+    ctx.fillStyle = "rgba(255,255,255,0.2)";
+    ctx.fillRect(t.worldX*TILE_SIZE, t.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 }
