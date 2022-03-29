@@ -61,7 +61,7 @@ export default class UI {
   }
 
   /**
-   * 
+   * Draw a line of text.
    * @param {CanvasRenderingContext2D} ctx 
    * @param {string} text 
    */
@@ -87,7 +87,7 @@ export default class UI {
   }
 
   /**
-   * 
+   * Draw a checkbox.
    * @param {boolean} value Whether the checkbox is checked
    * @param {string} label The text label
    * @returns {boolean}
