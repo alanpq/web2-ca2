@@ -63,9 +63,10 @@ export default class Renderer {
     this.#ctx.resetTransform();
     this.#ctx.fillStyle = "black";
     this.#ctx.fillRect(0,0, this.width, this.height);
-    if(this.onUI) this.onUI(dt, this.#ui);
     this.camera.setTransform(this.#ctx);
     if(this.onDraw) this.onDraw(dt, this.#ctx);
+    this.#ctx.resetTransform();
+    if(this.onUI) this.onUI(dt, this.#ui);
 
 
     this.camera.tick(dt);
