@@ -78,7 +78,10 @@ export default class Game {
       ui.startVertical();
       ui.text(`frametime: ${(dt*1000).toFixed(3)}`);
       ui.text(`p: ${this.#player.position.toString()}`);
+
       setFlag(Flags.PATHFINDING, ui.checkbox(getFlag(Flags.PATHFINDING), "pathfinding debug mode"));
+      ui.text(getFlag(Flags.PATHFINDING) ? 'Left click to place point A. Right click to place point B' : '');
+      
       ui.endVertical();
       ui.endArea();
     }
