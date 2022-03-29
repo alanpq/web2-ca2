@@ -1,5 +1,8 @@
 // super basic ui inspired by imgui
 
+import Rect from "../math/rect.mjs";
+import Vector from "../math/vector.mjs";
+import * as input from '../input/mod.mjs';
 // the ui stack holds the nested 'positioning contexts',
 // which is used when rendering widgets to build 1 dimensional layouts
 
@@ -49,6 +52,7 @@ export default class UI {
     color: "white",
   };
   get fontString () {
+    // TODO: cache this?
     return `${this.font.size}${this.font.unit} ${this.font.family}`;
   }
 
@@ -80,6 +84,45 @@ export default class UI {
       pctx.width = Math.max(pctx.width, w);
       pctx.height += h;
     }
+  }
+
+  /**
+   * 
+   * @param {boolean} value Whether the checkbox is checked
+   * @param {string} label The text label
+   * @returns {boolean}
+   */
+  checkbox(value, label) {
+    const parent = this.top();
+    const mText = this.ctx.measureText(label);
+    const rect = new Rect(
+      parent.x + (parent.width * parent.horizontal), parent.y + (parent.height * !parent.horizontal),
+      this.font.size + 5 + mText.width,
+      this.font.size * 1.1,
+    );
+    const hit = rect.containsPoint(input.mouse());
+    this.ctx.fillStyle = hit ? "#C5C5C5": "#F3F3F3";
+    this.ctx.strokeStyle = "#302f30";
+    this.ctx.lineWidth = 0.5;
+    const box = new Vector(rect.left + this.font.size * 0.1, rect.top);
+    this.ctx.fillRect(box.x, box.y, this.font.size, this.font.size);
+    this.ctx.strokeRect(box.x, box.y, this.font.size, this.font.size);
+    if(value) {
+      this.ctx.fillStyle = "#1B1B1B";
+      const padding = this.font.size*0.25;
+      this.ctx.fillRect(box.x+padding, box.y+padding, this.font.size-padding*2, this.font.size-padding*2);
+    }
+    this.ctx.fillStyle = this.font.color;
+    this.ctx.font = this.fontString;
+    this.ctx.fillText(label, rect.left + this.font.size * 1.2, rect.top + mText.actualBoundingBoxAscent)
+    if(parent.horizontal) {
+      parent.height = Math.max(parent.height, rect.height);
+      parent.width += rect.width;
+    } else {
+      parent.width = Math.max(parent.width, rect.width);
+      parent.height += rect.height;
+    }
+    return value ^ (hit && input.leftMouseDown());
   }
 
   startVertical() {

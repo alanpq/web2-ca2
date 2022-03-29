@@ -7,6 +7,8 @@ import * as input from './input/mod.mjs';
 import { CHUNK_AREA, CHUNK_SIZE, TILES, TILE_SIZE, World } from "./world.mjs";
 import { debug, findPath, idxToPos } from "./ai/pathfinding.mjs";
 import Vector from "./math/vector.mjs";
+import UI from './ui/mod.mjs';
+
 const horizontals = [
   [0, -1],
   [0, 1],
@@ -66,6 +68,8 @@ export default class Game {
     this.#renderer = renderer;
 
     this.#player = new Player();
+    this.#player.position.x = this.#player.position.y = CHUNK_SIZE*TILE_SIZE/2;
+    this.#renderer.camera.position = this.#player.position;
     this.#world = new World();
 
 
@@ -93,6 +97,7 @@ export default class Game {
 
   ////// ACTUAL GAME STUFF
 
+  #debug = false;
   /**
    * 
    * @param {number} dt Deltatime in seconds
@@ -104,6 +109,7 @@ export default class Game {
     ui.startVertical();
     ui.text(`frametime: ${(dt*1000).toFixed(3)}`);
     ui.text(`p: ${this.#player.position.toString()}`);
+    this.#debug = ui.checkbox(this.#debug, "test checkbox");
     ui.endVertical();
   }
 
