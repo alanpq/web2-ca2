@@ -3,8 +3,11 @@
 import Rect from "../math/rect.mjs";
 import Vector from "../math/vector.mjs";
 import * as input from '../input/mod.mjs';
+
 // the ui stack holds the nested 'positioning contexts',
 // which is used when rendering widgets to build 1 dimensional layouts
+
+// when a widget is rendered, it expands the positioning context in the direction of flow (ie. horizontally/vertically)
 
 /**
  * @typedef SidedValues
@@ -24,6 +27,34 @@ import * as input from '../input/mod.mjs';
  * @prop {number} x Inherited x of the context
  * @prop {number} y Inherited y of the context
  */
+
+/**
+ * 
+ * @param {PositioningContext} ctx The positioning context
+ * @param {Rect} rect The widget's bounding box.
+ */
+const expandPositioningContext = (ctx, rect) => { 
+  if(parent.horizontal) { // horizontal flow
+    parent.width += rect.width;
+    parent.height = Math.max(parent.height, rect.height);
+  } else { // vertical flow
+    parent.width = Math.max(parent.width, rect.width);
+    parent.height += rect.height;
+  }
+}
+
+/**
+ * Compute a new widget rect that fits in the parent positioning context.
+ * @param {PositioningContext} parent 
+ * @param {number} width width of the widget 
+ * @param {number} height height of the widget 
+ */
+const computeWidgetRect = (parent, width=0, height=0) => {
+  return new Rect(
+    parent.x + (parent.width * parent.horizontal),
+    parent.y + (parent.height * !parent.horizontal),
+    width, height);
+}
 
 export default class UI {
   /**
@@ -60,6 +91,12 @@ export default class UI {
     this.ctx = ctx;
   }
 
+  //** Set appropriate canvas properties for text rendering. */
+  #prepareFont() {
+    this.ctx.fillStyle = this.font.color;
+    this.ctx.font = this.fontString;
+  }
+
   /**
    * Draw a line of text.
    * @param {CanvasRenderingContext2D} ctx 
@@ -67,23 +104,15 @@ export default class UI {
    */
   text(text) {
     //TODO: multiline text
-    this.ctx.fillStyle = this.font.color;
-    this.ctx.font = this.fontString;
     const parent = this.top();
     const mText = this.ctx.measureText(text);
-    const rect = new Rect(
-      parent.x + (parent.width * parent.horizontal), parent.y + (parent.height * !parent.horizontal),
+    const rect = computeWidgetRect(parent,
       mText.width + this.textPadding.left + this.textPadding.right,
       mText.actualBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top + this.textPadding.bottom,
     );
+    this.#prepareFont();
     this.ctx.fillText(text, rect.left + this.textPadding.left, rect.top + mText.actualBoundingBoxAscent + this.textPadding.top);
-    if(parent.horizontal) { // horizontal flow
-      parent.width += rect.width;
-      parent.height = Math.max(parent.height, rect.height);
-    } else { // vertical flow
-      parent.width = Math.max(parent.width, rect.width);
-      parent.height += rect.height;
-    }
+    expandPositioningContext(parent, rect);
   }
 
   /**
@@ -95,8 +124,7 @@ export default class UI {
   checkbox(value, label) {
     const parent = this.top();
     const mText = this.ctx.measureText(label);
-    const rect = new Rect(
-      parent.x + (parent.width * parent.horizontal), parent.y + (parent.height * !parent.horizontal),
+    const rect = computeWidgetRect(parent,
       this.font.size + 5 + mText.width,
       this.font.size * 1.1,
     );
@@ -112,16 +140,11 @@ export default class UI {
       const padding = this.font.size*0.25;
       this.ctx.fillRect(box.x+padding, box.y+padding, this.font.size-padding*2, this.font.size-padding*2);
     }
-    this.ctx.fillStyle = this.font.color;
-    this.ctx.font = this.fontString;
-    this.ctx.fillText(label, rect.left + this.font.size * 1.4, rect.top + mText.actualBoundingBoxAscent)
-    if(parent.horizontal) {
-      parent.height = Math.max(parent.height, rect.height);
-      parent.width += rect.width;
-    } else {
-      parent.width = Math.max(parent.width, rect.width);
-      parent.height += rect.height;
-    }
+
+    this.#prepareFont();
+    this.ctx.fillText(label, rect.left + this.font.size * 1.4, rect.top + mText.actualBoundingBoxAscent);
+
+    expandPositioningContext(parent, rect);
     return value ^ (hit && input.leftMouseDown());
   }
 
