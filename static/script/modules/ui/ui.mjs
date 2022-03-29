@@ -34,12 +34,12 @@ import * as input from '../input/mod.mjs';
  * @param {Rect} rect The widget's bounding box.
  */
 const expandPositioningContext = (ctx, rect) => { 
-  if(parent.horizontal) { // horizontal flow
-    parent.width += rect.width;
-    parent.height = Math.max(parent.height, rect.height);
+  if(ctx.horizontal) { // horizontal flow
+    ctx.width += rect.width;
+    ctx.height = Math.max(ctx.height, rect.height);
   } else { // vertical flow
-    parent.width = Math.max(parent.width, rect.width);
-    parent.height += rect.height;
+    ctx.width = Math.max(ctx.width, rect.width);
+    ctx.height += rect.height;
   }
 }
 
