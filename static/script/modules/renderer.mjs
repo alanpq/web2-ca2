@@ -1,4 +1,4 @@
-import UI from './ui/mod.mjs';
+import UI from './ui/ui.mjs';
 import * as input from './input/mod.mjs';
 import { PHYSICS_INTER } from './constants.mjs';
 import { Camera } from './camera.mjs';

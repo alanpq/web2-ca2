@@ -7,7 +7,7 @@ import * as input from './input/mod.mjs';
 import { CHUNK_AREA, CHUNK_SIZE, TILES, TILE_SIZE, World } from "./world.mjs";
 import { debug, findPath, idxToPos } from "./ai/pathfinding.mjs";
 import Vector from "./math/vector.mjs";
-import UI from './ui/mod.mjs';
+import UI from './ui/ui.mjs';
 
 const horizontals = [
   [0, -1],
@@ -109,7 +109,7 @@ export default class Game {
     ui.startVertical();
     ui.text(`frametime: ${(dt*1000).toFixed(3)}`);
     ui.text(`p: ${this.#player.position.toString()}`);
-    this.#debug = ui.checkbox(this.#debug, "test checkbox");
+    this.#debug = ui.checkbox(this.#debug, "pathfinding debug mode");
     ui.endVertical();
   }
 
