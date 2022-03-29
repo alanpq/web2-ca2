@@ -6,6 +6,7 @@ export class Camera {
   smoothing = 10;
   #virtualPos = new Vector();
   #offset = new Vector();
+  #resolution = new Vector();
   constructor() {
 
   }
@@ -26,12 +27,23 @@ export class Camera {
    * @param {CanvasRenderingContext2D} ctx 
    */
   setTransform(ctx) {
-    this.#offset.x = ctx.canvas.width/2;
-    this.#offset.y = ctx.canvas.height/2;
+    this.#resolution.x = ctx.canvas.width;
+    this.#resolution.y = ctx.canvas.height;
+    this.#offset = this.#resolution.clone();
+    this.#offset.mul(0.5);
     ctx.transform(1, 0, 0, 1, -this.#virtualPos.x + this.#offset.x, -this.#virtualPos.y + this.#offset.y);
   }
 
   screenToWorld(pos) {
     return new Vector(pos.x + this.#virtualPos.x - this.#offset.x, pos.y + this.#virtualPos.y - this.#offset.y);
+  }
+
+  /**
+   * 
+   * @param {Vector} pos 
+   * @returns 
+   */
+  viewportToWorld(pos) {
+    return this.screenToWorld(pos.clone().scale(this.#resolution));
   }
 }
