@@ -15,6 +15,15 @@ export default class Rect {
     return `Rect:((${this.#left}, ${this.#top}), ${this.#width}x${this.#height})`;
   }
 
+  /**
+   * Whether this rect overlaps another rect.
+   * @param {Rect} other 
+   * @returns {boolean}
+   */
+  overlaps(other) {
+    return (this.left < other.right) && (this.right > other.left) && (this.top < other.bottom) && (this.bottom > other.top)
+  }
+
   get top() {return this.#top}
   get right() {return this.#left + this.#width}
   get bottom() {return this.#top + this.#height}
