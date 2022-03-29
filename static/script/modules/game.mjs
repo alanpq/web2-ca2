@@ -66,7 +66,7 @@ export default class Game {
     ui.font.color = "white";
     ui.font.family = FONTS.MONO;
     ui.startArea(new Rect(
-      50, 50, 50, 50,
+      50, 50, 500, 50,
     ));
     ui.startVertical();
     ui.text(`frametime: ${(dt*1000).toFixed(3)}`);

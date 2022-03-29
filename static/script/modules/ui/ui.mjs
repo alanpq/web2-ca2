@@ -3,6 +3,7 @@
 import Rect from "../math/rect.mjs";
 import Vector from "../math/vector.mjs";
 import * as input from '../input/mod.mjs';
+import PositioningContext, { Flow } from "./positioningContext.mjs";
 
 // the ui stack holds the nested 'positioning contexts',
 // which is used when rendering widgets to build 1 dimensional layouts
@@ -18,49 +19,11 @@ import * as input from '../input/mod.mjs';
  * @prop {number} left
  */
 
-/**
- * @typedef PositioningContext
- * @type {object}
- * @prop {boolean} horizontal Whether the context lays out horizontally.
- * @prop {number} width Current width of the context
- * @prop {number} height Current height of the context
- * @prop {number} x Inherited x of the context
- * @prop {number} y Inherited y of the context
- */
-
-/**
- * 
- * @param {PositioningContext} ctx The positioning context
- * @param {Rect} rect The widget's bounding box.
- */
-const expandPositioningContext = (ctx, rect) => { 
-  if(ctx.horizontal) { // horizontal flow
-    ctx.width += rect.width;
-    ctx.height = Math.max(ctx.height, rect.height);
-  } else { // vertical flow
-    ctx.width = Math.max(ctx.width, rect.width);
-    ctx.height += rect.height;
-  }
-}
-
-/**
- * Compute a new widget rect that fits in the parent positioning context.
- * @param {PositioningContext} parent 
- * @param {number} width width of the widget 
- * @param {number} height height of the widget 
- */
-const computeWidgetRect = (parent, width=0, height=0) => {
-  return new Rect(
-    parent.x + (parent.width * parent.horizontal),
-    parent.y + (parent.height * !parent.horizontal),
-    width, height);
-}
-
 export default class UI {
   /**
    * @type {PositioningContext[]}
    */
-  posStack = [];
+  stack = [];
   /** @type {CanvasRenderingContext2D} */
   ctx;
 
@@ -98,21 +61,39 @@ export default class UI {
   }
 
   /**
+   * Clip future render methods to the rect.
+   * @param {Rect} rect 
+   */
+  #clipRect(rect) {
+    this.ctx.beginPath();
+    this.ctx.rect(rect.left, rect.top, rect.width, rect.height);
+    this.ctx.clip();
+  }
+
+  /**
    * Draw a line of text.
    * @param {CanvasRenderingContext2D} ctx 
    * @param {string} text 
    */
   text(text) {
+    this.ctx.save();
     //TODO: multiline text
     const parent = this.top();
+    this.#prepareFont();
     const mText = this.ctx.measureText(text);
-    const rect = computeWidgetRect(parent,
+    const rect = parent.computeWidgetRect(
       mText.width + this.textPadding.left + this.textPadding.right,
       mText.actualBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top + this.textPadding.bottom,
     );
-    this.#prepareFont();
-    this.ctx.fillText(text, rect.left + this.textPadding.left, rect.top + mText.actualBoundingBoxAscent + this.textPadding.top);
-    expandPositioningContext(parent, rect);
+    this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+    this.#clipRect(rect);
+    this.ctx.fillText(
+      text,
+      rect.left + this.textPadding.left,
+      rect.top + mText.actualBoundingBoxAscent + this.textPadding.top,
+    );
+    parent.expand(rect);
+    this.ctx.restore();
   }
 
   /**
@@ -122,20 +103,25 @@ export default class UI {
    * @returns {boolean}
    */
   checkbox(value, label) {
+    this.ctx.save();
     const parent = this.top();
     const mText = this.ctx.measureText(label);
-    const rect = computeWidgetRect(parent,
+    const rect = parent.computeWidgetRect(
       this.font.size + 5 + mText.width,
       this.font.size * 1.1,
     );
+    this.#clipRect(rect);
     const hit = rect.containsPoint(input.mouse());
     input.setMouseEat(hit);
+
     this.ctx.fillStyle = hit ? "#C5C5C5": "#F3F3F3";
     this.ctx.strokeStyle = "#302f30";
     this.ctx.lineWidth = 0.5;
+
     const box = new Vector(rect.left + this.font.size * 0.1, rect.top);
-    this.ctx.fillRect(box.x, box.y, this.font.size, this.font.size);
+    this.ctx.fillRect  (box.x, box.y, this.font.size, this.font.size);
     this.ctx.strokeRect(box.x, box.y, this.font.size, this.font.size);
+
     if(value) {
       this.ctx.fillStyle = "#1B1B1B";
       const padding = this.font.size*0.25;
@@ -143,47 +129,55 @@ export default class UI {
     }
 
     this.#prepareFont();
-    this.ctx.fillText(label, rect.left + this.font.size * 1.4, rect.top + mText.actualBoundingBoxAscent);
+    this.ctx.fillText(
+      label,
+      rect.left + this.font.size * 1.4,
+      rect.top + mText.actualBoundingBoxAscent,
+    );
 
-    expandPositioningContext(parent, rect);
+    parent.expand(rect);
+    this.ctx.restore();
     return value ^ (hit && input.leftMouseDown(true));
   }
 
+  /**
+   * 
+   * @param {Rect} rect 
+   */
+  startArea(rect) {
+    this.stack.push(PositioningContext.newArea(rect));
+  }
+
+  endArea() {
+    if(this.stack.length == 0) throw new Error("Trying to end area when nothing is open!");
+    const old = this.stack.pop();
+    if(!old.explicit)
+      throw new Error("Tried to close area when another flow still open!");
+  }
+
   startVertical() {
-    const pctx = this.top();
-    this.posStack.push({
-      horizontal: false,
-      width: 0,
-      height: 0,
-      x: pctx.x + pctx.width * pctx.horizontal,
-      y: pctx.y + pctx.height * !pctx.horizontal,
-    })
+    this.stack.push(PositioningContext.newFlow(Flow.VERTICAL, this.top()));
   }
 
   startHorizontal() {
-    const pctx = this.top();
-    this.posStack.push({
-      horizontal: true,
-      width: 0,
-      height: 0,
-      x: pctx.x + pctx.width * pctx.horizontal,
-      y: pctx.y + pctx.height * !pctx.horizontal,
-    })
+    this.stack.push(PositioningContext.newFlow(Flow.HORIZONTAL, this.top()));
   }
   // TODO: max depth on queue to prevent memory leak if you forget an end call
   endVertical() {
-    const old = this.posStack.pop();
-    if(old.horizontal)
-      throw new Error("Unmatched horizontal flow! Tried to end vertical when a horizontal has not yet been closed.")
+    const old = this.stack.pop();
+    if(!old.vertical) {
+      console.error(old);
+      throw new Error("Unmatched flow! Tried to end vertical when another flow type has not yet been closed.")
+    }
     const n = this.top();
     n.x += old.width;
     n.y += old.height;
   }
   
   endHorizontal() {
-    const old = this.posStack.pop();
+    const old = this.stack.pop();
     if(!old.horizontal)
-      throw new Error("Unmatched vertical flow! Tried to end horizontal when a vertical has not yet been closed.")
+    throw new Error("Unmatched flow! Tried to end horizontal when another flow type has not yet been closed.")
     const n = this.top();
     n.height += old.height;
   }
@@ -193,16 +187,9 @@ export default class UI {
    * @returns {PositioningContext}
    */
   top() {
-    if(this.posStack.length == 0) {
-      return {
-        horizontal: false,
-        width: 0,
-        height: 0,
-        x: 0,
-        y: 0,
-      }
-    }
-    return this.posStack[this.posStack.length-1];
+    // virtual 'root' context
+    if(this.stack.length == 0) return PositioningContext.default();
+    return this.stack[this.stack.length-1];
   }
 }
 
