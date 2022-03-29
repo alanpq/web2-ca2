@@ -69,20 +69,20 @@ export default class UI {
     //TODO: multiline text
     this.ctx.fillStyle = this.font.color;
     this.ctx.font = this.fontString;
-    const pctx = this.top();
-    const metrics = this.ctx.measureText(text);
-    const w = metrics.width + this.textPadding.left + this.textPadding.right;
-    const h = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
-              + this.textPadding.top + this.textPadding.bottom;
-    if(pctx.horizontal) { // horizontal flow
-      this.ctx.fillText(text, pctx.x + pctx.width + this.textPadding.left, pctx.y + this.textPadding.top);
-      pctx.width += w;
-      pctx.height = Math.max(pctx.height, h);
+    const parent = this.top();
+    const mText = this.ctx.measureText(text);
+    const rect = new Rect(
+      parent.x + (parent.width * parent.horizontal), parent.y + (parent.height * !parent.horizontal),
+      mText.width + this.textPadding.left + this.textPadding.right,
+      mText.actualBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top + this.textPadding.bottom,
+    );
+    this.ctx.fillText(text, rect.left + this.textPadding.left, rect.top + mText.actualBoundingBoxAscent + this.textPadding.top);
+    if(parent.horizontal) { // horizontal flow
+      parent.width += rect.width;
+      parent.height = Math.max(parent.height, rect.height);
     } else { // vertical flow
-      if(pctx.height == 0) pctx.height = h;
-      this.ctx.fillText(text, pctx.x + this.textPadding.left, pctx.y + pctx.height + this.textPadding.top);
-      pctx.width = Math.max(pctx.width, w);
-      pctx.height += h;
+      parent.width = Math.max(parent.width, rect.width);
+      parent.height += rect.height;
     }
   }
 
