@@ -85,7 +85,7 @@ export default class UI {
       mText.width + this.textPadding.left + this.textPadding.right,
       mText.actualBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top + this.textPadding.bottom,
     );
-    this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+    // this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
     this.#clipRect(rect);
     this.ctx.fillText(
       text,
@@ -113,7 +113,7 @@ export default class UI {
       this.font.size + padding*3 + mText.width,
       this.font.size + padding*2,
     );
-    this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+    // this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
     this.#clipRect(rect);
     const hit = rect.containsPoint(input.mouse());
     input.setMouseEat(hit);

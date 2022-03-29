@@ -51,8 +51,8 @@ export default class PositioningContext {
     const pos = parent.computeOffset();
     return new PositioningContext(
       pos.x, pos.y,
-      (parent.explicit || flow == Flow.VERTICAL) ? parent.width : 0,
-      (parent.explicit || flow == Flow.HORIZONTAL) ? parent.height : 0,
+      (flow == Flow.VERTICAL) ? parent.width : 0,
+      (flow == Flow.HORIZONTAL) ? parent.height : 0,
       flow, false,
     );
   }
@@ -77,7 +77,7 @@ export default class PositioningContext {
   computeOffset() {
     return new Vector(
       this.x + (this.width * (this.horizontal && !this.explicit)),
-      this.y + (this.height * !(this.horizontal || this.explicit)),
+      this.y + (this.height * (this.vertical && !this.explicit)),
     );
   }
 
@@ -90,8 +90,8 @@ export default class PositioningContext {
     const pos = this.computeOffset();
     return new Rect(
       pos.x, pos.y,
-      this.vertical ? this.width : width,
-      this.horizontal ? this.height : height,
+      !this.horizontal ? this.width : width,
+      !this.vertical ? this.height : height,
     );
   }
   /**
