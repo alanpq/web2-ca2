@@ -95,11 +95,21 @@ export class World {
  * @type {number}
  */
 
+/**
+ * Enum for Tile types.
+ * @readonly
+ * @enum {number}
+ */
 export const TILES = {
   VOID: 0,
   FLOOR: 1,
   WALL: 2,
 }
+/**
+ * Enum for Tile colors.
+ * @readonly
+ * @enum {string}
+ */
 export const TILE_COLORS = [
   "black",
   "darkgray",
