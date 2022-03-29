@@ -1,5 +1,5 @@
 export {button, buttonDown, buttonUp} from "./keyboard.mjs";
-export {mouse, leftMouse, rightMouse, leftMouseDown, leftMouseUp} from "./mouse.mjs";
+export {mouse, leftMouse, rightMouse, leftMouseDown, leftMouseUp, rightMouseDown, rightMouseUp} from "./mouse.mjs";
 
 import {button, tick as keyTick, init as keyInit} from './keyboard.mjs';
 import {tick as mouseTick, init as mouseInit} from './mouse.mjs';
