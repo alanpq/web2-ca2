@@ -104,7 +104,7 @@ export default class Game {
     if(this.#debug) {
       ui.font.color = "white";
       ui.font.family = FONTS.MONO;
-      ui.startArea(new Rect(0,0, ui.ctx.canvas.width/2, ui.ctx.canvas.height), Align.START);
+      ui.startArea(new Rect(0,0, ui.ctx.canvas.width/3, ui.ctx.canvas.height), Align.START);
       ui.startVertical();
       ui.text(`frametime: ${(dt*1000).toFixed(3).padStart(6)}ms`);
 
