@@ -32,7 +32,7 @@ export default class Game {
     
     this.#world = new World();
 
-    this.#player = new Player(this.#world);
+    this.#player = new Player(this.#world, Vector.zero.clone());
     this.#player.position.x = this.#player.position.y = CHUNK_SIZE*TILE_SIZE/2;
     this.#renderer.camera.position = this.#player.position;
 
