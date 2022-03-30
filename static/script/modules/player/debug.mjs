@@ -5,6 +5,7 @@ import UI from "../ui/ui.mjs";
 import { TILE_SIZE } from "../world.mjs";
 import Player, { PLAYER_SIZE } from "./player.mjs";
 import * as input from '../input/mod.mjs';
+import { Align } from "../ui/positioningContext.mjs";
 
 /**
  * @param {Player} p
@@ -13,9 +14,11 @@ import * as input from '../input/mod.mjs';
  * @param {UI} ui 
  */
 export const ui = (p, debug, dt, ui) => {
-  ui.startArea(new Rect(ui.ctx.canvas.width-500,0, 500, 500));
+  ui.startArea(new Rect(ui.ctx.canvas.width-500,0, 500, 500), Align.END);
   ui.startVertical();
   ui.text(`input: (${input.axis("horizontal")}, ${-input.axis("vertical")})`);
+  ui.startHorizontal();
+  ui.endHorizontal();
   ui.endVertical();
   ui.endArea();
 }

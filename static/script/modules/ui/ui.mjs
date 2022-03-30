@@ -4,7 +4,7 @@
 import Rect from "../math/rect.mjs";
 import Vector from "../math/vector.mjs";
 import * as input from '../input/mod.mjs';
-import PositioningContext, { Flow } from "./positioningContext.mjs";
+import PositioningContext, { Align, Flow } from "./positioningContext.mjs";
 import { Flags, getFlag } from "./debug.mjs";
 
 // the ui stack holds the nested 'positioning contexts',
@@ -87,9 +87,14 @@ export default class UI {
       mText.width + this.textPadding.left + this.textPadding.right,
       mText.actualBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top + this.textPadding.bottom,
     );
-    if(getFlag(Flags.UI))
+    const clipRect = parent.computeClipRect(rect.width, rect.height);
+    if(getFlag(Flags.UI)) {
+      this.ctx.strokeStyle = "blue";
+      this.ctx.strokeRect(clipRect.left, clipRect.top, clipRect.width, clipRect.height);
+      this.ctx.strokeStyle = "red";
       this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
-    this.#clipRect(parent.computeClipRect(rect.width, rect.height));
+    }
+    this.#clipRect(clipRect);
     this.ctx.fillText(
       text,
       rect.left + this.textPadding.left,
@@ -116,9 +121,14 @@ export default class UI {
       this.font.size + padding*3 + mText.width,
       this.font.size + padding*2,
     );
-    if(getFlag(Flags.UI))
+    const clipRect = parent.computeClipRect(rect.width, rect.height);
+    if(getFlag(Flags.UI)) {
+      this.ctx.strokeStyle = "blue";
+      this.ctx.strokeRect(clipRect.left, clipRect.top, clipRect.width, clipRect.height);
+      this.ctx.strokeStyle = "red";
       this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
-    this.#clipRect(parent.computeClipRect(rect.width, rect.height));
+    }
+    this.#clipRect(clipRect);
     const hit = rect.containsPoint(input.mouse());
     input.setMouseEat(hit);
 
@@ -153,8 +163,8 @@ export default class UI {
    * 
    * @param {Rect} rect 
    */
-  startArea(rect) {
-    this.stack.push(PositioningContext.newArea(rect));
+  startArea(rect, align=Align.START, justify=Align.START) {
+    this.stack.push(PositioningContext.newArea(rect, align, justify));
   }
 
   endArea() {
@@ -164,12 +174,12 @@ export default class UI {
       throw new Error("Tried to close area when another flow still open!");
   }
 
-  startVertical() {
-    this.stack.push(PositioningContext.newFlow(Flow.VERTICAL, this.top()));
+  startVertical(align=null, justify=null) {
+    this.stack.push(PositioningContext.newFlow(Flow.VERTICAL, this.top(), align, justify));
   }
 
-  startHorizontal() {
-    this.stack.push(PositioningContext.newFlow(Flow.HORIZONTAL, this.top()));
+  startHorizontal(align=null, justify=null) {
+    this.stack.push(PositioningContext.newFlow(Flow.HORIZONTAL, this.top(), align, justify));
   }
   // TODO: max depth on queue to prevent memory leak if you forget an end call
   endVertical() {

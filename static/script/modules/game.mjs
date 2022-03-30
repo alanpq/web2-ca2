@@ -11,6 +11,7 @@ import Vector from "./math/vector.mjs";
 import UI from './ui/ui.mjs';
 import Rect from "./math/rect.mjs";
 import { ui, setFlag, getFlag, registerDebug, Flags } from "./ui/debug.mjs";
+import { Align } from "./ui/positioningContext.mjs";
 
 export default class Game {
   #loaded = false;
@@ -75,7 +76,7 @@ export default class Game {
     if(this.#debug) {
       ui.font.color = "white";
       ui.font.family = FONTS.MONO;
-      ui.startArea(new Rect(0,0, ui.ctx.canvas.width, ui.ctx.canvas.height));
+      ui.startArea(new Rect(0,0, ui.ctx.canvas.width/2, ui.ctx.canvas.height), Align.START);
       ui.startVertical();
       ui.text(`frametime: ${(dt*1000).toFixed(3)}ms`);
       ui.text(`pos: ${this.#player.position.toString(3)}`);
