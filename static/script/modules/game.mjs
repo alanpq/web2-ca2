@@ -78,7 +78,7 @@ export default class Game {
       ui.font.family = FONTS.MONO;
       ui.startArea(new Rect(0,0, ui.ctx.canvas.width/2, ui.ctx.canvas.height), Align.START);
       ui.startVertical();
-      ui.text(`frametime: ${(dt*1000).toFixed(3)}ms`);
+      ui.text(`frametime: ${(dt*1000).toFixed(3).padStart(6)}ms`);
       ui.text(`pos: ${this.#player.position.toString(3)}`);
       ui.text('vel: ' + this.#player.velocity.toString(3));
 
