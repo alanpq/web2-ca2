@@ -74,6 +74,12 @@ export default class UI {
     this.ctx.clip();
   }
 
+  space(amount=null) {
+    const parent = this.top();
+    const amt = amount || this.font.size;
+    parent.expand(parent.computeClipRect(amt, amt));
+  }
+
   /**
    * Draw a line of text.
    * @param {CanvasRenderingContext2D} ctx 
