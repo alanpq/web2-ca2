@@ -63,6 +63,14 @@ export default class UI {
     this.ctx.fillStyle = this.font.color;
     this.ctx.font = this.fontString;
   }
+  #drawBounds (widget, clip) {
+    if(!getFlag(Flags.UI)) return;
+    this.ctx.lineWidth = 1;
+    this.ctx.strokeStyle = "blue";
+    this.ctx.strokeRect(clip.left, clip.top, clip.width, clip.height);
+    this.ctx.strokeStyle = "red";
+    this.ctx.strokeRect(widget.left, widget.top, widget.width, widget.height);
+  }
 
   /**
    * Clip future render methods to the rect.
@@ -97,12 +105,7 @@ export default class UI {
     );
     if(!this.hidden) {
       const clipRect = parent.computeClipRect(rect.width, rect.height);
-      if(getFlag(Flags.UI)) {
-        this.ctx.strokeStyle = "blue";
-        this.ctx.strokeRect(clipRect.left, clipRect.top, clipRect.width, clipRect.height);
-        this.ctx.strokeStyle = "red";
-        this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
-      }
+      this.#drawBounds(rect, clipRect);
       this.#clipRect(clipRect);
       this.ctx.fillText(
         text,
@@ -134,12 +137,7 @@ export default class UI {
     let hit = false;
     if(!this.hidden) {
       const clipRect = parent.computeClipRect(rect.width, rect.height);
-      if(getFlag(Flags.UI)) {
-        this.ctx.strokeStyle = "blue";
-        this.ctx.strokeRect(clipRect.left, clipRect.top, clipRect.width, clipRect.height);
-        this.ctx.strokeStyle = "red";
-        this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
-      }
+      this.#drawBounds(rect, clipRect);
       this.#clipRect(clipRect);
       hit = rect.containsPoint(input.mouse());
       input.setMouseEat(hit);
