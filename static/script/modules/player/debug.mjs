@@ -16,7 +16,7 @@ import { Align } from "../ui/positioningContext.mjs";
 export const ui = (p, debug, dt, ui) => {
   ui.startArea(new Rect(ui.ctx.canvas.width-500,0, 500, 500), Align.END);
   ui.startVertical();
-  ui.text(`input: (${input.axis("horizontal")}, ${-input.axis("vertical")})`);
+  ui.text(`(${input.axis("horizontal")}, ${-input.axis("vertical")}): input`);
   ui.startHorizontal();
   ui.endHorizontal();
   ui.endVertical();
