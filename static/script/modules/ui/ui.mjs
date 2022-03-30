@@ -89,7 +89,7 @@ export default class UI {
     );
     if(getFlag(Flags.UI))
       this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
-    this.#clipRect(rect);
+    this.#clipRect(parent.computeClipRect(rect.width, rect.height));
     this.ctx.fillText(
       text,
       rect.left + this.textPadding.left,
@@ -118,7 +118,7 @@ export default class UI {
     );
     if(getFlag(Flags.UI))
       this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
-    this.#clipRect(rect);
+    this.#clipRect(parent.computeClipRect(rect.width, rect.height));
     const hit = rect.containsPoint(input.mouse());
     input.setMouseEat(hit);
 

@@ -82,6 +82,20 @@ export default class PositioningContext {
   }
 
   /**
+   * Compute a new widget clip rect that fits in this context.
+   * @param {number} width width of the widget 
+   * @param {number} height height of the widget 
+   */
+  computeClipRect(width=0, height=0) {
+    const pos = this.computeOffset();
+    return new Rect(
+      pos.x, pos.y,
+      !this.horizontal ? this.width : width,
+      !this.vertical ? this.height : height,
+    );
+  }
+
+  /**
    * Compute a new widget rect that fits in this context.
    * @param {number} width width of the widget 
    * @param {number} height height of the widget 
@@ -90,8 +104,8 @@ export default class PositioningContext {
     const pos = this.computeOffset();
     return new Rect(
       pos.x, pos.y,
-      !this.horizontal ? this.width : width,
-      !this.vertical ? this.height : height,
+      width,
+      height,
     );
   }
   /**
