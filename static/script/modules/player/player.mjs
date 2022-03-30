@@ -9,6 +9,7 @@ import { TILE_SIZE, World, worldToTile } from "../world.mjs";
 import Rect from "../math/rect.mjs";
 
 export const PLAYER_SIZE = 20;
+export const PLAYER_SIZE_HALF = PLAYER_SIZE/2;
 /**
  * @typedef PlayerDebug
  * @prop {Vector} tangent

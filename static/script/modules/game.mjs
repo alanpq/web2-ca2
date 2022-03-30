@@ -1,6 +1,6 @@
 'use strict';
 import { FONTS, PHYSICS_INTER } from "./constants.mjs";
-import Player from "./player/player.mjs";
+import Player, { PLAYER_SIZE, PLAYER_SIZE_HALF } from "./player/player.mjs";
 import Renderer from "./renderer.mjs";
 
 import * as input from './input/mod.mjs';
@@ -159,8 +159,8 @@ export default class Game {
       this.#gunTime += dt;
       if(this.#gunTime > this.#gunInterval) {
         bullets.createBullet("pistol", {
-          pos: this.#player.position.clone(),
-          vel: Vector.sub(this.#crosshair, this.#player.position).normalized().mul(600),
+          pos: this.#player.position.clone().add(new Vector(PLAYER_SIZE_HALF,PLAYER_SIZE_HALF)),
+          vel: Vector.sub(Vector.random().mul(TILE_SIZE*0.5).add(this.#crosshair), this.#player.position).normalized().mul(600),
           damage: 10,
           life: 5,
         })

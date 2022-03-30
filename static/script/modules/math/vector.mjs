@@ -17,6 +17,15 @@ export default class Vector {
   static right = new Vector(1,0);
   static one = new Vector(1,1);
 
+  // TODO: random unit vector
+  /**
+   * Random vector uniformly distributed within a square
+   * @returns {Vector}
+   */
+  static random() {
+    return new Vector(Math.random()*2-1, Math.random()*2-1);
+  }
+
   /** Get the square magnitude of the vector.
    * @returns {number}
    */
