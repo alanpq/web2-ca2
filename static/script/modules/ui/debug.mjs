@@ -12,6 +12,7 @@ export const Flags = {
   PATHFINDING: 0,
   AI: 1,
   PLAYER: 2,
+  UI: 3,
 }
 
 /**
@@ -32,7 +33,14 @@ export const getFlag = (flag) => flags[flag] || false;
 /**
  * Debug flags for various categories
  */
-const flags = {}
+let flags = {};
+
+window.onload = () => {
+  flags = JSON.parse(localStorage.getItem("flags") || "{}")
+}
+window.onunload = () => {
+  localStorage.setItem("flags", JSON.stringify(flags));
+};
 
 /**
  * @typedef CBCollection
