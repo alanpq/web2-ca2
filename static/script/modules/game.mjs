@@ -4,6 +4,7 @@ import Player from "./player/player.mjs";
 import Renderer from "./renderer.mjs";
 
 import * as input from './input/mod.mjs';
+import * as bullets from './weapons/bullets.mjs';
 
 import { CHUNK_AREA, CHUNK_SIZE, TILES, TILE_SIZE, World } from "./world.mjs";
 import * as pathfinding from "./ai/pathfinding/pathfinding.mjs";
@@ -52,6 +53,17 @@ export default class Game {
     this.#loaded = true;
     registerDebug(Flags.PATHFINDING, "draw", pathfinding.debug.draw);
     registerDebug(Flags.PATHFINDING, "tick", pathfinding.debug.tick);
+
+    bullets.registerBulletType("pistol", {
+      type: bullets.ProjectileType.PHYSICS,
+      params: {
+        drag: 1,
+        restitution: 0,
+        size: new Vector(5, 5),
+        trailColor: "yellow",
+        trailLength: 10,
+      }
+    })
   }
 
   start() {
@@ -119,8 +131,11 @@ export default class Game {
   draw(dt, ctx) {
     this.#world.render(dt, ctx);
 
+    bullets.draw(dt, ctx);
+
     ctx.fillStyle = "red";
     ctx.fillRect(this.#crosshair.x-2.5, this.#crosshair.y-2.5, 5, 5);
+
     
     this.#player
       .render(dt, ctx);
@@ -129,12 +144,28 @@ export default class Game {
   /** @type {Vector} */
   #crosshair = Vector.zero;
 
+  #gunTime = 0;
+  #gunInterval = 0.05;
+
   /**
    * Do a tick.
    */
   tick(dt) {
     if(input.buttonDown("debug")) {
       this.#debug ^= true;
+    }
+
+    if(input.leftMouse()) {
+      this.#gunTime += dt;
+      if(this.#gunTime > this.#gunInterval) {
+        bullets.createBullet("pistol", {
+          pos: this.#player.position.clone(),
+          vel: Vector.sub(this.#crosshair, this.#player.position).normalized().mul(600),
+          damage: 10,
+          life: 5,
+        })
+        this.#gunTime = 0;
+      }
     }
 
     this.#crosshair = this.#renderer.camera.screenToWorld(input.mouse());
@@ -147,6 +178,7 @@ export default class Game {
    * @param {number} dt
    */
   physics(dt) {
+    bullets.physics(dt, this.#world);
     this.#player.physics(dt);
   }
 }
