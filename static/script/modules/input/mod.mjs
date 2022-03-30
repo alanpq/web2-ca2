@@ -23,6 +23,7 @@ export const buttons = {
   "down": {state: 0, keys: ["s"]},
   "right": {state: 0, keys: ["d"]},
   "debug": {state: 0, keys: ["`"]},
+  "space": {state: 0, keys: [" "]}, // this ones more just to stop scrolling
 }
 
 const axes = {

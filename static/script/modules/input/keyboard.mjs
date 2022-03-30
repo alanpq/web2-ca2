@@ -23,6 +23,18 @@ const keys = {};
 // to be applied for the start of the next.
 let keyQueue = []; 
 
+const keydown = (e) => {
+  if(!buttonsRev[e.key]) return;
+  e.preventDefault();
+  keyQueue.push([e.key, true]);
+};
+
+const keyup = (e) => {
+  if(!buttonsRev[e.key]) return;
+  e.preventDefault();
+  keyQueue.push([e.key, false]);
+};
+
 /**
  * 
  * @param {HTMLElement} el 
@@ -36,14 +48,13 @@ export const init = (el) => {
   console.debug("Button mapping:", buttonsRev);
 
   // add any key pressed/releases to the queue
-  window.addEventListener("keydown", (e) => {
-    if(!buttonsRev[e.key]) return;
-    keyQueue.push([e.key, true]);
-  })
-  window.addEventListener("keyup", (e) => {
-    if(!buttonsRev[e.key]) return;
-    keyQueue.push([e.key, false]);
-  })
+  window.addEventListener("keydown", keydown);
+  window.addEventListener("keyup", keyup);
+}
+
+export const destroy = () => {
+  window.removeEventListener("keydown", keydown);
+  window.removeEventListener("keyup", keyup);
 }
 
 export const tick = () => {

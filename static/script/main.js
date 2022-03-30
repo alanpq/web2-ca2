@@ -31,5 +31,7 @@ spa.addEventListener("game", "close", () => {
     game.destroy();
 });
 spa.goto('game').then(() => {
+  // no idea why this needs to be here twice, but it works so i dont care
+  renderer.conformToParent();
   renderer.conformToParent();
 })
