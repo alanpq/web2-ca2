@@ -26,15 +26,15 @@ export default class Game {
 
   constructor(renderer) {
     this.#renderer = renderer;
+    
+    this.#world = new World();
 
-    this.#player = new Player();
+    this.#player = new Player(this.#world);
     this.#player.position.x = this.#player.position.y = CHUNK_SIZE*TILE_SIZE/2;
     this.#renderer.camera.position = this.#player.position;
-    this.#world = new World();
 
     pathfinding.debug.state.world = this.#world;
     pathfinding.debug.state.renderer = this.#renderer;
-
 
     this.#renderer.listen(
       (dt, ctx) => {this.draw(dt, ctx)},
@@ -77,11 +77,13 @@ export default class Game {
       ui.font.family = FONTS.MONO;
       ui.startArea(new Rect(0,0, ui.ctx.canvas.width, ui.ctx.canvas.height));
       ui.startVertical();
-      ui.text(`frametime: ${(dt*1000).toFixed(3)}`);
-      ui.text(`p: ${this.#player.position.toString()}`);
+      ui.text(`frametime: ${(dt*1000).toFixed(3)}ms`);
+      ui.text(`pos: ${this.#player.position.toString(3)}`);
+      ui.text('vel: ' + this.#player.velocity.toString(3));
 
-      setFlag(Flags.PATHFINDING, ui.checkbox(getFlag(Flags.PATHFINDING), "pathfinding debug mode"));
+      setFlag(Flags.PATHFINDING, ui.checkbox(getFlag(Flags.PATHFINDING), "pathfinding visualisation"));
       ui.text(getFlag(Flags.PATHFINDING) ? 'Left click to place point A. Right click to place point B' : '');
+      setFlag(Flags.PLAYER, ui.checkbox(getFlag(Flags.PLAYER), "player debug"));
       
       ui.endVertical();
       ui.endArea();
@@ -118,8 +120,9 @@ export default class Game {
   }
   /**
    * Do a fixed rate physics tick.
+   * @param {number} dt
    */
   physics(dt) {
-    this.#player.tick(dt);
+    this.#player.physics(dt);
   }
 }

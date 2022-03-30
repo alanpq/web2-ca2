@@ -6,11 +6,15 @@ export default class Vector {
     this.x = x;
     this.y = y;
   }
-  toString() {
-    return `(${this.x}, ${this.y})`;
+  toString(fixed=20) {
+    return `(${this.x.toFixed(fixed)}, ${this.y.toFixed(fixed)})`;
   }
 
   static zero = new Vector();
+  static up = new Vector(0,1);
+  static down = new Vector(0,-1);
+  static left = new Vector(-1,0);
+  static right = new Vector(1,0);
   static one = new Vector(1,1);
 
   /** Get the square magnitude of the vector.
@@ -24,6 +28,11 @@ export default class Vector {
    */
   get magnitude() {
     return Math.sqrt(this.sqrMagnitude);
+  }
+
+  normalized() {
+    const m = this.magnitude;
+    return new Vector(this.x/m, this.y/m);
   }
 
   clone() {
@@ -108,6 +117,35 @@ export default class Vector {
    */
    static mul(v, n) {
     return new Vector(v.x*n, v.y*n);
+  }
+
+  /**
+   * Divides this vector by a scalar
+   * @param {number} v Scalar to divide.
+   */
+   div(v) {
+    this.x /= v;
+    this.y /= v;
+    return this;
+  }
+
+  /**
+   * Dot product of a and b.
+   * @param {Vector} a 
+   * @param {Vector} b 
+   */
+  static dot(a,b) {
+    return a.x * b.x + a.y * b.y;
+  }
+
+  /**
+   * Project vector a onto vector b.
+   * @param {Vector} a Vector to project.
+   * @param {Vector} b Unit vector to project onto.
+   */
+  static project(a, b) {
+    const dot = Vector.dot(a,b);
+    return new Vector(dot * b.x, dot * b.y);
   }
 
 }

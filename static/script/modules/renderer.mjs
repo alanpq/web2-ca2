@@ -59,7 +59,7 @@ export default class Renderer {
     const dt = (now-this.#then)/1000;
     this.#time += dt;
     // has enough time passed for physics tick?
-    if (this.#time > PHYSICS_INTER) {
+    if (this.#time > PHYSICS_INTER) { // FIXME: window blur causes time to keep accumulating without getting consumed
       this.#time -= PHYSICS_INTER; // consume time taken by the tick
       if(this.onPhysics) this.onPhysics(PHYSICS_INTER);
     }
