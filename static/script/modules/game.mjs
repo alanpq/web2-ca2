@@ -79,16 +79,25 @@ export default class Game {
       ui.startArea(new Rect(0,0, ui.ctx.canvas.width/2, ui.ctx.canvas.height), Align.START);
       ui.startVertical();
       ui.text(`frametime: ${(dt*1000).toFixed(3).padStart(6)}ms`);
+
+      ui.space();
+
       ui.text(`pos: ${this.#player.position.toString(3)}`);
       ui.text('vel: ' + this.#player.velocity.toString(3));
 
+      ui.space();
+
+      ui.text('DEBUG FLAGS');
       setFlag(Flags.PATHFINDING, ui.checkbox(getFlag(Flags.PATHFINDING), "pathfinding visualisation"));
       setFlag(Flags.PLAYER, ui.checkbox(getFlag(Flags.PLAYER), "player debug"));
       setFlag(Flags.UI, ui.checkbox(getFlag(Flags.UI), "ui debug"));
 
+      ui.space();
       
       ui.hidden = !getFlag(Flags.PATHFINDING);
-      ui.text('Left click to place point A. Right click to place point B');
+      ui.text('PATHFINDING VIS:');
+      ui.text('Left click to place point A.');
+      ui.text('Right click to place point B.');
       ui.hidden = false;
       
       ui.endVertical();
