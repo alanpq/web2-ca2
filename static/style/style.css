@@ -100,3 +100,8 @@ canvas {
   display: block;
   margin: auto;
 }
+
+#game > section:first-child {
+  margin-top: 2em;
+  height: 70vh;
+}
