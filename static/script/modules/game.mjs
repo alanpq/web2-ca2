@@ -13,6 +13,8 @@ import UI from './ui/ui.mjs';
 import Rect from "./math/rect.mjs";
 import { ui, setFlag, getFlag, registerDebug, Flags } from "./ui/debug.mjs";
 import { Align } from "./ui/positioningContext.mjs";
+import Dummy from "./ai/enemy/dummy.mjs";
+import Entity from "./entity.mjs";
 
 export default class Game {
   #loaded = false;
@@ -21,6 +23,9 @@ export default class Game {
 
   #player;
   #world;
+
+  /** @type {Entity[]} */
+  #entities = [];
 
 
   get loaded() {
@@ -77,6 +82,7 @@ export default class Game {
   }
 
   start() {
+    this.#entities.push(new Dummy(this.#world, new Vector(TILE_SIZE*5,TILE_SIZE*5)));
   }
 
   destroy() {
@@ -146,6 +152,7 @@ export default class Game {
     ctx.fillStyle = "red";
     ctx.fillRect(this.#crosshair.x-2.5, this.#crosshair.y-2.5, 5, 5);
 
+    this.#entities.forEach(e => e.render(dt, ctx));
     
     this.#player
       .render(dt, ctx);
@@ -161,6 +168,7 @@ export default class Game {
    * Do a tick.
    */
   tick(dt) {
+    this.#entities.forEach(e => e.tick(dt));
     if(input.buttonDown("debug")) {
       this.#debug ^= true;
     }
@@ -191,6 +199,7 @@ export default class Game {
    * @param {number} dt
    */
   physics(dt) {
+    this.#entities.forEach(e => e.physics(dt));
     bullets.physics(dt, this.#world);
     this.#player.physics(dt);
   }

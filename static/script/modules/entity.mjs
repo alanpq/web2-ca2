@@ -36,6 +36,14 @@ export default class Entity {
   }
 
   /**
+   * Do a tick.
+   * @param {number} dt
+   */
+  tick(dt) {
+    
+  }
+
+  /**
    * Do a fixed rate physics tick.
    * @param {number} dt
    */
@@ -62,12 +70,10 @@ export default class Entity {
   }
 
   /**
-   * Render the player.
    * @param {number} dt Delta-time in seconds 
    * @param {CanvasRenderingContext2D} ctx 2D Context
    */
   render(dt, ctx) {
-    ctx.fillStyle = "white";
     this.#virtualPos = Vector.lerp(this.#virtualPos, this.#position, 0.2);
     ctx.fillRect(this.#virtualPos.x, this.#virtualPos.y, this.#rect.width, this.#rect.height);
   }
