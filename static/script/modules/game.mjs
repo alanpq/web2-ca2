@@ -84,6 +84,7 @@ export default class Game {
       setFlag(Flags.PATHFINDING, ui.checkbox(getFlag(Flags.PATHFINDING), "pathfinding visualisation"));
       ui.text(getFlag(Flags.PATHFINDING) ? 'Left click to place point A. Right click to place point B' : '');
       setFlag(Flags.PLAYER, ui.checkbox(getFlag(Flags.PLAYER), "player debug"));
+      setFlag(Flags.UI, ui.checkbox(getFlag(Flags.UI), "ui debug"));
       
       ui.endVertical();
       ui.endArea();

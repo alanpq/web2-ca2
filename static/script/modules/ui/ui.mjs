@@ -5,6 +5,7 @@ import Rect from "../math/rect.mjs";
 import Vector from "../math/vector.mjs";
 import * as input from '../input/mod.mjs';
 import PositioningContext, { Flow } from "./positioningContext.mjs";
+import { Flags, getFlag } from "./debug.mjs";
 
 // the ui stack holds the nested 'positioning contexts',
 // which is used when rendering widgets to build 1 dimensional layouts
@@ -86,7 +87,8 @@ export default class UI {
       mText.width + this.textPadding.left + this.textPadding.right,
       mText.actualBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top + this.textPadding.bottom,
     );
-    // this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+    if(getFlag(Flags.UI))
+      this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
     this.#clipRect(rect);
     this.ctx.fillText(
       text,
@@ -114,7 +116,8 @@ export default class UI {
       this.font.size + padding*3 + mText.width,
       this.font.size + padding*2,
     );
-    // this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+    if(getFlag(Flags.UI))
+      this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
     this.#clipRect(rect);
     const hit = rect.containsPoint(input.mouse());
     input.setMouseEat(hit);
