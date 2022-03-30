@@ -118,10 +118,16 @@ export default class Game {
   */
   draw(dt, ctx) {
     this.#world.render(dt, ctx);
+
+    ctx.fillStyle = "red";
+    ctx.fillRect(this.#crosshair.x-2.5, this.#crosshair.y-2.5, 5, 5);
     
     this.#player
       .render(dt, ctx);
   }
+
+  /** @type {Vector} */
+  #crosshair = Vector.zero;
 
   /**
    * Do a tick.
@@ -131,7 +137,10 @@ export default class Game {
       this.#debug ^= true;
     }
 
-    this.#renderer.camera.position = this.#player.position;
+    this.#crosshair = this.#renderer.camera.screenToWorld(input.mouse());
+    this.#renderer.camera.position = Vector.lerp(this.#player.position, this.#crosshair, 0.3);
+
+    // this.#renderer.camera.position = this.#player.position;
   }
   /**
    * Do a fixed rate physics tick.
