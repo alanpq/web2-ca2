@@ -32,6 +32,8 @@ export default class UI {
   /** @type {SidedValues} */
   textPadding = {top: 2, right: 2, bottom: 2, left: 2};
 
+  hidden = false;
+
   /**
  * @typedef Font
  * @type {object}
@@ -87,19 +89,21 @@ export default class UI {
       mText.width + this.textPadding.left + this.textPadding.right,
       mText.actualBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top + this.textPadding.bottom,
     );
-    const clipRect = parent.computeClipRect(rect.width, rect.height);
-    if(getFlag(Flags.UI)) {
-      this.ctx.strokeStyle = "blue";
-      this.ctx.strokeRect(clipRect.left, clipRect.top, clipRect.width, clipRect.height);
-      this.ctx.strokeStyle = "red";
-      this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+    if(!this.hidden) {
+      const clipRect = parent.computeClipRect(rect.width, rect.height);
+      if(getFlag(Flags.UI)) {
+        this.ctx.strokeStyle = "blue";
+        this.ctx.strokeRect(clipRect.left, clipRect.top, clipRect.width, clipRect.height);
+        this.ctx.strokeStyle = "red";
+        this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+      }
+      this.#clipRect(clipRect);
+      this.ctx.fillText(
+        text,
+        rect.left + this.textPadding.left,
+        rect.top + mText.actualBoundingBoxAscent + this.textPadding.top,
+      );
     }
-    this.#clipRect(clipRect);
-    this.ctx.fillText(
-      text,
-      rect.left + this.textPadding.left,
-      rect.top + mText.actualBoundingBoxAscent + this.textPadding.top,
-    );
     parent.expand(rect);
     this.ctx.restore();
   }
@@ -121,41 +125,44 @@ export default class UI {
       this.font.size + padding*3 + mText.width,
       this.font.size + padding*2,
     );
-    const clipRect = parent.computeClipRect(rect.width, rect.height);
-    if(getFlag(Flags.UI)) {
-      this.ctx.strokeStyle = "blue";
-      this.ctx.strokeRect(clipRect.left, clipRect.top, clipRect.width, clipRect.height);
-      this.ctx.strokeStyle = "red";
-      this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+    let hit = false;
+    if(!this.hidden) {
+      const clipRect = parent.computeClipRect(rect.width, rect.height);
+      if(getFlag(Flags.UI)) {
+        this.ctx.strokeStyle = "blue";
+        this.ctx.strokeRect(clipRect.left, clipRect.top, clipRect.width, clipRect.height);
+        this.ctx.strokeStyle = "red";
+        this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+      }
+      this.#clipRect(clipRect);
+      hit = rect.containsPoint(input.mouse());
+      input.setMouseEat(hit);
+
+      this.ctx.fillStyle = hit ? "#C5C5C5": "#F3F3F3";
+      this.ctx.strokeStyle = "#302f30";
+      this.ctx.lineWidth = 0.5;
+
+      const box = new Vector(rect.left + padding, rect.top + padding);
+      this.ctx.fillRect  (box.x, box.y, this.font.size, this.font.size);
+      this.ctx.strokeRect(box.x, box.y, this.font.size, this.font.size);
+
+      if(value) {
+        const tickPadding = this.font.size*0.25;
+        this.ctx.fillStyle = "#1B1B1B";
+        this.ctx.fillRect(box.x+tickPadding, box.y+tickPadding,
+                          this.font.size-tickPadding*2, this.font.size-tickPadding*2);
+      }
+
+      this.ctx.fillStyle = this.font.color;
+      this.ctx.fillText(
+        label,
+        box.x + this.font.size + padding,
+        rect.top + mText.actualBoundingBoxAscent + padding,
+      );
     }
-    this.#clipRect(clipRect);
-    const hit = rect.containsPoint(input.mouse());
-    input.setMouseEat(hit);
-
-    this.ctx.fillStyle = hit ? "#C5C5C5": "#F3F3F3";
-    this.ctx.strokeStyle = "#302f30";
-    this.ctx.lineWidth = 0.5;
-
-    const box = new Vector(rect.left + padding, rect.top + padding);
-    this.ctx.fillRect  (box.x, box.y, this.font.size, this.font.size);
-    this.ctx.strokeRect(box.x, box.y, this.font.size, this.font.size);
-
-    if(value) {
-      const tickPadding = this.font.size*0.25;
-      this.ctx.fillStyle = "#1B1B1B";
-      this.ctx.fillRect(box.x+tickPadding, box.y+tickPadding,
-                        this.font.size-tickPadding*2, this.font.size-tickPadding*2);
-    }
-
-    this.ctx.fillStyle = this.font.color;
-    this.ctx.fillText(
-      label,
-      box.x + this.font.size + padding,
-      rect.top + mText.actualBoundingBoxAscent + padding,
-    );
-
     parent.expand(rect);
     this.ctx.restore();
+    if (this.hidden) return value;
     return value ^ (hit && input.leftMouseDown(true));
   }
 
