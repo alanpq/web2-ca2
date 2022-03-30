@@ -22,6 +22,7 @@ export default class Game {
   #player;
   #world;
 
+
   get loaded() {
     return this.#loaded;
   }
@@ -45,10 +46,19 @@ export default class Game {
       (dt) => {this.physics(dt)},
     )
   }
-
+  /** @type {HTMLAudioElement} */
+  #audio;
   async load() {
     if(this.#loaded) return;
     console.debug("Loading game...");
+
+    this.#audio = new Audio(URL_BASE + "/static/sound/machine-gun.mp3");
+    this.#audio.loop = true;
+    await new Promise((resolve, reject) => {
+      this.#audio.addEventListener("canplaythrough", e => {
+        resolve();
+      });
+    })
 
     this.#loaded = true;
     registerDebug(Flags.PATHFINDING, "draw", pathfinding.debug.draw);
@@ -145,7 +155,7 @@ export default class Game {
   #crosshair = Vector.zero;
 
   #gunTime = 0;
-  #gunInterval = 0.05;
+  #gunInterval = 0.105;
 
   /**
    * Do a tick.
@@ -154,6 +164,9 @@ export default class Game {
     if(input.buttonDown("debug")) {
       this.#debug ^= true;
     }
+
+    if(input.leftMouseDown()) this.#audio.play();
+    if(input.leftMouseUp()) {this.#audio.pause();this.#audio.currentTime = 0;}
 
     if(input.leftMouse()) {
       this.#gunTime += dt;
