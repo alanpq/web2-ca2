@@ -6,22 +6,21 @@ import Renderer from "./renderer.mjs";
 import * as input from './input/mod.mjs';
 import * as bullets from './weapons/bullets.mjs';
 
-import { CHUNK_AREA, CHUNK_SIZE, TILES, TILE_SIZE, World } from "./world.mjs";
+import World from "./world.mjs";
 import * as pathfinding from "./ai/pathfinding/pathfinding.mjs";
 import Vector from "./math/vector.mjs";
 import UI from './ui/ui.mjs';
 import Rect from "./math/rect.mjs";
-import { ui, setFlag, getFlag, registerDebug, Flags } from "./ui/debug.mjs";
+import { setFlag, getFlag, registerDebug, Flags } from "./ui/debug.mjs";
 import { Align } from "./ui/positioningContext.mjs";
 import Dummy from "./ai/enemy/dummy.mjs";
 import Entity from "./entity.mjs";
+import { TILE_SIZE } from "./world/map.mjs";
 
 export default class Game {
   #loaded = false;
   /** @type {Renderer} */
   #renderer;
-
-  #player;
   #world;
 
   /** @type {Entity[]} */
@@ -37,12 +36,10 @@ export default class Game {
     
     this.#world = new World();
 
-    this.#player = new Player(this.#world, Vector.zero.clone());
-    this.#player.position.x = this.#player.position.y = CHUNK_SIZE*TILE_SIZE/2;
-    this.#renderer.camera.position = this.#player.position;
+    // this.#renderer.camera.position = this.#world.player.position;
 
-    pathfinding.debug.state.world = this.#world;
-    pathfinding.debug.state.renderer = this.#renderer;
+    // pathfinding.debug.state.world = this.#world;
+    // pathfinding.debug.state.renderer = this.#renderer;
 
     this.#renderer.listen(
       (dt, ctx) => {this.draw(dt, ctx)},
@@ -110,8 +107,8 @@ export default class Game {
 
       ui.space();
 
-      ui.text(`pos: ${this.#player.position.toString(3)}`);
-      ui.text('vel: ' + this.#player.velocity.toString(3));
+      ui.text(`pos: ${this.#world.player.position.toString(3)}`);
+      ui.text('vel: ' + this.#world.player.velocity.toString(3));
 
       ui.space();
 
@@ -134,9 +131,9 @@ export default class Game {
   }
 
   
-  /** @type {import("./world.mjs").DetailedTile} */
+  /** @type {import("./world/map.mjs").DetailedTile} */
   #a;
-  /** @type {import("./world.mjs").DetailedTile} */
+  /** @type {import("./world/map.mjs").DetailedTile} */
   #b;
   #path;
   /**
@@ -154,7 +151,7 @@ export default class Game {
 
     this.#entities.forEach(e => e.render(dt, ctx));
     
-    this.#player
+    this.#world.player
       .render(dt, ctx);
   }
 
@@ -169,6 +166,7 @@ export default class Game {
    */
   tick(dt) {
     this.#entities.forEach(e => e.tick(dt));
+    this.#world.tick(dt);
     if(input.buttonDown("debug")) {
       this.#debug ^= true;
     }
@@ -180,8 +178,8 @@ export default class Game {
       this.#gunTime += dt;
       if(this.#gunTime > this.#gunInterval) {
         bullets.createBullet("pistol", {
-          pos: this.#player.position.clone().add(new Vector(PLAYER_SIZE_HALF,PLAYER_SIZE_HALF)),
-          vel: Vector.sub(Vector.random().mul(TILE_SIZE*0.5).add(this.#crosshair), this.#player.position).normalized().mul(600),
+          pos: this.#world.player.position.clone().add(new Vector(PLAYER_SIZE_HALF,PLAYER_SIZE_HALF)),
+          vel: Vector.sub(Vector.random().mul(TILE_SIZE*0.5).add(this.#crosshair), this.#world.player.position).normalized().mul(600),
           damage: 10,
           life: 5,
         })
@@ -190,7 +188,7 @@ export default class Game {
     }
 
     this.#crosshair = this.#renderer.camera.screenToWorld(input.mouse());
-    this.#renderer.camera.position = Vector.lerp(this.#player.position, this.#crosshair, 0.3);
+    this.#renderer.camera.position = Vector.lerp(this.#world.player.position, this.#crosshair, 0.3);
 
     // this.#renderer.camera.position = this.#player.position;
   }
@@ -199,8 +197,8 @@ export default class Game {
    * @param {number} dt
    */
   physics(dt) {
-    this.#entities.forEach(e => e.physics(dt));
+    this.#entities.forEach(e => e.physics(dt, this.#world));
     bullets.physics(dt, this.#world);
-    this.#player.physics(dt);
+    this.#world.physics(dt, this.#world);
   }
 }

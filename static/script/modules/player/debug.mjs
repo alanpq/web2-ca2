@@ -2,10 +2,10 @@
 import Rect from "../math/rect.mjs";
 import Vector from "../math/vector.mjs";
 import UI from "../ui/ui.mjs";
-import { TILE_SIZE } from "../world.mjs";
 import Player, { PLAYER_SIZE } from "./player.mjs";
 import * as input from '../input/mod.mjs';
 import { Align } from "../ui/positioningContext.mjs";
+import { TILE_SIZE } from "../world/map.mjs";
 
 /**
  * @param {Player} p

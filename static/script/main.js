@@ -1,8 +1,7 @@
 'use strict';
 import * as spa from './modules/spa.mjs';
-import Game from './modules/game.mjs';
 
-import Vector from './modules/math/vector.mjs';
+import Game from './modules/game.mjs';
 import Renderer from './modules/renderer.mjs';
 
 import * as input from './modules/input/mod.mjs';

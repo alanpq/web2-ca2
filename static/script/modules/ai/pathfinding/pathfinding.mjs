@@ -1,6 +1,6 @@
 'use strict';
 import Vector from "../../math/vector.mjs"
-import { CHUNK_AREA, CHUNK_SIZE, TILES, World } from "../../world.mjs"
+import { CHUNK_AREA, CHUNK_SIZE, TILES } from "../../world/map.mjs";
 import { state } from "./debug.mjs";
 
 export * as debug from './debug.mjs';
@@ -48,8 +48,8 @@ const dist = (a, b) => {
 /**
  * Find the shortest path between two tiles.
  * @param {World} world
- * @param {import("../../world.mjs").DetailedTile} a 
- * @param {import("../../world.mjs").DetailedTile} b 
+ * @param {import("../../world/map.mjs").DetailedTile} a 
+ * @param {import("../../world/map.mjs").DetailedTile} b
  */
 export const findPath = (world, a, b) => {
   // FIXME: implement cross-chunk pathing

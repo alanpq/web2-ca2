@@ -1,6 +1,6 @@
 import Rect from "../math/rect.mjs";
 import Vector from "../math/vector.mjs";
-import { World } from "../world.mjs";
+import World from "../world.mjs";
 
 /**
  * @readonly
@@ -92,7 +92,7 @@ export const physics = (dt, world) => {
           b.vel.mul(type.params.drag);
           rect.left = b.pos.x;
           rect.top = b.pos.y;
-          if(world.tileCollides(rect)) {
+          if(world.map.tileCollides(rect)) {
             b.life = 0;
           }
         break;

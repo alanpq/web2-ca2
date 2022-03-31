@@ -1,7 +1,8 @@
 'use strict';
 import * as input from '../../input/mod.mjs';
 import Vector from '../../math/vector.mjs';
-import { TILE_SIZE, World } from '../../world.mjs';
+import World from '../../world.mjs';
+import { TILE_SIZE } from '../../world/map.mjs';
 import { findPath, idxToPos } from './pathfinding.mjs';
 
 export const state = {
