@@ -2,8 +2,8 @@ import Entity from "../../entity.mjs";
 import Vector from "../../math/vector.mjs";
 
 export default class Dummy extends Entity {
-  constructor (world, position) {
-    super(world, position, new Vector(10, 10));
+  constructor (position) {
+    super(position, new Vector(10, 10));
     this.speed = 0;
   }
 

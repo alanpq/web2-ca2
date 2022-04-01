@@ -51,7 +51,7 @@ const dist = (a, b) => {
  * @param {import("../../world/map.mjs").DetailedTile} a 
  * @param {import("../../world/map.mjs").DetailedTile} b
  */
-export const findPath = (world, a, b) => {
+export const findPath = (world, a, b, debug=false) => {
   // FIXME: implement cross-chunk pathing
   // TODO: do bi-directional pathing to exit impossible paths earlier
   if(a.chunk != b.chunk) return console.error("Pathfinding does not yet work across chunks!");
@@ -76,9 +76,11 @@ export const findPath = (world, a, b) => {
   // estimated cost of total path if going through [n]
   const fScore = {}; // fScore[n] = gScore[n] + dist(n, goal)
   fScore[aIdx] = dist(aIdx, bIdx);
-
-  state.i = 0;
-  state.order = {};
+  
+  if(debug) {
+    state.i = 0;
+    state.order = {};
+  }
 
   const neighborsOf = (tile) => {
     if(tile < 0 || tile >= CHUNK_AREA) return;
@@ -93,18 +95,18 @@ export const findPath = (world, a, b) => {
       if(openSet.has(tile) || c.getTile(x, y) == TILES.WALL) return;
       lst.push(tile+n);
     });
-    diagonals.forEach(([xo, yo]) => {
-      const n = xo + yo * CHUNK_SIZE;
-      const x = t.x + xo;
-      const y = t.y + yo;
-      if(x < 0 || x >= CHUNK_SIZE) return;
-      if(y < 0 || y >= CHUNK_SIZE) return;
-      if(openSet.has(tile) || c.getTile(x, y) == TILES.WALL) return;
-      if(c.getTile(x, t.y) == TILES.WALL && c.getTile(t.x, y) == TILES.WALL) {
-        return;
-      }
-      lst.push(tile+n);
-    })
+    // diagonals.forEach(([xo, yo]) => {
+    //   const n = xo + yo * CHUNK_SIZE;
+    //   const x = t.x + xo;
+    //   const y = t.y + yo;
+    //   if(x < 0 || x >= CHUNK_SIZE) return;
+    //   if(y < 0 || y >= CHUNK_SIZE) return;
+    //   if(openSet.has(tile) || c.getTile(x, y) == TILES.WALL) return;
+    //   if(c.getTile(x, t.y) == TILES.WALL && c.getTile(t.x, y) == TILES.WALL) {
+    //     return;
+    //   }
+    //   lst.push(tile+n);
+    // })
     return lst;
   }
   const lowestFscore = (set) => {
@@ -127,9 +129,11 @@ export const findPath = (world, a, b) => {
     }
     //TODO: use priority queue or min-heap to bring this down to O(logn)
     const cur = lowestFscore(openSet);
-    state.cameFrom = cameFrom;
-    state.fScore = fScore;
-    state.gScore = gScore;
+    if(debug) {
+      state.cameFrom = cameFrom;
+      state.fScore = fScore;
+      state.gScore = gScore;
+    }
     if (cur == bIdx) return constructPath(cameFrom, cur);
 
     openSet.delete(cur);
@@ -138,9 +142,11 @@ export const findPath = (world, a, b) => {
     neighbors.forEach(neighbor => {
       const tentGScore = gScore[cur] + 1;//dist(cur, neighbor);
       if (gScore[neighbor] == undefined || tentGScore < gScore[neighbor] ) {
-        if(!state.order[neighbor])
-          state.order[neighbor] = state.i;
-        state.i += 1;
+        if(debug) {
+          if(!state.order[neighbor])
+            state.order[neighbor] = state.i;
+          state.i += 1;
+        }
         cameFrom[neighbor] = cur;
         gScore[neighbor] = tentGScore;
         fScore[neighbor] = tentGScore + dist(neighbor, bIdx);
@@ -148,8 +154,10 @@ export const findPath = (world, a, b) => {
       }
     })
   }
-  state.cameFrom = cameFrom;
-  state.fScore = fScore;
-  state.gScore = gScore;
+  if(debug) {
+    state.cameFrom = cameFrom;
+    state.fScore = fScore;
+    state.gScore = gScore;
+  }
   return null;
 }

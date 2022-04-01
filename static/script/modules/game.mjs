@@ -13,8 +13,10 @@ import UI from './ui/ui.mjs';
 import Rect from "./math/rect.mjs";
 import { setFlag, getFlag, registerDebug, Flags } from "./ui/debug.mjs";
 import { Align } from "./ui/positioningContext.mjs";
-import Dummy from "./ai/enemy/dummy.mjs";
+
 import Entity from "./entity.mjs";
+import Dummy from "./ai/enemy/dummy.mjs";
+import Enemy from "./ai/enemy/enemy.mjs";
 import { TILE_SIZE } from "./world/map.mjs";
 
 export default class Game {
@@ -36,10 +38,10 @@ export default class Game {
     
     this.#world = new World();
 
-    // this.#renderer.camera.position = this.#world.player.position;
+    this.#renderer.camera.position = this.#world.player.position;
 
-    // pathfinding.debug.state.world = this.#world;
-    // pathfinding.debug.state.renderer = this.#renderer;
+    pathfinding.debug.state.world = this.#world;
+    pathfinding.debug.state.renderer = this.#renderer;
 
     this.#renderer.listen(
       (dt, ctx) => {this.draw(dt, ctx)},
@@ -79,7 +81,10 @@ export default class Game {
   }
 
   start() {
-    this.#entities.push(new Dummy(this.#world, new Vector(TILE_SIZE*5,TILE_SIZE*5)));
+    console.log('Starting game...');
+    this.#entities.push(new Dummy(new Vector(TILE_SIZE*5,TILE_SIZE*5)));
+    this.#entities.push(new Enemy(new Vector(TILE_SIZE*6,TILE_SIZE*6)));
+    console.log('Game started!');
   }
 
   destroy() {
@@ -116,6 +121,7 @@ export default class Game {
       setFlag(Flags.PATHFINDING, ui.checkbox(getFlag(Flags.PATHFINDING), "pathfinding visualisation"));
       setFlag(Flags.PLAYER, ui.checkbox(getFlag(Flags.PLAYER), "player debug"));
       setFlag(Flags.UI, ui.checkbox(getFlag(Flags.UI), "ui debug"));
+      setFlag(Flags.AI, ui.checkbox(getFlag(Flags.AI), "ai debug"));
 
       ui.space();
       

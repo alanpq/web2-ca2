@@ -1,3 +1,5 @@
+'use strict';
+
 import Rect from "./math/rect.mjs";
 import Vector from "./math/vector.mjs";
 import World from "./world.mjs";
@@ -6,8 +8,8 @@ const SUBSTEPS = 10;
 
 export default class Entity {
   #virtualPos = new Vector(); // virtual position for interpolation
-  #position = new Vector();
-  #velocity = new Vector();
+  position = new Vector();
+  velocity = new Vector();
   /** @type {Rect} */
   #rect;
 
@@ -17,8 +19,6 @@ export default class Entity {
 
   
   get virtualPosition (){return this.#virtualPos;}
-  get position (){return this.#position;}
-  get velocity (){return this.#velocity;}
 
   /**
    * 
@@ -26,7 +26,7 @@ export default class Entity {
    * @param {Vector} size 
    */
   constructor(position, size) {
-    this.#position = position;
+    this.position = position;
     this.#virtualPos = position;
     this.#rect = new Rect(0,0,size.x,size.y);
   }
@@ -45,24 +45,25 @@ export default class Entity {
    * @param {World} world
    */
   physics(dt, world) {
-    let inputDir = this.input.clone().mul(dt * this.speed);
-    this.#velocity.add(inputDir).mul(this.drag);
+    this.velocity.mul(this.drag);
     // naive, needs substeppage to feel tight
     for(let i = 0; i < SUBSTEPS; i++) {
-      const newPos = Vector.add(this.#position, this.#velocity.clone().div(SUBSTEPS));
-      this.#rect.top = this.#position.y;
+      const newPos = Vector.add(this.position, this.velocity.clone().div(SUBSTEPS));
+      this.#rect.top = this.position.y;
       this.#rect.left = newPos.x;
       let hit = world.map.tileCollides(this.#rect);
       if(hit) {
-        newPos.x = this.#position.x;
-        this.#rect.left = this.#position.x;
+        newPos.x = this.position.x;
+        this.velocity.x = 0;
+        this.#rect.left = this.position.x;
       }
       this.#rect.top = newPos.y;
       hit = world.map.tileCollides(this.#rect);
       if(hit) {
-        newPos.y = this.#position.y;
+        newPos.y = this.position.y;
+        this.velocity.y = 0;
       }
-      this.#position = newPos;
+      this.position = newPos;
     }
   }
 
@@ -71,7 +72,7 @@ export default class Entity {
    * @param {CanvasRenderingContext2D} ctx 2D Context
    */
   render(dt, ctx) {
-    this.#virtualPos = Vector.lerp(this.#virtualPos, this.#position, 0.2);
+    this.#virtualPos = Vector.lerp(this.#virtualPos, this.position, 0.2);
     ctx.fillRect(this.#virtualPos.x, this.#virtualPos.y, this.#rect.width, this.#rect.height);
   }
 }

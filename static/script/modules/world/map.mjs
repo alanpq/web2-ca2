@@ -22,6 +22,12 @@ export const worldToTile = (pos) => {
 export const tileToChunk = (pos) => {
   return new Vector(Math.floor(pos.x/CHUNK_SIZE), Math.floor(pos.y/CHUNK_SIZE));
 }
+
+export const tileToWorld = (pos, chunk=null) => {
+  if(chunk) return new Vector((pos.x + chunk.x*CHUNK_SIZE)*TILE_SIZE,
+                              (pos.y + chunk.y*CHUNK_SIZE)*TILE_SIZE);
+  return new Vector(pos.x*TILE_SIZE, pos.y*TILE_SIZE);
+}
 /**
  * Convert from world-space to chunk-space
  * @param {Vector} pos
@@ -102,31 +108,24 @@ export default class Map {
     return this.getChunk(worldToChunk(pos));
   }
 
-  /**
-   * 
-   * @param {Vector} pos 
-   * @returns {DetailedTile}
-   */
-  probeTileFromWorld(pos) {
-    const t = worldToTile(pos);
-    const c = this.getChunk(tileToChunk(t));
-    if(!c) return {tile: null};
-    const xx = t.x - c.x * CHUNK_SIZE;
-    const yy = t.y - c.y * CHUNK_SIZE;
-    return {tile: c.getTile(t.x, t.y),
+  probeTile(pos) {
+    const c = this.getChunk(tileToChunk(pos));
+    if(!c) return {tile: null, chunk: null, x: null, y: null, worldX: null, worldY: null};
+    const x = pos.x - c.x * CHUNK_SIZE;
+    const y = pos.y - c.y * CHUNK_SIZE;
+    return {
+      tile: c.getTile(pos.x, pos.y),
       chunk: c,
-      x: xx, y: yy,
-      worldX: t.x, worldY: t.y
-    };
+      x, y, worldX: pos.x, worldY: pos.y
+    }
   }
 /**
    * 
    * @param {Vector} pos 
    * @returns {Tile}
    */
-  getTileFromWorld(pos) {
-    // console.debug(pos, this.probeTileFromWorld(pos));
-    return this.probeTileFromWorld(pos).tile;
+  getTile(pos) {
+    return this.probeTile(pos).tile;
   }
 
   /**
@@ -134,15 +133,15 @@ export default class Map {
    * @param {Rect} rect 
    */
   tileCollides(rect) {
-    const left = Math.floor(rect.left / TILE_SIZE) * TILE_SIZE;
-    const right = Math.floor(rect.right / TILE_SIZE) * TILE_SIZE;
-    const top = Math.floor(rect.top / TILE_SIZE) * TILE_SIZE;
-    const bottom = Math.floor(rect.bottom / TILE_SIZE) * TILE_SIZE;
+    const left = Math.floor(rect.left / TILE_SIZE);
+    const right = Math.floor(rect.right / TILE_SIZE);
+    const top = Math.floor(rect.top / TILE_SIZE);
+    const bottom = Math.floor(rect.bottom / TILE_SIZE);
     for(let x = left; x<=right; x++) {
       for(let y = top; y <= bottom; y++) {
         const v = new Vector(x,y);
         // console.log(v.toString(),this.getTileFromWorld(v));
-        if(this.getTileFromWorld(v) == TILES.WALL) {
+        if(this.getTile(v) == TILES.WALL) {
           return v.mul(1/TILE_SIZE);
         }
         

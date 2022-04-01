@@ -2,7 +2,7 @@
 import * as input from '../../input/mod.mjs';
 import Vector from '../../math/vector.mjs';
 import World from '../../world.mjs';
-import { TILE_SIZE } from '../../world/map.mjs';
+import { TILE_SIZE, worldToTile } from '../../world/map.mjs';
 import { findPath, idxToPos } from './pathfinding.mjs';
 
 export const state = {
@@ -20,13 +20,13 @@ export const state = {
 
 export const tick = (dt) => {
   if(input.leftMouseDown()) {
-    state.a = state.world.probeTileFromWorld(state.renderer.camera.screenToWorld(input.mouse()));
-    if(state.b) state.path = findPath(state.world, state.a, state.b);
+    state.a = state.world.map.probeTile(worldToTile(state.renderer.camera.screenToWorld(input.mouse())));
+    if(state.b) state.path = findPath(state.world, state.a, state.b, true);
   }
 
   if(input.rightMouseDown()) {
-    state.b = state.world.probeTileFromWorld(state.renderer.camera.screenToWorld(input.mouse()));
-    if(state.a) state.path = findPath(state.world, state.a, state.b);
+    state.b = state.world.map.probeTile(worldToTile(state.renderer.camera.screenToWorld(input.mouse())));
+    if(state.a) state.path = findPath(state.world, state.a, state.b, true);
   }
 }
 
@@ -82,7 +82,7 @@ export const draw = (dt, ctx) => {
     ctx.fillRect(state.b.worldX*TILE_SIZE, state.b.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
-  const t = state.world.probeTileFromWorld(state.renderer.camera.screenToWorld(input.mouse()));
+  const t = state.world.map.probeTile(worldToTile(state.renderer.camera.screenToWorld(input.mouse())));
   if(t && !input.isMouseEaten()) {
     ctx.fillStyle = "rgba(255,255,255,0.2)";
     ctx.fillRect(t.worldX*TILE_SIZE, t.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
