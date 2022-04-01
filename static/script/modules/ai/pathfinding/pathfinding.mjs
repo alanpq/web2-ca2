@@ -95,18 +95,18 @@ export const findPath = (world, a, b, debug=false) => {
       if(openSet.has(tile) || c.getTile(x, y) == TILES.WALL) return;
       lst.push(tile+n);
     });
-    // diagonals.forEach(([xo, yo]) => {
-    //   const n = xo + yo * CHUNK_SIZE;
-    //   const x = t.x + xo;
-    //   const y = t.y + yo;
-    //   if(x < 0 || x >= CHUNK_SIZE) return;
-    //   if(y < 0 || y >= CHUNK_SIZE) return;
-    //   if(openSet.has(tile) || c.getTile(x, y) == TILES.WALL) return;
-    //   if(c.getTile(x, t.y) == TILES.WALL && c.getTile(t.x, y) == TILES.WALL) {
-    //     return;
-    //   }
-    //   lst.push(tile+n);
-    // })
+    diagonals.forEach(([xo, yo]) => {
+      const n = xo + yo * CHUNK_SIZE;
+      const x = t.x + xo;
+      const y = t.y + yo;
+      if(x < 0 || x >= CHUNK_SIZE) return;
+      if(y < 0 || y >= CHUNK_SIZE) return;
+      if(openSet.has(tile) || c.getTile(x, y) == TILES.WALL) return;
+      if(c.getTile(x, t.y) == TILES.WALL && c.getTile(t.x, y) == TILES.WALL) {
+        return;
+      }
+      lst.push(tile+n);
+    })
     return lst;
   }
   const lowestFscore = (set) => {
