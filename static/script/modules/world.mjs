@@ -13,12 +13,19 @@ export default class World {
     this.player.position.x = this.player.position.y = CHUNK_SIZE*TILE_SIZE/2;
   }
 
+  /** @type {Entity[]} */
+  #entities = [];
+
+  addEntity(entity) {
+    this.#entities.push(entity);
+  }
+
   /**
    * Do a tick.
    * @param {number} dt
    */
   tick(dt) {
-
+    this.#entities.forEach(e => e.tick(dt));
   }
   
   /**
@@ -26,11 +33,14 @@ export default class World {
    * @param {number} dt
    * @param {World} world
    */
-  physics(dt, world) {
-    this.player.physics(dt, world);
+  physics(dt) {
+    this.#entities.forEach(e => e.physics(dt, this));
+    this.player.physics(dt, this);
   }
 
   render(dt, ctx) {
     this.map.render(dt, ctx);
+    this.player.render(dt, ctx);
+    this.#entities.forEach(e => e.render(dt, ctx));
   }
 }

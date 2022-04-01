@@ -23,10 +23,8 @@ export default class Game {
   #loaded = false;
   /** @type {Renderer} */
   #renderer;
+  /** @type {World} */
   #world;
-
-  /** @type {Entity[]} */
-  #entities = [];
 
 
   get loaded() {
@@ -82,8 +80,8 @@ export default class Game {
 
   start() {
     console.log('Starting game...');
-    this.#entities.push(new Dummy(new Vector(TILE_SIZE*5,TILE_SIZE*5)));
-    this.#entities.push(new Enemy(new Vector(TILE_SIZE*6,TILE_SIZE*6)));
+    this.#world.addEntity(new Dummy(new Vector(TILE_SIZE*5,TILE_SIZE*5)));
+    this.#world.addEntity(new Enemy(new Vector(TILE_SIZE*6,TILE_SIZE*6)));
     console.log('Game started!');
   }
 
@@ -154,11 +152,6 @@ export default class Game {
 
     ctx.fillStyle = "red";
     ctx.fillRect(this.#crosshair.x-2.5, this.#crosshair.y-2.5, 5, 5);
-
-    this.#entities.forEach(e => e.render(dt, ctx));
-    
-    this.#world.player
-      .render(dt, ctx);
   }
 
   /** @type {Vector} */
@@ -171,7 +164,6 @@ export default class Game {
    * Do a tick.
    */
   tick(dt) {
-    this.#entities.forEach(e => e.tick(dt));
     this.#world.tick(dt);
     if(input.buttonDown("debug")) {
       this.#debug ^= true;
@@ -203,8 +195,7 @@ export default class Game {
    * @param {number} dt
    */
   physics(dt) {
-    this.#entities.forEach(e => e.physics(dt, this.#world));
     bullets.physics(dt, this.#world);
-    this.#world.physics(dt, this.#world);
+    this.#world.physics(dt);
   }
 }
