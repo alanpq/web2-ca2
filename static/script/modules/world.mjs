@@ -10,7 +10,7 @@ export default class World {
   player;
   constructor() {
     this.player = new Player(Vector.zero.clone());
-    this.player.position.x = this.player.position.y = CHUNK_SIZE*TILE_SIZE/2;
+    this.player.position.x = this.player.position.y = (CHUNK_SIZE*TILE_SIZE/2)+TILE_SIZE/2;
   }
 
   /** @type {Entity[]} */

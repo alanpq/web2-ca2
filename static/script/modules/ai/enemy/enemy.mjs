@@ -19,6 +19,7 @@ export default class Enemy extends Entity {
   }
 
   #target = new Vector(); // current world-space destination
+  #destination = new Vector();           // tile-space path destination
   #targetTile;            // destination tile (usually the player)
   #path;                  // path to destination tile
   get curTile() {
@@ -44,26 +45,34 @@ export default class Enemy extends Entity {
    * @param {World} world
    */
   physics(dt, world) {
-    const tile = world.map.probeTile(worldToTile(world.player.position));
+    const player = worldToTile(world.player.position);
+    const tile = world.map.probeTile(player);
     this.#debug.tile = tile;
     this.#debug.curIdx = this.#curIdx;
 
-    if(tile != this.#targetTile) {
+    if((player.x != this.#destination.x || player.y != this.#destination.y) || !this.#path) {
       // this.#testDone = true;
+      this.#destination = player;
       this.#targetTile = tile;
       const cur = world.map.probeTile(worldToTile(this.position));
       this.#path = pathfinding.findPath(world, cur, tile);
       this.#curIdx = 1;
       this.newTarget();
+      console.log('new path');
     }
-    if(this.#path != null && this.#path.length > 1 && this.#target != null) {
+    if(this.#path != null && this.#path.length > 1 && this.#target != null && this.#curIdx < this.#path.length) {
       let targetDir = Vector.sub(this.#target, this.position).div(TILE_SIZE);
       const d = targetDir.magnitude;
       this.#debug.d = d;
-      if (d > 1) {
-        targetDir = targetDir.normalized();
-        // targetDir.mul(1);
+      if(d < 0.5) {
+        if(this.#curIdx >= this.#path.length) {
+          console.log('reached destination');
+        } else {
+          this.#curIdx += 1;
+          this.newTarget();
+        }
       }
+      targetDir = targetDir.normalized();
       this.#debug.targetDir = targetDir;
       // this.input = this.#target.sub(this.position).normalized();
       this.velocity.add(targetDir.mul(dt*100));

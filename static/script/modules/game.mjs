@@ -80,8 +80,8 @@ export default class Game {
 
   start() {
     console.log('Starting game...');
-    this.#world.addEntity(new Dummy(new Vector(TILE_SIZE*5,TILE_SIZE*5)));
-    this.#world.addEntity(new Enemy(new Vector(TILE_SIZE*6,TILE_SIZE*6)));
+    this.#world.addEntity(new Dummy(new Vector(TILE_SIZE*5.5,TILE_SIZE*5.5)));
+    this.#world.addEntity(new Enemy(new Vector(TILE_SIZE*6.5,TILE_SIZE*6.5)));
     console.log('Game started!');
   }
 

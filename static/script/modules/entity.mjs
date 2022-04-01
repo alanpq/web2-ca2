@@ -49,15 +49,15 @@ export default class Entity {
     // naive, needs substeppage to feel tight
     for(let i = 0; i < SUBSTEPS; i++) {
       const newPos = Vector.add(this.position, this.velocity.clone().div(SUBSTEPS));
-      this.#rect.top = this.position.y;
-      this.#rect.left = newPos.x;
+      this.#rect.top = this.position.y - this.#rect.height/2;
+      this.#rect.left = newPos.x - this.#rect.width/2;
       let hit = world.map.tileCollides(this.#rect);
       if(hit) {
         newPos.x = this.position.x;
         this.velocity.x = 0;
-        this.#rect.left = this.position.x;
+        this.#rect.left = this.position.x - this.#rect.width/2;
       }
-      this.#rect.top = newPos.y;
+      this.#rect.top = newPos.y - this.#rect.height/2;
       hit = world.map.tileCollides(this.#rect);
       if(hit) {
         newPos.y = this.position.y;
@@ -73,6 +73,6 @@ export default class Entity {
    */
   render(dt, ctx) {
     this.#virtualPos = Vector.lerp(this.#virtualPos, this.position, 0.2);
-    ctx.fillRect(this.#virtualPos.x, this.#virtualPos.y, this.#rect.width, this.#rect.height);
+    ctx.fillRect(this.#virtualPos.x-this.#rect.width/2, this.#virtualPos.y-this.#rect.height/2, this.#rect.width, this.#rect.height);
   }
 }
