@@ -11,7 +11,7 @@ import * as debug from './debug.mjs';
 export default class Enemy extends Entity {
   #debug = {targetDir: null, d: 0};
   constructor (position) {
-    super(position, new Vector(10, 10));
+    super(position, new Vector(10, 10), 100);
     this.speed = 105;
     this.drag = 0.5;
 
@@ -86,5 +86,11 @@ export default class Enemy extends Entity {
   render(dt, ctx) {
     ctx.fillStyle = "black";
     super.render(dt, ctx);
+    const ww = (this.rect.width*1.5);
+    const w = ww * (this.health/this.maxHealth);
+    ctx.fillStyle = "red";
+    ctx.fillRect(this.virtualPosition.x - (ww)/2, this.virtualPosition.y - this.rect.height*1.1, ww, 5);
+    ctx.fillStyle = "green";
+    ctx.fillRect(this.virtualPosition.x - (ww)/2, this.virtualPosition.y - this.rect.height*1.1, w, 5);
   }
 }

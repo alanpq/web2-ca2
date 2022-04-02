@@ -16,19 +16,36 @@ export default class Entity {
   input = new Vector();
   speed = 0;
   drag = 0.5;
+  
+  #maxHealth = 0;
+  health = 0;
 
   
   get virtualPosition (){return this.#virtualPos;}
+  get rect () {return new Rect(this.position.x, this.position.y, this.#rect.width, this.#rect.height);}
 
   /**
    * 
    * @param {Vector} position 
    * @param {Vector} size 
    */
-  constructor(position, size) {
+  constructor(position, size, maxHealth=0) {
     this.position = position;
     this.#virtualPos = position;
     this.#rect = new Rect(0,0,size.x,size.y);
+  
+    this.#maxHealth = this.health = maxHealth;
+  }
+  
+  get maxHealth() {return this.#maxHealth;}
+
+  /**
+   * 
+   * @param {import("./weapons/bullets.mjs").Bullet} bullet 
+   */
+  onHit(bullet) {
+    this.health -= bullet.damage;
+    this.velocity.add(bullet.vel.clone().mul(0.05));
   }
 
   /**

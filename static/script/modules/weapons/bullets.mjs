@@ -1,6 +1,7 @@
 import Rect from "../math/rect.mjs";
 import Vector from "../math/vector.mjs";
 import World from "../world.mjs";
+import Entity from "../entity.mjs";
 
 /**
  * @readonly
@@ -94,6 +95,14 @@ export const physics = (dt, world) => {
           rect.top = b.pos.y;
           if(world.map.tileCollides(rect)) {
             b.life = 0;
+          }
+          for(let i = 0; i < world.entities.length; i++) {
+            /** @type {Entity} */
+            const ent = world.entities[i];
+            if(ent.rect.overlaps(rect)) {
+              ent.onHit(b);
+              b.life = 0;
+            }
           }
         break;
         default:

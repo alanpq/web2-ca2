@@ -16,6 +16,8 @@ export default class World {
   /** @type {Entity[]} */
   #entities = [];
 
+  get entities() {return this.#entities;}
+
   addEntity(entity) {
     this.#entities.push(entity);
   }
