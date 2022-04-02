@@ -28,7 +28,7 @@ export const draw = (state, dt, ctx) => {
     ctx.lineWidth = 1;
     ctx.strokeStyle = "black";
     ctx.beginPath();
-    ctx.moveTo(state.debug.targetDir.x, state.debug.targetDir.y);
+    ctx.moveTo(state.enemy.position.x, state.enemy.position.y);
     ctx.lineTo(state.debug.targetDir.x + state.enemy.position.x, state.debug.targetDir.y + state.enemy.position.y);
     ctx.stroke();
   }
