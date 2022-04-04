@@ -13,6 +13,7 @@ export const Flags = {
   AI: 1,
   PLAYER: 2,
   UI: 3,
+  COLLISION: 4,
 }
 
 /**

@@ -5,6 +5,7 @@ import Renderer from "./renderer.mjs";
 
 import * as input from './input/mod.mjs';
 import * as bullets from './weapons/bullets.mjs';
+import * as collisionDebug from './debug/collision.mjs';
 
 import World from "./world.mjs";
 import * as pathfinding from "./ai/pathfinding/pathfinding.mjs";
@@ -65,6 +66,8 @@ export default class Game {
     this.#loaded = true;
     registerDebug(Flags.PATHFINDING, "draw", pathfinding.debug.draw);
     registerDebug(Flags.PATHFINDING, "tick", pathfinding.debug.tick);
+    registerDebug(Flags.COLLISION, "draw", collisionDebug.draw);
+    registerDebug(Flags.COLLISION, "tick", collisionDebug.tick);
 
     bullets.registerBulletType("pistol", {
       type: bullets.ProjectileType.PHYSICS,
@@ -120,6 +123,7 @@ export default class Game {
       setFlag(Flags.PLAYER, ui.checkbox(getFlag(Flags.PLAYER), "player debug"));
       setFlag(Flags.UI, ui.checkbox(getFlag(Flags.UI), "ui debug"));
       setFlag(Flags.AI, ui.checkbox(getFlag(Flags.AI), "ai debug"));
+      setFlag(Flags.COLLISION, ui.checkbox(getFlag(Flags.COLLISION), "collision debug"));
 
       ui.space();
       

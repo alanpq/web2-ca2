@@ -38,6 +38,7 @@ export const ProjectileType = {
  * @type {object}
  * @prop {Vector} drawPos
  * @prop {Vector} pos
+ * @prop {Vector} oldPos
  * @prop {Vector} vel
  * @prop {number} damage
  * @prop {number} life
@@ -89,6 +90,7 @@ export const physics = (dt, world) => {
       b.life -= dt;
       switch (type.type) {
         case ProjectileType.PHYSICS:
+          b.oldPos = b.pos.clone();
           b.pos.add(Vector.mul(b.vel, dt));
           b.vel.mul(type.params.drag);
           rect.left = b.pos.x;
@@ -99,7 +101,7 @@ export const physics = (dt, world) => {
           for(let i = 0; i < world.entities.length; i++) {
             /** @type {Entity} */
             const ent = world.entities[i];
-            if(ent.rect.overlaps(rect)) {
+            if(ent.rect.lineIntersects(b.oldPos, b.pos)) {
               ent.onHit(b);
               b.life = 0;
             }
