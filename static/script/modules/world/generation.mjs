@@ -91,7 +91,7 @@ const door = (map, pos, orient, retry=false) => {
   const a = getTile(map, new Vector(pos.x - xOff, pos.y - yOff));
   const b = getTile(map, new Vector(pos.x + xOff, pos.y + yOff));
   if(a == TILES.WALL || b == TILES.WALL) {
-    setTile(map, pos.x, pos.y, TILES.VOID);
+    // setTile(map, pos.x, pos.y, TILES.VOID);
     if(retry) return;
     door(map, new Vector(pos.x - yOff, pos.y - xOff), orient, true);
     door(map, new Vector(pos.x + yOff, pos.y + xOff), orient, true);

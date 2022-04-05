@@ -10,12 +10,7 @@ export default class Chunk {
   /** @type {Tile[]} */
   #map = []
 
-  exits = {
-    top: null,
-    bottom: null,
-    left: null,
-    right: null,
-  };
+  doored = [false, false];
 
   constructor(x, y) {
     this.x = x;

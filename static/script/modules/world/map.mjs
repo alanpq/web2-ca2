@@ -1,3 +1,4 @@
+import { randRange } from "../math/mod.mjs";
 import Rect from "../math/rect.mjs";
 import Vector from "../math/vector.mjs";
 import Chunk from "./chunk.mjs";
@@ -94,49 +95,24 @@ export default class Map {
     c.render(dt, ctx);
   }
 
-/**
-   * 
-   * @param {Chunk} a 
-   * @param {Chunk} b 
-   */
-  #pullExit(a,b, v) {
-    if(!a || !b) return;
-    const exit = v ? "bottom" : "right";
-    const exitOpp = v ? "top" : "left";
-    if(!b.exits[exitOpp]) return;
-    a.exits[exit] = new Vector(
-      b.exits[exitOpp].x || CHUNK_SIZE-1,
-      b.exits[exitOpp].y || CHUNK_SIZE-1,
-    );
-    if(v) a.exits[exit].y -= 1;
-    else a.exits[exit].x -= 1;
-  }
-
   /**
    * 
    * @param {Chunk} a 
    * @param {Chunk} b 
    */
   #glueEdge(a, b, v) {
-    if(!a || !b) return;
-    const exit = v ? "top" : "left";
-    const exitOpp = v ? "bottom" : "right";
-    if(a.exits[exit] != null) return;
+    if(!a || !b) return false;
 
-    for(let i = 1; i < CHUNK_SIZE-1; i++) {
+    while(true) {
+      const i = randRange(1, CHUNK_SIZE-1);
       const x = i * v;
       const y = i * !v;
-      if(b.getTile(CHUNK_SIZE - (x+1),CHUNK_SIZE - (y+1)) == TILES.FLOOR) {
-        a.setTile(i * v, i * !v, TILES.DOOR);
-        a.exits[exit] = new Vector(i * v, i * !v);
-        b.exits[exitOpp] = new Vector(
-          v ? i : CHUNK_SIZE-1,
-          !v ? i : CHUNK_SIZE-1,
-        );
-        return;
+      if(b.getTile(CHUNK_SIZE - (x+1),CHUNK_SIZE - (y+1)) == TILES.FLOOR &&
+         a.getTile(x + !v, y + v) == TILES.FLOOR) {
+        a.setTile(x,y, TILES.DOOR);
+        return true;
       }
     }
-    console.error('bad');
   }
 
   /**
@@ -146,15 +122,16 @@ export default class Map {
    */
   createChunk(pos) {
     if(this.#chunks[pos.y] == undefined) this.#chunks[pos.y] = {};
-    if(this.#chunks[pos.y][pos.x] != undefined) return;
+    if(this.#chunks[pos.y][pos.x] != undefined) {
+      const c = this.#chunks[pos.y][pos.x];
+      if(!c.doored[1])
+        c.doored[1] = this.#glueEdge(c, this.getChunk(Vector.sub(pos, Vector.up)), true);
+      if(!c.doored[0])
+        c.doored[0] =  this.#glueEdge(c, this.getChunk(Vector.add(pos, Vector.left)), false);
+      return;
+    }
     const c = new Chunk(pos.x, pos.y);
     this.#chunks[pos.y][pos.x] = c;
-    this.#glueEdge(c, this.getChunk(Vector.sub(pos, Vector.up)), true);
-    this.#glueEdge(c, this.getChunk(Vector.add(pos, Vector.left)), false);
-
-    this.#pullExit(c, this.getChunk(Vector.add(pos, Vector.up)), true);
-    this.#pullExit(c, this.getChunk(Vector.add(pos, Vector.right)), false);
-    
   }
 
   /**

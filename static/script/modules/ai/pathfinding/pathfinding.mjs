@@ -48,31 +48,6 @@ const dist = (a, b) => {
   return manhatten(a, b);
 }
 
-/**
- * 
- * @param {Chunk} chunk 
- * @param {Vector} pos 
- * @returns 
- */
-const createTile = (chunk, pos) => {
-  return {
-    tile: chunk.getTile(pos.x, pos.y),
-    chunk,
-    x: pos.x, y: pos.y
-  }
-}
-
-/**
- * 
- * @param {Chunk} chunk 
- * @param {string} exit 
- */
-const fromExit = (chunk, exit) => {
-  if(!chunk) return null;
-  if(!chunk.exits[exit]) return null;
-  return createTile(chunk, chunk.exits[exit]);
-}
-
 class Dict2D {
   #map = {};
   constructor(fallback) {

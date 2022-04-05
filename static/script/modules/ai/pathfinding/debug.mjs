@@ -97,12 +97,6 @@ export const draw = (dt, ctx) => {
       const y = t.chunk.y*CHUNK_WORLD_SIZE;
       ctx.fillStyle = "rgba(255,255,255,0.2)";
       ctx.fillRect(x, y, CHUNK_WORLD_SIZE, CHUNK_WORLD_SIZE);
-      for(const [k,v] of Object.entries(t.chunk.exits)) {
-        if(v == null) continue;
-        ctx.fillStyle = "pink";
-        ctx.font = "20px monospace";
-        ctx.fillText(k, x+v.x*TILE_SIZE, y+v.y*TILE_SIZE);
-      }
     }
   }
 }
