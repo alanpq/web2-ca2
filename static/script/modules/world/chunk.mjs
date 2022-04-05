@@ -1,3 +1,4 @@
+import { generateChunk } from "./generation.mjs";
 import { CHUNK_AREA, CHUNK_SIZE, TILES, TILE_COLORS, TILE_SIZE } from "./map.mjs";
 
 export default class Chunk {
@@ -14,8 +15,10 @@ export default class Chunk {
     this.y = y;
 
     for(let i = 0; i < CHUNK_AREA; i++) {
-      this.#map[i] = TILES.FLOOR + (Math.random() < 0.2);
+      this.#map[i] = TILES.FLOOR;
     }
+
+    this.#map = generateChunk(this, this.#map);
   }
   /**
    * Render the chunk.

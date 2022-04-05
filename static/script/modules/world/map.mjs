@@ -91,6 +91,11 @@ export default class Map {
     })
   }
 
+  createChunk(pos) {
+    if(!this.#chunks[pos.y]) this.#chunks[pos.y] = {};
+    this.#chunks[pos.y][pos.x] = new Chunk(pos.x, pos.y);
+  }
+
   /**
    * 
    * @param {Vector} pos
