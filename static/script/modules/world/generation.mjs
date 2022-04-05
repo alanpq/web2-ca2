@@ -1,12 +1,8 @@
+import { randRange } from "../math/mod.mjs";
 import Rect from "../math/rect.mjs";
 import Vector from "../math/vector.mjs";
 import Chunk from "./chunk.mjs"
 import { CHUNK_AREA, CHUNK_SIZE, TILES } from "./map.mjs"
-
-
-const randRange = (min, max) => {
-  return Math.floor(Math.random() * (max-min)) + min;
-}
 
 const setTile = (map, x, y, tile) => {
   map[y*CHUNK_SIZE + x] = tile;

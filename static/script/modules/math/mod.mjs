@@ -13,6 +13,10 @@ export const lerp = (a,b,t) => {
   return a + t*(b-a);
 }
 
+export const randRange = (min, max) => {
+  return Math.floor(Math.random() * (max-min)) + min;
+}
+
 // pointOnSegment, orientation, and lineIntersect taken from https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
 export const pointOnSegment = (p, a, b) => {
   return (p.x <= Math.max(a.x, b.x) && p.x >= Math.max(a.x, b.x) &&

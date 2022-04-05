@@ -4,8 +4,9 @@ import { Camera } from "./camera.mjs";
 import Rect from "./math/rect.mjs";
 import Vector from "./math/vector.mjs";
 import Player from "./player/player.mjs";
-import Map, { CHUNK_SIZE, TILE_SIZE } from "./world/map.mjs";
+import Map, { CHUNK_SIZE, TILES, TILE_SIZE, worldToTile } from "./world/map.mjs";
 import * as bullets from './weapons/bullets.mjs';
+import { randRange } from "./math/mod.mjs";
 
 export default class World {
   map = new Map();
@@ -15,7 +16,11 @@ export default class World {
   camera; // i hate this but cant be bothered
   constructor(camera) {
     this.player = new Player(Vector.zero.clone());
-    this.player.position.x = this.player.position.y = (CHUNK_SIZE*TILE_SIZE/2)+TILE_SIZE/2;
+    while (true) {
+      this.player.position.x = randRange(0, CHUNK_SIZE*TILE_SIZE);
+      this.player.position.y = randRange(0, CHUNK_SIZE*TILE_SIZE);
+      if(this.map.getTile(worldToTile(this.player.position)) == TILES.FLOOR) break;
+    }
     this.camera = camera;
   }
 
