@@ -182,7 +182,7 @@ export default class Game {
       if(this.#gunTime > this.#gunInterval) {
         bullets.createBullet("pistol", {
           pos: this.#world.player.position.clone(),
-          vel: Vector.sub(Vector.random().mul(TILE_SIZE*0).add(this.#crosshair), this.#world.player.position).normalized().mul(600),
+          vel: Vector.sub(Vector.random().mul(TILE_SIZE*.4).add(this.#crosshair), this.#world.player.position).normalized().mul(600),
           damage: 10,
           life: 5,
         })
