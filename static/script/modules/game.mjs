@@ -210,7 +210,7 @@ export default class Game {
     // console.debug(topLeft.toString(), bottomRight.toString())
     let count = 0;
     for(let x = this.#topLeft.x; x <= this.#bottomRight.x; x++) {
-      for(let y = this.#topLeft.y; y <= this.#bottomRight.y; y++) {
+      for(let y = this.#topLeft.y-1; y <= this.#bottomRight.y; y++) {
         this.#world.map.createChunk(new Vector(x,y));
         count++;
       }
