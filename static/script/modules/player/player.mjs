@@ -38,7 +38,7 @@ export default class Player extends Entity {
    * @param {World} world
    */
   physics(dt, world) {
-    this.input = new Vector(input.axis("horizontal"), -input.axis("vertical"));
+    this.input = new Vector(input.axis("horizontal"), -input.axis("vertical")).normalized();
     const inputDir = this.input.clone().mul(dt * this.speed);
     this.velocity.add(inputDir);
     super.physics(dt, world);

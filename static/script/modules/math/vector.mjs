@@ -2,6 +2,8 @@
 import { lerp } from "./mod.mjs";
 
 export default class Vector {
+  x;
+  y;
   constructor(x = 0, y = 0) {
     this.x = x;
     this.y = y;
@@ -40,7 +42,7 @@ export default class Vector {
   }
 
   normalized() {
-    const m = this.magnitude;
+    const m = this.magnitude || 1;
     return new Vector(this.x/m, this.y/m);
   }
 
