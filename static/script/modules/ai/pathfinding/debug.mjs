@@ -21,7 +21,7 @@ export const state = {
 export const tick = (dt) => {
   if(input.leftMouseDown()) {
     state.a = state.world.map.probeTile(worldToTile(state.renderer.camera.screenToWorld(input.mouse())));
-    if(state.b) state.path = findPath(state.world, state.a, state.b, true);
+    // if(state.b) state.path = findPath(state.world, state.a, state.b, true);
   }
 
   if(input.rightMouseDown()) {
@@ -32,7 +32,7 @@ export const tick = (dt) => {
 
 export const draw = (dt, ctx) => {
   if(state.path) {
-    const off = new Vector(state.a.chunk.x + 0.5, state.a.chunk.y + 0.5);
+    const off = new Vector(0.5, 0.5);
     Object.entries(state.order).forEach(([k,v]) => {
       const aa = idxToPos(k).mul(TILE_SIZE);
       const bb = idxToPos(v).mul(TILE_SIZE);
@@ -66,8 +66,8 @@ export const draw = (dt, ctx) => {
       ctx.lineWidth = 2;
       ctx.strokeStyle = "green";
       ctx.beginPath();
-      const aa = idxToPos(state.path[i]).add(off).mul(TILE_SIZE);
-      const bb = idxToPos(state.path[i-1]).add(off).mul(TILE_SIZE);
+      const aa = state.path[i].clone().add(off).mul(TILE_SIZE);
+      const bb = state.path[i-1].clone().add(off).mul(TILE_SIZE);
       ctx.moveTo(aa.x, aa.y);
       ctx.lineTo(bb.x, bb.y);
       ctx.stroke();
@@ -84,6 +84,7 @@ export const draw = (dt, ctx) => {
 
   const t = state.world.map.probeTile(worldToTile(state.renderer.camera.screenToWorld(input.mouse())));
   if(t && !input.isMouseEaten()) {
+    ctx.font = "10px monospace";
     ctx.fillStyle = "rgba(255,255,255,0.2)";
     ctx.fillRect(t.worldX*TILE_SIZE, t.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
     ctx.fillStyle = "black";
@@ -92,8 +93,16 @@ export const draw = (dt, ctx) => {
     ctx.fillText(t.tile, t.worldX*TILE_SIZE, t.worldY*TILE_SIZE - 10)
 
     if(t.chunk) {
+      const x = t.chunk.x*CHUNK_WORLD_SIZE;
+      const y = t.chunk.y*CHUNK_WORLD_SIZE;
       ctx.fillStyle = "rgba(255,255,255,0.2)";
-      ctx.fillRect(t.chunk.x*CHUNK_WORLD_SIZE, t.chunk.y*CHUNK_WORLD_SIZE, CHUNK_WORLD_SIZE, CHUNK_WORLD_SIZE);
+      ctx.fillRect(x, y, CHUNK_WORLD_SIZE, CHUNK_WORLD_SIZE);
+      for(const [k,v] of Object.entries(t.chunk.exits)) {
+        if(v == null) continue;
+        ctx.fillStyle = "pink";
+        ctx.font = "20px monospace";
+        ctx.fillText(k, x+v.x*TILE_SIZE, y+v.y*TILE_SIZE);
+      }
     }
   }
 }

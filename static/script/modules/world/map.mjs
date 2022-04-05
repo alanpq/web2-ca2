@@ -94,19 +94,45 @@ export default class Map {
     c.render(dt, ctx);
   }
 
+/**
+   * 
+   * @param {Chunk} a 
+   * @param {Chunk} b 
+   */
+  #pullExit(a,b, v) {
+    if(!a || !b) return;
+    const exit = v ? "bottom" : "right";
+    const exitOpp = v ? "top" : "left";
+    if(!b.exits[exitOpp]) return;
+    a.exits[exit] = new Vector(
+      b.exits[exitOpp].x || CHUNK_SIZE-1,
+      b.exits[exitOpp].y || CHUNK_SIZE-1,
+    );
+    if(v) a.exits[exit].y -= 1;
+    else a.exits[exit].x -= 1;
+  }
 
   /**
    * 
    * @param {Chunk} a 
    * @param {Chunk} b 
    */
-  #glueEdge(a, b, vertical) {
-    if(!b) return;
+  #glueEdge(a, b, v) {
+    if(!a || !b) return;
+    const exit = v ? "top" : "left";
+    const exitOpp = v ? "bottom" : "right";
+    if(a.exits[exit] != null) return;
+
     for(let i = 1; i < CHUNK_SIZE-1; i++) {
-      const x = i * vertical;
-      const y = i * !vertical;
+      const x = i * v;
+      const y = i * !v;
       if(b.getTile(CHUNK_SIZE - (x+1),CHUNK_SIZE - (y+1)) == TILES.FLOOR) {
-        a.setTile(i * vertical, i * !vertical, TILES.DOOR);
+        a.setTile(i * v, i * !v, TILES.DOOR);
+        a.exits[exit] = new Vector(i * v, i * !v);
+        b.exits[exitOpp] = new Vector(
+          v ? i : CHUNK_SIZE-1,
+          !v ? i : CHUNK_SIZE-1,
+        );
         return;
       }
     }
@@ -125,6 +151,10 @@ export default class Map {
     this.#chunks[pos.y][pos.x] = c;
     this.#glueEdge(c, this.getChunk(Vector.sub(pos, Vector.up)), true);
     this.#glueEdge(c, this.getChunk(Vector.add(pos, Vector.left)), false);
+
+    this.#pullExit(c, this.getChunk(Vector.add(pos, Vector.up)), true);
+    this.#pullExit(c, this.getChunk(Vector.add(pos, Vector.right)), false);
+    
   }
 
   /**

@@ -10,6 +10,13 @@ export default class Chunk {
   /** @type {Tile[]} */
   #map = []
 
+  exits = {
+    top: null,
+    bottom: null,
+    left: null,
+    right: null,
+  };
+
   constructor(x, y) {
     this.x = x;
     this.y = y;
