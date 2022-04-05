@@ -38,7 +38,7 @@ const room = (map, rect, depth) => {
   const fac = 0.2 + (Math.random()*0.6);
   if(orient) {
     const w = rect.width * fac;
-    if(rect.width * fac <= 3 || rect.width * (1-fac) <= 3) return room(map, rect, 0, doors);
+    if(rect.width * fac <= 4 || rect.width * (1-fac) <= 4) return room(map, rect, 0, doors);
     const wallOff = Math.floor(w);
     doors = doors.concat(room(map, new Rect(
       rect.left,
@@ -60,7 +60,7 @@ const room = (map, rect, depth) => {
     doors.push([new Vector(rect.left + Math.floor(w), door), orient]);
   } else {
     const w = rect.height * fac;
-    if(rect.height * fac <= 3 || rect.height * (1-fac) <= 3) return room(map, rect, 0, doors);
+    if(rect.height * fac <= 4 || rect.height * (1-fac) <= 4) return room(map, rect, 0, doors);
     const wallOff = Math.floor(w);
     doors = doors.concat(room(map, new Rect(
       rect.left,
@@ -91,7 +91,7 @@ const door = (map, pos, orient, retry=false) => {
   const a = getTile(map, new Vector(pos.x - xOff, pos.y - yOff));
   const b = getTile(map, new Vector(pos.x + xOff, pos.y + yOff));
   if(a == TILES.WALL || b == TILES.WALL) {
-    // setTile(map, pos.x, pos.y, TILES.VOID);
+    setTile(map, pos.x, pos.y, TILES.VOID);
     if(retry) return;
     door(map, new Vector(pos.x - yOff, pos.y - xOff), orient, true);
     door(map, new Vector(pos.x + yOff, pos.y + xOff), orient, true);
