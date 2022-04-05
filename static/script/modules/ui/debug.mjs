@@ -1,6 +1,7 @@
 'use strict';
 import { FONTS } from "../constants.mjs";
 import Rect from "../math/rect.mjs";
+import World from "../world.mjs";
 import UI from "./ui.mjs";
 
 
@@ -49,6 +50,7 @@ window.onunload = () => {
  * @prop {DebugUIEvent[]} ui
  * @prop {DebugDrawEvent[]} draw
  * @prop {DebugTickEvent[]} tick
+ * @prop {DebugPhysicsEvent[]} physics
 */
 
 /**
@@ -87,6 +89,16 @@ export const draw = (dt, ctx) => {
 /**
  * 
  * @param {number} dt Deltatime in seconds
+ * @param {World} world World Object
+ */
+ export const physics = (dt, world) => {
+  invokeCallbacks("physics", [dt, world])
+}
+
+
+/**
+ * 
+ * @param {number} dt Deltatime in seconds
  */
  export const tick = (dt) => {
   invokeCallbacks("tick", [dt])
@@ -96,6 +108,11 @@ export const draw = (dt, ctx) => {
  * @callback DebugUIEvent
  * @param {number} dt
  * @param {UI} ui
+ */
+/**
+ * @callback DebugPhysicsEvent
+ * @param {number} dt
+ * @param {World} world
  */
 /**
  * @callback DebugDrawEvent
@@ -118,6 +135,7 @@ export const registerDebug = (flag, event, uiCB) => {
     ui: [],
     tick: [],
     draw: [],
+    physics: [],
   };
   cbs[flag][event].push(uiCB);
 }

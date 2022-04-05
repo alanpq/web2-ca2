@@ -1,3 +1,4 @@
+import Rect from "../math/rect.mjs";
 import Vector from "../math/vector.mjs";
 import Chunk from "./chunk.mjs";
 
@@ -128,6 +129,10 @@ export default class Map {
     return this.probeTile(pos).tile;
   }
 
+  getTileRect(pos) {
+    return new Rect(Math.floor(pos.x / TILE_SIZE)*TILE_SIZE,Math.floor(pos.y / TILE_SIZE)*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  }
+
   /**
    * 
    * @param {Rect} rect 
@@ -148,5 +153,72 @@ export default class Map {
       }
     }
     return null;
+  }
+
+  // raycast algorithm taken and modified from https://theshoemaker.de/2016/02/ray-casting-in-2d-grids/
+  /**
+   * 
+   * @param {Vector} pos 
+   * @param {number} dir 
+   */
+  #rayHelpers(pos, dir) {
+    const tile = Math.floor(pos / TILE_SIZE) + 1;
+    let dTile, dt;
+    if (dir > 0) {
+      dTile = 1;
+      dt = (tile*TILE_SIZE - pos) / dir;
+    } else {
+      dTile = -1;
+      dt = ((tile-1)*TILE_SIZE - pos) / dir;
+    }
+    return [tile, dTile, dt, dTile * TILE_SIZE/dir];
+  }
+
+  /**
+   * 
+   * @param {Vector} start 
+   * @param {Vector} end
+   * @param {number} maxPoints 
+   */
+  raycast(start, end, maxPoints = Infinity) {
+    const dir = Vector.sub(end, start);
+    const length = dir.magnitude;
+    dir.div(length);
+
+    let [tileX, dTileX, dtX, ddtX] = this.#rayHelpers(start.x, dir.x);
+    let [tileY, dTileY, dtY, ddtY] = this.#rayHelpers(start.y, dir.y);
+    let t = 0;
+    const out = [];
+    const epsilon = 2;
+    if (dir.sqrMagnitude <= 0) return [];
+    while(tileX > 0 && tileX <= CHUNK_SIZE && tileY > 0 && tileY <= CHUNK_SIZE) {
+      if(out.length >= maxPoints) break;
+      if(t >= length) break;
+
+      // TODO: fix raycast point flickering
+      // this is a hack fix
+      const point = new Vector(start.x + dir.x*t, start.y + dir.y*t);
+      const testA = this.getTile(worldToTile(point));
+      const testB = this.getTile(worldToTile(Vector.sub(point, new Vector(epsilon, 0))));
+      const testC = this.getTile(worldToTile(Vector.sub(point, new Vector(0, epsilon))));
+      if(testA == TILES.WALL || testB == TILES.WALL || testC == TILES.WALL) {
+        out.push(point);
+      }
+
+      if (dtX < dtY) {
+        tileX += dTileX;
+        const dt = dtX;
+        t += dt;
+        dtX += ddtX - dt;
+        dtY -= dt;
+      } else {
+        tileY += dTileY;
+        const dt = dtY;
+        t += dt;
+        dtX -= dt;
+        dtY += ddtY - dt;
+      }
+    }
+    return out;
   }
 }

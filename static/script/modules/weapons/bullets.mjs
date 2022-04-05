@@ -2,6 +2,7 @@ import Rect from "../math/rect.mjs";
 import Vector from "../math/vector.mjs";
 import World from "../world.mjs";
 import Entity from "../entity.mjs";
+import { TILES, worldToTile } from "../world/map.mjs";
 
 /**
  * @readonly
@@ -87,6 +88,7 @@ export const physics = (dt, world) => {
     for(let j = 0; j < bullets.length; j++) {
       const b = bullets[j];
       if(!b) continue;
+      if(b.life <= 0) bullets[j] = null;
       b.life -= dt;
       switch (type.type) {
         case ProjectileType.PHYSICS:
@@ -95,14 +97,19 @@ export const physics = (dt, world) => {
           b.vel.mul(type.params.drag);
           rect.left = b.pos.x;
           rect.top = b.pos.y;
-          if(world.map.tileCollides(rect)) {
-            b.life = 0;
-          }
-          for(let i = 0; i < world.entities.length; i++) {
-            /** @type {Entity} */
-            const ent = world.entities[i];
-            if(ent.rect.lineIntersects(b.oldPos, b.pos)) {
-              ent.onHit(b);
+
+          if(b.oldPos != undefined) {
+            for(let i = 0; i < world.entities.length; i++) {
+              /** @type {Entity} */
+              const ent = world.entities[i];
+              if(ent.virtualRect.lineIntersects(b.oldPos, b.pos)) {
+                ent.onHit(b);
+                b.life = 0;
+              }
+            }
+            const hits = world.map.raycast(b.oldPos, b.pos, 1);
+            if(hits.length > 0) {
+              b.pos = hits[0];
               b.life = 0;
             }
           }
@@ -111,7 +118,6 @@ export const physics = (dt, world) => {
 
         break;
       }
-      if(b.life <= 0) bullets[j] = null;
     }
   }
 }

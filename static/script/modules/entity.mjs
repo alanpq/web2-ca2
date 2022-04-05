@@ -23,6 +23,7 @@ export default class Entity {
   
   get virtualPosition (){return this.#virtualPos;}
   get rect () {return new Rect(this.position.x, this.position.y, this.#rect.width, this.#rect.height);}
+  get virtualRect() {return new Rect(this.#virtualPos.x, this.#virtualPos.y, this.#rect.width, this.#rect.height);}
 
   /**
    * 

@@ -1,5 +1,6 @@
 'use strict';
 
+import { Camera } from "./camera.mjs";
 import Rect from "./math/rect.mjs";
 import Vector from "./math/vector.mjs";
 import Player from "./player/player.mjs";
@@ -8,9 +9,13 @@ import Map, { CHUNK_SIZE, TILE_SIZE } from "./world/map.mjs";
 export default class World {
   map = new Map();
   player;
-  constructor() {
+
+  /** @type {Camera} */
+  camera; // i hate this but cant be bothered
+  constructor(camera) {
     this.player = new Player(Vector.zero.clone());
     this.player.position.x = this.player.position.y = (CHUNK_SIZE*TILE_SIZE/2)+TILE_SIZE/2;
+    this.camera = camera;
   }
 
   /** @type {Entity[]} */

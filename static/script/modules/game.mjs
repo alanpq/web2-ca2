@@ -12,7 +12,7 @@ import * as pathfinding from "./ai/pathfinding/pathfinding.mjs";
 import Vector from "./math/vector.mjs";
 import UI from './ui/ui.mjs';
 import Rect from "./math/rect.mjs";
-import { setFlag, getFlag, registerDebug, Flags } from "./ui/debug.mjs";
+import { setFlag, getFlag, registerDebug, Flags, physics as debugPhysics } from "./ui/debug.mjs";
 import { Align } from "./ui/positioningContext.mjs";
 
 import Entity from "./entity.mjs";
@@ -35,7 +35,7 @@ export default class Game {
   constructor(renderer) {
     this.#renderer = renderer;
     
-    this.#world = new World();
+    this.#world = new World(this.#renderer.camera);
 
     this.#renderer.camera.position = this.#world.player.position;
 
@@ -68,13 +68,14 @@ export default class Game {
     registerDebug(Flags.PATHFINDING, "tick", pathfinding.debug.tick);
     registerDebug(Flags.COLLISION, "draw", collisionDebug.draw);
     registerDebug(Flags.COLLISION, "tick", collisionDebug.tick);
+    registerDebug(Flags.COLLISION, "physics", collisionDebug.physics);
 
     bullets.registerBulletType("pistol", {
       type: bullets.ProjectileType.PHYSICS,
       params: {
         drag: 1,
         restitution: 0,
-        size: new Vector(5, 5),
+        size: new Vector(2, 5),
         trailColor: "yellow",
         trailLength: 10,
       }
@@ -180,8 +181,8 @@ export default class Game {
       this.#gunTime += dt;
       if(this.#gunTime > this.#gunInterval) {
         bullets.createBullet("pistol", {
-          pos: this.#world.player.position.clone().add(new Vector(PLAYER_SIZE_HALF,PLAYER_SIZE_HALF)),
-          vel: Vector.sub(Vector.random().mul(TILE_SIZE*0.5).add(this.#crosshair), this.#world.player.position).normalized().mul(600),
+          pos: this.#world.player.position.clone(),
+          vel: Vector.sub(Vector.random().mul(TILE_SIZE*0).add(this.#crosshair), this.#world.player.position).normalized().mul(600),
           damage: 10,
           life: 5,
         })
@@ -201,5 +202,6 @@ export default class Game {
   physics(dt) {
     bullets.physics(dt, this.#world);
     this.#world.physics(dt);
+    debugPhysics(dt, this.#world);
   }
 }
