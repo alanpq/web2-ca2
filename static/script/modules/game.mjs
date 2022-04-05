@@ -18,7 +18,7 @@ import { Align } from "./ui/positioningContext.mjs";
 import Entity from "./entity.mjs";
 import Dummy from "./ai/enemy/dummy.mjs";
 import Enemy from "./ai/enemy/enemy.mjs";
-import { TILE_SIZE } from "./world/map.mjs";
+import { CHUNK_SIZE, TILE_SIZE, worldToChunk } from "./world/map.mjs";
 
 export default class Game {
   #loaded = false;
@@ -84,8 +84,8 @@ export default class Game {
 
   start() {
     console.log('Starting game...');
-    this.#world.addEntity(new Dummy(new Vector(TILE_SIZE*5.5,TILE_SIZE*5.5)));
-    this.#world.addEntity(new Enemy(new Vector(TILE_SIZE*6.5,TILE_SIZE*6.5)));
+    // this.#world.addEntity(new Dummy(new Vector(TILE_SIZE*5.5,TILE_SIZE*5.5)));
+    // this.#world.addEntity(new Enemy(new Vector(TILE_SIZE*6.5,TILE_SIZE*6.5)));
     console.log('Game started!');
   }
 
@@ -192,6 +192,18 @@ export default class Game {
 
     this.#crosshair = this.#renderer.camera.screenToWorld(input.mouse());
     this.#renderer.camera.position = Vector.lerp(this.#world.player.position, this.#crosshair, 0.3);
+
+    const realSize = CHUNK_SIZE*TILE_SIZE;
+    const topLeft = worldToChunk(this.#renderer.camera.viewportToWorld(Vector.zero));
+    const bottomRight = worldToChunk(this.#renderer.camera.viewportToWorld(Vector.one));
+    // console.debug(topLeft.toString(), bottomRight.toString())
+    let count = 0;
+    for(let x = topLeft.x; x <= bottomRight.x; x++) {
+      for(let y = topLeft.y; y <= bottomRight.y; y++) {
+        this.#world.map.createChunk(new Vector(x,y));
+        count++;
+      }
+    }
 
     // this.#renderer.camera.position = this.#player.position;
   }

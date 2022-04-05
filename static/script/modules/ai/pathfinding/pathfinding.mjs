@@ -44,6 +44,10 @@ const dist = (a, b) => {
   return Math.abs(aa.x-bb.x) + Math.abs(aa.y-bb.y);
 }
 
+export const findPath = (world, a, b) => {
+  return [];
+}
+
 // a* implemented with the help of https://en.wikipedia.org/wiki/A*_search_algorithm
 /**
  * Find the shortest path between two tiles.
@@ -51,7 +55,7 @@ const dist = (a, b) => {
  * @param {import("../../world/map.mjs").DetailedTile} a 
  * @param {import("../../world/map.mjs").DetailedTile} b
  */
-export const findPath = (world, a, b, debug=false) => {
+const pathfind = (world, a, b, debug=false) => {
   // FIXME: implement cross-chunk pathing
   // TODO: do bi-directional pathing to exit impossible paths earlier
   if(a.chunk != b.chunk) return console.error("Pathfinding does not yet work across chunks!");

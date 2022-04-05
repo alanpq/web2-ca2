@@ -54,7 +54,7 @@ const room = (map, rect, depth) => {
     ), depth-1));
     let door = 0;
     do {
-      door = randRange(rect.top+1, rect.bottom-1);
+      door = randRange(rect.top+1, rect.bottom);
       if(door != wallOff) break;
     } while(true);
     doors.push([new Vector(rect.left + Math.floor(w), door), orient]);
@@ -76,7 +76,7 @@ const room = (map, rect, depth) => {
     ), depth-1));
     let door = 0;
     do {
-      door = randRange(rect.left+1, rect.right-1);
+      door = randRange(rect.left+1, rect.right);
       if(door != wallOff+1) break;
     } while(true);
     doors.push([new Vector(door, rect.top + Math.floor(w)), orient]);
@@ -86,16 +86,16 @@ const room = (map, rect, depth) => {
 
 // worst door hack of all time
 const door = (map, pos, orient, retry=false) => {
+  console.debug(pos, orient);
   const xOff = orient + 0;
   const yOff = !orient + 0;
   const a = getTile(map, new Vector(pos.x - xOff, pos.y - yOff));
   const b = getTile(map, new Vector(pos.x + xOff, pos.y + yOff));
   if(a == TILES.WALL || b == TILES.WALL) {
     // setTile(map, pos.x, pos.y, TILES.VOID);
-    if(!retry) {
-      door(map, new Vector(pos.x - yOff, pos.y - xOff), orient, true);
-      door(map, new Vector(pos.x + yOff, pos.y + xOff), orient, true);
-    }
+    if(retry) return;
+    door(map, new Vector(pos.x - yOff, pos.y - xOff), orient, true);
+    door(map, new Vector(pos.x + yOff, pos.y + xOff), orient, true);
   } else {
     setTile(map, pos.x, pos.y, TILES.FLOOR);
   }
@@ -106,10 +106,10 @@ const door = (map, pos, orient, retry=false) => {
  * @param {Chunk} chunk 
  */
 export const generateChunk = async (chunk, map) => {
-  const doors = room(map, new Rect(0, 0, CHUNK_SIZE, CHUNK_SIZE-1), 4);
+  const doors = room(map, new Rect(0, 0, CHUNK_SIZE+1, CHUNK_SIZE), 4);
   console.debug(doors);
   for(const d of doors) {
-    door(map, d[0], d[1]);
+    door(map, d[0], d[1], false);
   }
   return map;
 }

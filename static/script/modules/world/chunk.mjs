@@ -1,5 +1,5 @@
 import { generateChunk } from "./generation.mjs";
-import { CHUNK_AREA, CHUNK_SIZE, TILES, TILE_COLORS, TILE_SIZE } from "./map.mjs";
+import { CHUNK_AREA, CHUNK_SIZE, CHUNK_WORLD_SIZE, TILES, TILE_COLORS, TILE_SIZE } from "./map.mjs";
 
 export default class Chunk {
   /** x in chunk-space */
@@ -31,7 +31,7 @@ export default class Chunk {
     for(let i = 0; i < CHUNK_AREA; i++) {
       ctx.strokeStyle = "none";
       ctx.fillStyle = TILE_COLORS[this.#map[i]];
-      ctx.fillRect((i % CHUNK_SIZE) * TILE_SIZE, Math.floor(i / CHUNK_SIZE) * TILE_SIZE,
+      ctx.fillRect((i % CHUNK_SIZE) * TILE_SIZE + CHUNK_WORLD_SIZE*this.x, Math.floor(i / CHUNK_SIZE) * TILE_SIZE + CHUNK_WORLD_SIZE*this.y,
                     TILE_SIZE+1, TILE_SIZE+1);
     }
   }
@@ -44,6 +44,15 @@ export default class Chunk {
   getTile(x, y) {
     const i = y * CHUNK_SIZE + x;
     return this.getTileFromIdx(i);
+  }
+
+  setTile(x,y, tile) {
+    const i = y * CHUNK_SIZE + x;
+    this.setTileFromIdx(i, tile);
+  }
+
+  setTileFromIdx(i, tile) {
+    this.#map[i] = tile;
   }
 
   /**

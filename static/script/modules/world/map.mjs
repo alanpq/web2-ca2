@@ -6,6 +6,7 @@ export const CHUNK_SIZE = 20;
 export const CHUNK_AREA = CHUNK_SIZE*CHUNK_SIZE;
 
 export const TILE_SIZE = 32;
+export const CHUNK_WORLD_SIZE = CHUNK_SIZE * TILE_SIZE;
 
 /**
  * Convert from world-space to tile-space
@@ -93,9 +94,37 @@ export default class Map {
     })
   }
 
+
+  /**
+   * 
+   * @param {Chunk} a 
+   * @param {Chunk} b 
+   */
+  #glueEdge(a, b, vertical) {
+    if(!b) return;
+    for(let i = 1; i < CHUNK_SIZE-1; i++) {
+      const x = i * vertical;
+      const y = i * !vertical;
+      if(b.getTile(CHUNK_SIZE - (x+1),CHUNK_SIZE - (y+1)) == TILES.FLOOR) {
+        a.setTile(i * vertical, i * !vertical, TILES.DOOR);
+        return;
+      }
+    }
+    console.error('bad');
+  }
+
+  /**
+   * 
+   * @param {Vector} pos 
+   * @returns 
+   */
   createChunk(pos) {
-    if(!this.#chunks[pos.y]) this.#chunks[pos.y] = {};
-    this.#chunks[pos.y][pos.x] = new Chunk(pos.x, pos.y);
+    if(this.#chunks[pos.y] == undefined) this.#chunks[pos.y] = {};
+    if(this.#chunks[pos.y][pos.x] != undefined) return;
+    const c = new Chunk(pos.x, pos.y);
+    this.#chunks[pos.y][pos.x] = c;
+    this.#glueEdge(c, this.getChunk(Vector.sub(pos, Vector.up)), true);
+    this.#glueEdge(c, this.getChunk(Vector.add(pos, Vector.left)), false);
   }
 
   /**
