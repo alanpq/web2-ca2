@@ -63,6 +63,7 @@ export const worldToChunk = (pos) => {
   VOID: 0,
   FLOOR: 1,
   WALL: 2,
+  DOOR: 3,
 }
 /**
  * Enum for Tile colors.
@@ -73,6 +74,7 @@ export const TILE_COLORS = [
   "black",
   "darkgray",
   "blue",
+  "red",
 ];
 
 export default class Map {

@@ -18,7 +18,9 @@ export default class Chunk {
       this.#map[i] = TILES.FLOOR;
     }
 
-    this.#map = generateChunk(this, this.#map);
+    generateChunk(this, this.#map).then(map => {
+      this.#map = map;
+    });
   }
   /**
    * Render the chunk.

@@ -1,4 +1,5 @@
 import Rect from "../math/rect.mjs";
+import Vector from "../math/vector.mjs";
 import Chunk from "./chunk.mjs"
 import { CHUNK_AREA, CHUNK_SIZE, TILES } from "./map.mjs"
 
@@ -9,6 +10,11 @@ const randRange = (min, max) => {
 
 const setTile = (map, x, y, tile) => {
   map[y*CHUNK_SIZE + x] = tile;
+}
+
+const getTile = (map, pos) => {
+  if(pos.x < 0 || pos.x >= CHUNK_SIZE || pos.y < 0 || pos.y >= CHUNK_SIZE) return TILES.VOID;
+  return map[pos.y*CHUNK_SIZE + pos.x];
 }
 
 /**
@@ -27,53 +33,87 @@ const room = (map, rect, depth) => {
       map[i*CHUNK_SIZE + rect.left] = TILES.WALL;
       map[i*CHUNK_SIZE + (CHUNK_SIZE-1) + rect.right] = TILES.WALL;
     }
-    return;
+    return [];
   }
+  let doors = [];
   // split room into two rooms
   const aspect = rect.width / rect.height;
   const orient = Math.random() < (Math.log10(aspect)+0.5);
   const fac = 0.2 + (Math.random()*0.6);
   if(orient) {
     const w = rect.width * fac;
-    if(Math.floor(w) <= 2) return room(map, rect, 1);
-    room(map, new Rect(
+    if(rect.width * fac <= 3 || rect.width * (1-fac) <= 3) return room(map, rect, 0, doors);
+    const wallOff = Math.floor(w);
+    doors = doors.concat(room(map, new Rect(
       rect.left,
       rect.top,
-      Math.floor(w)+1,
+      wallOff+1,
       rect.height,
-    ), depth-1);
-    room(map, new Rect(
-      rect.left + Math.floor(w),
+    ), depth-1));
+    doors = doors.concat(room(map, new Rect(
+      rect.left + wallOff,
       rect.top,
-      rect.width - Math.floor(w),
+      rect.width - wallOff,
       rect.height,
-    ), depth-1);
-    setTile(map, rect.left + Math.floor(w), randRange(rect.top+1, rect.bottom-1), TILES.FLOOR);
+    ), depth-1));
+    let door = 0;
+    do {
+      door = randRange(rect.top+1, rect.bottom-1);
+      if(door != wallOff) break;
+    } while(true);
+    doors.push([new Vector(rect.left + Math.floor(w), door), orient]);
   } else {
     const w = rect.height * fac;
-    if(Math.floor(w) <= 2) return room(map, rect, 1);
-    room(map, new Rect(
+    if(rect.height * fac <= 3 || rect.height * (1-fac) <= 3) return room(map, rect, 0, doors);
+    const wallOff = Math.floor(w);
+    doors = doors.concat(room(map, new Rect(
       rect.left,
       rect.top,
       rect.width,
-      Math.floor(w),
-    ), depth-1);
-    room(map, new Rect(
+      wallOff,
+    ), depth-1));
+    doors = doors.concat(room(map, new Rect(
       rect.left,
-      rect.top + Math.floor(w),
+      rect.top + wallOff,
       rect.width,
-      rect.height - Math.floor(w),
-    ), depth-1);
-    setTile(map, randRange(rect.left+1, rect.right-1), rect.top + Math.floor(w), TILES.FLOOR);
+      rect.height - wallOff,
+    ), depth-1));
+    let door = 0;
+    do {
+      door = randRange(rect.left+1, rect.right-1);
+      if(door != wallOff+1) break;
+    } while(true);
+    doors.push([new Vector(door, rect.top + Math.floor(w)), orient]);
   }
-  
+  return doors;
+}
+
+// worst door hack of all time
+const door = (map, pos, orient, retry=false) => {
+  const xOff = orient + 0;
+  const yOff = !orient + 0;
+  const a = getTile(map, new Vector(pos.x - xOff, pos.y - yOff));
+  const b = getTile(map, new Vector(pos.x + xOff, pos.y + yOff));
+  if(a == TILES.WALL || b == TILES.WALL) {
+    // setTile(map, pos.x, pos.y, TILES.VOID);
+    if(!retry) {
+      door(map, new Vector(pos.x - yOff, pos.y - xOff), orient, true);
+      door(map, new Vector(pos.x + yOff, pos.y + xOff), orient, true);
+    }
+  } else {
+    setTile(map, pos.x, pos.y, TILES.FLOOR);
+  }
 }
 
 /**
  * 
  * @param {Chunk} chunk 
  */
-export const generateChunk = (chunk, map) => {
-  room(map, new Rect(0, 0, CHUNK_SIZE, CHUNK_SIZE-1), 4);
+export const generateChunk = async (chunk, map) => {
+  const doors = room(map, new Rect(0, 0, CHUNK_SIZE, CHUNK_SIZE-1), 4);
+  console.debug(doors);
+  for(const d of doors) {
+    door(map, d[0], d[1]);
+  }
   return map;
 }
