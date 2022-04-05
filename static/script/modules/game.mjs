@@ -75,7 +75,7 @@ export default class Game {
       params: {
         drag: 1,
         restitution: 0,
-        size: new Vector(2, 5),
+        size: new Vector(2, 2),
         trailColor: "yellow",
         trailLength: 10,
       }
