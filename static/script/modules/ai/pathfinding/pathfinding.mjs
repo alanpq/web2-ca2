@@ -8,17 +8,17 @@ import { state } from "./debug.mjs";
 export * as debug from './debug.mjs';
 
 const horizontals = [
-  [0, -1],
-  [0, 1],
-  [-1, 0],
-  [1, 0],
+  new Vector(0, -1),
+  new Vector(0, 1),
+  new Vector(-1, 0),
+  new Vector(1, 0),
 ];
 
 const diagonals = [
-  [-1, -1],
-  [1, 1],
-  [1, -1],
-  [-1, 1],
+  new Vector(-1, -1),
+  new Vector(1, 1),
+  new Vector(1, -1),
+  new Vector(-1, 1),
 ];
 
 /**
@@ -32,12 +32,12 @@ const manhatten = (a,b) => {
   return Math.abs(a.x-b.x) + Math.abs(a.y-b.y);
 }
 
-const constructPath = (chunk, cameFrom, cur) => {
-  const path = [idxToPos(cur).add(new Vector(chunk.x, chunk.y).mul(CHUNK_SIZE))];
-  let c = cur + 0;
-  while (cameFrom[c] != undefined) {
-    c = cameFrom[c];
-    path.push(idxToPos(c).add(new Vector(chunk.x, chunk.y).mul(CHUNK_SIZE)))
+const constructPath = (cameFrom, cur) => {
+  const path = [cur];
+  let c = cur;
+  while (cameFrom.get(c) != undefined) {
+    c = cameFrom.get(c);
+    path.push(c)
   }
   return path;
 }
@@ -45,9 +45,7 @@ const constructPath = (chunk, cameFrom, cur) => {
 // manhatten distance
 // TODO: investigate octile distance
 const dist = (a, b) => {
-  const aa = idxToPos(a);
-  const bb = idxToPos(b);
-  return manhatten(aa, bb);
+  return manhatten(a, b);
 }
 
 /**
@@ -75,151 +73,103 @@ const fromExit = (chunk, exit) => {
   return createTile(chunk, chunk.exits[exit]);
 }
 
+class Dict2D {
+  #map = {};
+  constructor(fallback) {
+    this.fallback = fallback;
+  }
+  set(pos, val) {
+    if(this.#map[pos.x] === undefined) this.#map[pos.x] = {};
+    this.#map[pos.x][pos.y] = val;
+  }
+  get(pos) {
+    if(this.#map[pos.x] === undefined) return this.fallback;
+    if(this.#map[pos.x][pos.y] === undefined) return this.fallback;
+    return this.#map[pos.x][pos.y];
+  }
+}
+
+// a* implemented with the help of https://en.wikipedia.org/wiki/A*_search_algorithm
+
 /**
  * Find the shortest path between two tiles.
  * @param {World} world
  * @param {import("../../world/map.mjs").DetailedTile} a 
  * @param {import("../../world/map.mjs").DetailedTile} b
  */
-export const findPath = (world, a, b) => {
-  if(a.chunk == b.chunk) {
-    
-    const p = pathfind(world, a, b);
-    console.debug(p);
-    return p;
-  }
-  const aPos = new Vector(a.chunk.x, a.chunk.y);
-  const bPos = new Vector(b.chunk.x, b.chunk.y);
-  let pos = aPos.clone();
-  const dX = Math.sign(b.chunk.x - a.chunk.x);
-  const dY = Math.sign(b.chunk.y - a.chunk.y);
-
-  const dist = manhatten(aPos, bPos);
-  console.debug("total dist", dist);
-  console.debug('dx:', dX, 'dy:', dY);
-
-  /** @type {Vector[]} */
-  let path = [];
-  let exit;
-  let exitOpp;
-  let prevChunk;
-  let i = 0;
-  let j = 0;
-  while(i <= dist) {
-    const c = world.map.getChunk(pos);
-    if(exit && prevChunk != c) {
-      console.debug(i, j, `(${prevChunk.x}, ${prevChunk.y})`, '-->', pos.toString());
-      if(i==1) {
-        const p = pathfind(world, a, fromExit(prevChunk, exit));
-        if(!p) return null;
-        p.reverse();
-        path = path.concat(p);
-        path.push(p[p.length-1].clone().add(new Vector(dX, dY)));
-      }
-      // path.push(pathfind(world, fromExit(prevChunk, exit), fromExit(prevChunk, exitOpp)))
-    }
-    prevChunk = c;
-    if(j % 2 == 0) {
-      pos.x += dX;
-      if(dX != 0) {
-        i+=1;
-        exit = dX > 0 ? "right" : "left";
-        exitOpp = dX > 0 ? "left" : "right";
-      }
-    } else {
-      pos.y += dY;
-      if(dY != 0) {
-        i+=1;
-        exit = dY > 0 ? "bottom" : "top";
-        exitOpp = dY > 0 ? "top" : "bottom";
-      }
-    }
-    j+=1;
-  }
-  console.log('final', exit, exitOpp);
-  const p = pathfind(world, fromExit(prevChunk, exitOpp), b);
-  if(!p) return null;
-  p.reverse();
-  // path.push(p[0].clone().add(new Vector(dX, dY)));
-  path = path.concat(p);
-  path.reverse();
-  console.debug(path);
-  return path;
-}
-
-// a* implemented with the help of https://en.wikipedia.org/wiki/A*_search_algorithm
-
-const pathfind = (world, a, b, debug=false) => {
+export const findPath = (world, a, b, debug=false) => {
   // FIXME: implement cross-chunk pathing
   // TODO: do bi-directional pathing to exit impossible paths earlier
   console.debug('pathing from', a, 'to', b);
   if(!a || !b) return null;
-  if(a.chunk != b.chunk) return console.error("Pathfinding does not yet work across chunks!");
+  // if(a.chunk != b.chunk) return console.error("Pathfinding does not yet work across chunks!");
   if(b.tile == TILES.WALL) return null;
-  const c = a.chunk;
 
-  const aIdx = a.x + a.y * CHUNK_SIZE;
-  const bIdx = b.x + b.y * CHUNK_SIZE;
+  const lowestFscore = (set) => {
+    // console.debug('fscore =======');
+    // console.debug(fScore);
+    let minScore = Number.POSITIVE_INFINITY;
+    let minN = null;
+    for (const n of set.values()) {
+      // console.debug('n:', n);
+      // console.debug('f:', fScore.get(n));
+      if(fScore.get(n) < minScore) {
+        minScore = fScore.get(n);
+        minN = n;
+      }
+    }
+    return minN;
+  }
+
+  // const aIdx = a.x + a.y * CHUNK_SIZE;
+  // const bIdx = b.x + b.y * CHUNK_SIZE;
+  const aPos = new Vector(a.worldX, a.worldY);
+  const bPos = new Vector(b.worldX, b.worldY);
 
   const openSet = new Set();
-  openSet.add(aIdx);
+  openSet.add(aPos);
 
   // cameFrom[n] = node immediately preceding it on the path
-  const cameFrom = {};
-  cameFrom[aIdx] = null;
+  const cameFrom = new Dict2D(null);
+  cameFrom.set(aPos, null);
 
   // undefined == infinity here
-  const gScore = {}; // cost of cheapest path from a to [n]
-  gScore[aIdx] = 0;
+  const gScore = new Dict2D(Number.POSITIVE_INFINITY); // cost of cheapest path from a to [n]
+  gScore.set(aPos, 0);
 
   // undefined == infinity here
   // estimated cost of total path if going through [n]
-  const fScore = {}; // fScore[n] = gScore[n] + dist(n, goal)
-  fScore[aIdx] = dist(aIdx, bIdx);
+  const fScore = new Dict2D(Number.POSITIVE_INFINITY); // fScore[n] = gScore[n] + dist(n, goal)
+  fScore.set(aPos, dist(aPos, bPos));
   
   if(debug) {
     state.i = 0;
     state.order = {};
   }
 
+  /**
+   * 
+   * @param {Vector} tile 
+   * @returns 
+   */
   const neighborsOf = (tile) => {
-    if(tile < 0 || tile >= CHUNK_AREA) return;
     const lst = [];
-    const t = idxToPos(tile);
-    horizontals.forEach(([xo, yo]) => {
-      const n = xo + yo * CHUNK_SIZE;
-      const x = t.x + xo;
-      const y = t.y + yo;
-      if(x < 0 || x >= CHUNK_SIZE) return;
-      if(y < 0 || y >= CHUNK_SIZE) return;
-      if(openSet.has(tile) || c.getTile(x, y) == TILES.WALL) return;
-      lst.push(tile+n);
+    horizontals.forEach((off) => {
+      const pos = Vector.add(off, tile);
+      if(openSet.has(tile) || world.map.getTile(pos) == TILES.WALL) return;
+      lst.push(pos);
     });
-    diagonals.forEach(([xo, yo]) => {
-      const n = xo + yo * CHUNK_SIZE;
-      const x = t.x + xo;
-      const y = t.y + yo;
-      if(x < 0 || x >= CHUNK_SIZE) return;
-      if(y < 0 || y >= CHUNK_SIZE) return;
-      if(openSet.has(tile) || c.getTile(x, y) == TILES.WALL) return;
-      if(c.getTile(x, t.y) == TILES.WALL && c.getTile(t.x, y) == TILES.WALL) {
+    diagonals.forEach((off) => {
+      const pos = Vector.add(off, tile);
+      if(openSet.has(tile) || world.map.getTile(pos) == TILES.WALL) return;
+      if(world.map.getTile(new Vector(pos.x, tile.y)) == TILES.WALL && world.map.getTile(new Vector(tile.x, pos.y)) == TILES.WALL) {
         return;
       }
-      lst.push(tile+n);
+      lst.push(pos);
     })
     return lst;
   }
-  const lowestFscore = (set) => {
-    let minScore = Number.POSITIVE_INFINITY;
-    let minN = -1;
-    for (const n of set.values()) {
-      if(fScore[n] < minScore) {
-        minScore = fScore[n];
-        minN = n;
-      }
-    }
-    return minN;
-  }
+  
   let counter = 0;
   while (openSet.size > 0) {
     counter += 1;
@@ -234,22 +184,17 @@ const pathfind = (world, a, b, debug=false) => {
       state.fScore = fScore;
       state.gScore = gScore;
     }
-    if (cur == bIdx) return constructPath(a.chunk, cameFrom, cur);
+    if (cur.x == bPos.x && cur.y == bPos.y) return constructPath(cameFrom, cur);
 
     openSet.delete(cur);
     
     const neighbors = neighborsOf(cur, openSet);
     neighbors.forEach(neighbor => {
-      const tentGScore = gScore[cur] + 1;//dist(cur, neighbor);
-      if (gScore[neighbor] == undefined || tentGScore < gScore[neighbor] ) {
-        if(debug) {
-          if(!state.order[neighbor])
-            state.order[neighbor] = state.i;
-          state.i += 1;
-        }
-        cameFrom[neighbor] = cur;
-        gScore[neighbor] = tentGScore;
-        fScore[neighbor] = tentGScore + dist(neighbor, bIdx);
+      const tentGScore = gScore.get(cur) + 1;//dist(cur, neighbor);
+      if (tentGScore < gScore.get(neighbor)) {
+        cameFrom.set(neighbor, cur);
+        gScore.set(neighbor, tentGScore);
+        fScore.set(neighbor, tentGScore + dist(neighbor, bPos));
         openSet.add(neighbor);
       }
     })
