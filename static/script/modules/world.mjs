@@ -5,6 +5,7 @@ import Rect from "./math/rect.mjs";
 import Vector from "./math/vector.mjs";
 import Player from "./player/player.mjs";
 import Map, { CHUNK_SIZE, TILE_SIZE } from "./world/map.mjs";
+import * as bullets from './weapons/bullets.mjs';
 
 export default class World {
   map = new Map();
@@ -43,6 +44,7 @@ export default class World {
   physics(dt) {
     this.#entities.forEach(e => e.physics(dt, this));
     this.player.physics(dt, this);
+    bullets.physics(dt, this);
   }
 
   render(dt, ctx) {

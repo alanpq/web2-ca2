@@ -200,7 +200,6 @@ export default class Game {
    * @param {number} dt
    */
   physics(dt) {
-    bullets.physics(dt, this.#world);
     this.#world.physics(dt);
     debugPhysics(dt, this.#world);
   }

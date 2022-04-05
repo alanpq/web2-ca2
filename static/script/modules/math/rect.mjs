@@ -49,6 +49,9 @@ export default class Rect {
    * @param {Vector} b 
    */
   lineIntersects(a, b) {
+    if(a.x >= this.left && a.x <= this.right && a.y >= this.top && a.y <= this.bottom) return true;
+    if(b.x >= this.left && b.x <= this.right && b.y >= this.top && b.y <= this.bottom) return true;
+
     if(lineIntersect(a, b, new Vector(this.left, this.top), new Vector(this.right, this.top))) return true;
     if(lineIntersect(a, b, new Vector(this.left, this.top), new Vector(this.left, this.bottom))) return true;
     if(lineIntersect(a, b, new Vector(this.right, this.top), new Vector(this.right, this.bottom))) return true;
