@@ -227,7 +227,7 @@ export default class Map {
     const out = [];
     const epsilon = 2;
     if (dir.sqrMagnitude <= 0) return [];
-    while(tileX > 0 && tileX <= CHUNK_SIZE && tileY > 0 && tileY <= CHUNK_SIZE) {
+    while(true) { //tileX > 0 && tileX <= CHUNK_SIZE && tileY > 0 && tileY <= CHUNK_SIZE
       if(out.length >= maxPoints) break;
       if(t >= length) break;
 
