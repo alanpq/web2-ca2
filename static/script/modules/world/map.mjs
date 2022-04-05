@@ -109,7 +109,7 @@ export default class Map {
       const y = i * !v;
       if(b.getTile(CHUNK_SIZE - (x+1),CHUNK_SIZE - (y+1)) == TILES.FLOOR &&
          a.getTile(x + !v, y + v) == TILES.FLOOR) {
-        a.setTile(x,y, TILES.DOOR);
+        a.setTile(x,y, TILES.FLOOR);
         return true;
       }
     }
