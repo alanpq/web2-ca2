@@ -17,8 +17,8 @@ export default class World {
   constructor(camera) {
     this.player = new Player(Vector.zero.clone());
     while (true) {
-      this.player.position.x = randRange(0, CHUNK_SIZE*TILE_SIZE);
-      this.player.position.y = randRange(0, CHUNK_SIZE*TILE_SIZE);
+      this.player.position.x = (randRange(0, CHUNK_SIZE)+0.5) * TILE_SIZE;
+      this.player.position.y = (randRange(0, CHUNK_SIZE)+0.5) * TILE_SIZE;
       if(this.map.getTile(worldToTile(this.player.position)) == TILES.FLOOR) break;
     }
     this.camera = camera;
