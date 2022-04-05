@@ -151,12 +151,20 @@ export default class Game {
   * @param {CanvasRenderingContext2D} ctx 
   */
   draw(dt, ctx) {
+    if(this.#topLeft) {
+      for(let x = this.#topLeft.x; x <= this.#bottomRight.x; x++) {
+        for(let y = this.#topLeft.y; y <= this.#bottomRight.y; y++) {
+          this.#world.map.renderChunk(new Vector(x,y), dt, ctx);
+        }
+      }
+    }
     this.#world.render(dt, ctx);
 
     bullets.draw(dt, ctx);
 
     ctx.fillStyle = "red";
     ctx.fillRect(this.#crosshair.x-2.5, this.#crosshair.y-2.5, 5, 5);
+
   }
 
   /** @type {Vector} */
@@ -164,6 +172,10 @@ export default class Game {
 
   #gunTime = 0;
   #gunInterval = 0.105;
+
+
+  #topLeft;
+  #bottomRight;
 
   /**
    * Do a tick.
@@ -193,13 +205,12 @@ export default class Game {
     this.#crosshair = this.#renderer.camera.screenToWorld(input.mouse());
     this.#renderer.camera.position = Vector.lerp(this.#world.player.position, this.#crosshair, 0.3);
 
-    const realSize = CHUNK_SIZE*TILE_SIZE;
-    const topLeft = worldToChunk(this.#renderer.camera.viewportToWorld(Vector.zero));
-    const bottomRight = worldToChunk(this.#renderer.camera.viewportToWorld(Vector.one));
+    this.#topLeft = worldToChunk(this.#renderer.camera.viewportToWorld(Vector.zero));
+    this.#bottomRight = worldToChunk(this.#renderer.camera.viewportToWorld(Vector.one));
     // console.debug(topLeft.toString(), bottomRight.toString())
     let count = 0;
-    for(let x = topLeft.x; x <= bottomRight.x; x++) {
-      for(let y = topLeft.y; y <= bottomRight.y; y++) {
+    for(let x = this.#topLeft.x; x <= this.#bottomRight.x; x++) {
+      for(let y = this.#topLeft.y; y <= this.#bottomRight.y; y++) {
         this.#world.map.createChunk(new Vector(x,y));
         count++;
       }

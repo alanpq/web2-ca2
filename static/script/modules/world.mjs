@@ -53,7 +53,7 @@ export default class World {
   }
 
   render(dt, ctx) {
-    this.map.render(dt, ctx);
+    // this.map.render(dt, ctx);
     this.player.render(dt, ctx);
     this.#entities.forEach(e => e.render(dt, ctx));
   }

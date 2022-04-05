@@ -87,11 +87,11 @@ export default class Map {
     this.#chunks[0][0] = new Chunk(0,0);
   }
 
-  render(dt, ctx) {
-    const cols = Object.values(this.#chunks);
-    cols.forEach(col => {
-      Object.values(col).forEach(chunk => chunk.render(dt, ctx));
-    })
+  renderChunk(pos, dt, ctx) {
+    if(this.#chunks[pos.y] == undefined) return;
+    const c = this.#chunks[pos.y][pos.x];
+    if(!c) return;
+    c.render(dt, ctx);
   }
 
 
