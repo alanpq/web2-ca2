@@ -24,7 +24,7 @@ export default class Player extends Entity {
 
   constructor (position) {
     super(position, new Vector(PLAYER_SIZE, PLAYER_SIZE));
-    this.speed = 100;
+    this.speed = 200;
     registerDebug(Flags.PLAYER, "draw", debug.draw.bind(this, this, this.#debug));
     registerDebug(Flags.PLAYER, "ui", debug.ui.bind(this, this, this.#debug));
   }

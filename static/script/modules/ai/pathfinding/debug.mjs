@@ -2,7 +2,7 @@
 import * as input from '../../input/mod.mjs';
 import Vector from '../../math/vector.mjs';
 import World from '../../world.mjs';
-import { TILE_SIZE, worldToTile } from '../../world/map.mjs';
+import { CHUNK_WORLD_SIZE, TILE_SIZE, worldToTile } from '../../world/map.mjs';
 import { findPath, idxToPos } from './pathfinding.mjs';
 
 export const state = {
@@ -86,5 +86,14 @@ export const draw = (dt, ctx) => {
   if(t && !input.isMouseEaten()) {
     ctx.fillStyle = "rgba(255,255,255,0.2)";
     ctx.fillRect(t.worldX*TILE_SIZE, t.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    ctx.fillStyle = "black";
+    ctx.fillText(`${t.worldX}, ${t.worldY}`, t.worldX*TILE_SIZE, t.worldY*TILE_SIZE - 30)
+    ctx.fillText(`${t.x}, ${t.y}`,t.worldX*TILE_SIZE, t.worldY*TILE_SIZE - 20)
+    ctx.fillText(t.tile, t.worldX*TILE_SIZE, t.worldY*TILE_SIZE - 10)
+
+    if(t.chunk) {
+      ctx.fillStyle = "rgba(255,255,255,0.2)";
+      ctx.fillRect(t.chunk.x*CHUNK_WORLD_SIZE, t.chunk.y*CHUNK_WORLD_SIZE, CHUNK_WORLD_SIZE, CHUNK_WORLD_SIZE);
+    }
   }
 }

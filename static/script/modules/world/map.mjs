@@ -151,7 +151,7 @@ export default class Map {
     const x = pos.x - c.x * CHUNK_SIZE;
     const y = pos.y - c.y * CHUNK_SIZE;
     return {
-      tile: c.getTile(pos.x, pos.y),
+      tile: c.getTile(x, y),
       chunk: c,
       x, y, worldX: pos.x, worldY: pos.y
     }
@@ -181,7 +181,7 @@ export default class Map {
     for(let x = left; x<=right; x++) {
       for(let y = top; y <= bottom; y++) {
         const v = new Vector(x,y);
-        // console.log(v.toString(),this.getTileFromWorld(v));
+        // console.log(v.toString(),this.getTile(v));
         if(this.getTile(v) == TILES.WALL) {
           return v.mul(1/TILE_SIZE);
         }
