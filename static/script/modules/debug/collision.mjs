@@ -9,6 +9,7 @@ let a = new Vector();
 let b = new Vector();
 
 let hits = [];
+let entHits = [];
 
 let p = new Vector();
 let c = new Vector();
@@ -42,6 +43,16 @@ export const physics = (dt, world) => {
   c = world.camera.screenToWorld(input.mouse());
   p = world.player.position;
   hits = world.map.raycast(world.player.position, c, 1);
+
+  entHits = [];
+  for(let i = 0; i < world.entities.length; i++) {
+    /** @type {Entity} */
+    const ent = world.entities[i];
+    if(!ent) continue;
+    if(ent.virtualRect.lineIntersects(world.player.position, c)) {
+      entHits.push(ent.virtualRect);
+    }
+  }
 }
 
 /**
@@ -63,6 +74,15 @@ export const draw = (dt, ctx) => {
       ctx.beginPath();
       ctx.arc(h.x, h.y, 3, 0, Math.PI*2);
       ctx.fill();
+    } 
+  }
+
+  if(entHits) {
+    ctx.fillStyle = "red";
+    for(const h of entHits) {
+      // ctx.beginPath();
+      ctx.fillRect(h.left, h.top, h.width, h.height);
+      // ctx.fill();
     } 
   }
   // ctx.save();

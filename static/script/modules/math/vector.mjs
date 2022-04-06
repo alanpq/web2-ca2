@@ -135,8 +135,8 @@ export default class Vector {
    * @param {number} v Scalar to divide.
    */
    div(v) {
-    this.x /= v;
-    this.y /= v;
+    this.x = this.x/v;
+    this.y = this.y/v;
     return this;
   }
 

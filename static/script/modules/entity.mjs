@@ -3,6 +3,7 @@
 import Rect from "./math/rect.mjs";
 import Vector from "./math/vector.mjs";
 import World from "./world.mjs";
+import { TILE_SIZE } from "./world/map.mjs";
 
 const SUBSTEPS = 10;
 
@@ -22,8 +23,8 @@ export default class Entity {
 
   
   get virtualPosition (){return this.#virtualPos;}
-  get rect () {return new Rect(this.position.x, this.position.y, this.#rect.width, this.#rect.height);}
-  get virtualRect() {return new Rect(this.#virtualPos.x, this.#virtualPos.y, this.#rect.width, this.#rect.height);}
+  get rect () {return new Rect(this.position.x-this.#rect.width/2, this.position.y-this.#rect.height/2, this.#rect.width, this.#rect.height);}
+  get virtualRect() {return new Rect(this.#virtualPos.x-this.#rect.width/2, this.#virtualPos.y-this.#rect.height/2, this.#rect.width, this.#rect.height);}
 
   /**
    * 
@@ -52,7 +53,7 @@ export default class Entity {
   }
 
   onDead() {
-    
+
   }
 
   /**
@@ -69,6 +70,17 @@ export default class Entity {
    * @param {World} world
    */
   physics(dt, world) {
+    for(let i = 0; i < world.entities.length; i++) {
+      /** @type {Entity} */
+      const ent = world.entities[i];
+      if(!ent) continue;
+      const dir = Vector.sub(this.position, ent.position);
+      const m = dir.magnitude;
+      if(m < TILE_SIZE) {
+        this.velocity.add(dir.normalized());
+      }
+    }
+
     this.velocity.mul(this.drag);
     // naive, needs substeppage to feel tight
     for(let i = 0; i < SUBSTEPS; i++) {
@@ -89,6 +101,8 @@ export default class Entity {
       }
       this.position = newPos;
     }
+
+    
   }
 
   /**

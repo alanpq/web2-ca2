@@ -93,7 +93,7 @@ export default class Enemy extends Entity {
       let targetDir = Vector.sub(this.#target, this.position).div(TILE_SIZE);
       const d = targetDir.magnitude;
       this.#debug.d = d;
-      if(d < 0.5) {
+      if(d < 0.2) {
         if(this.#curIdx >= this.#path.length) {
           console.log('reached destination');
         } else {
