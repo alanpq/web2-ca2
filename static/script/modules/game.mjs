@@ -97,7 +97,7 @@ export default class Game {
 
   ////// ACTUAL GAME STUFF
 
-  #debug = true; // FIXME: make this false by default before prod
+  #debug = false; // FIXME: make this false by default before prod
   /**
    * 
    * @param {number} dt Deltatime in seconds
@@ -137,15 +137,15 @@ export default class Game {
       
       ui.endVertical();
       ui.endArea();
-      if(!document.fullscreenElement) {
-        ui.textPadding.top = 5;
-        ui.textPadding.bottom = 5;
-        ui.startArea(new Rect(5,ui.ctx.canvas.height-25, ui.ctx.canvas.width/3, ui.ctx.canvas.height), Align.START, Align.END);
-        if(ui.button("Fullscreen")) {
-          ui.ctx.canvas.requestFullscreen();
-        }
-        ui.endArea();
+    }
+    if(!document.fullscreenElement) {
+      ui.textPadding.top = 5;
+      ui.textPadding.bottom = 5;
+      ui.startArea(new Rect(5,ui.ctx.canvas.height-25, ui.ctx.canvas.width/3, ui.ctx.canvas.height), Align.START, Align.END);
+      if(ui.button("Fullscreen")) {
+        ui.ctx.canvas.requestFullscreen();
       }
+      ui.endArea();
     }
   }
 
