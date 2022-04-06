@@ -63,8 +63,10 @@ const invokeCallbacks = (event, args) => {
     if (!getFlag(flag)) continue;
     if (!cbs[flag]) continue;
     if (!cbs[flag][event]) continue;
-    for (const cb of cbs[flag][event])
+    for (const cb of cbs[flag][event]) {
+      if(!cb) continue;
       cb(...args);
+    }
   }
 }
 
@@ -138,4 +140,9 @@ export const registerDebug = (flag, event, uiCB) => {
     physics: [],
   };
   cbs[flag][event].push(uiCB);
+  return cbs[flag][event].length-1;
+}
+
+export const removeDebug = (flag, event, i) => {
+  delete cbs[flag][event][i];
 }
