@@ -3,7 +3,7 @@
 import Rect from "./math/rect.mjs";
 import Vector from "./math/vector.mjs";
 import World from "./world.mjs";
-import { TILE_SIZE } from "./world/map.mjs";
+import { CHUNK_SIZE, TILE_SIZE } from "./world/map.mjs";
 
 const SUBSTEPS = 10;
 
@@ -79,7 +79,9 @@ export default class Entity {
       const ent = world.entities[i];
       if(!ent || ent.dead) continue;
       const dir = Vector.sub(this.position, ent.position);
-      const m = dir.magnitude;
+      let m = dir.sqrMagnitude;
+      if(m > 100000) continue;
+      m = Math.sqrt(m);
       if(m < TILE_SIZE) {
         this.velocity.add(dir.normalized());
       }
