@@ -146,6 +146,7 @@ export default class Game {
   /** @type {import("./world/map.mjs").DetailedTile} */
   #b;
   #path;
+  #laserHit = [];
   /**
   * Render a frame.
   * @param {number} dt
@@ -158,6 +159,15 @@ export default class Game {
           this.#world.map.renderChunk(new Vector(x,y), dt, ctx);
         }
       }
+    }
+
+    if(this.#laserHit) {
+      ctx.strokeStyle = "rgba(255,0,0,0.2";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(this.#world.player.virtualPosition.x, this.#world.player.virtualPosition.y);
+      ctx.lineTo(this.#laserHit.x, this.#laserHit.y);
+      ctx.stroke();
     }
     this.#world.render(dt, ctx);
 
@@ -227,6 +237,11 @@ export default class Game {
 
     this.#crosshair = this.#renderer.camera.screenToWorld(input.mouse());
     this.#renderer.camera.position = Vector.lerp(this.#world.player.position, this.#crosshair, 0.3);
+
+    const target = Vector.sub(this.#crosshair, this.#world.player.position).mul(100);
+    this.#laserHit = this.#world.map.raycast(this.#world.player.position, target, 1)[0];
+    if(!this.#laserHit)
+      this.#laserHit = target;
 
     this.#topLeft = worldToChunk(this.#renderer.camera.viewportToWorld(Vector.zero));
     this.#bottomRight = worldToChunk(this.#renderer.camera.viewportToWorld(Vector.one));
