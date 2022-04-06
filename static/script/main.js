@@ -34,5 +34,4 @@ spa.addEventListener("game", "close", () => {
   if(game)
     game.destroy();
 });
-spa.goto('help').then(() => {
-})
+spa.goto('game');
