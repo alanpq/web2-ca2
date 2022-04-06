@@ -1,16 +1,17 @@
 'use strict';
 import * as input from '../../input/mod.mjs';
+import { Dict2D } from '../../lib/Dict2d.mjs';
 import Vector from '../../math/vector.mjs';
 import World from '../../world.mjs';
 import { CHUNK_WORLD_SIZE, TILE_SIZE, worldToTile } from '../../world/map.mjs';
-import { findPath, idxToPos } from './pathfinding.mjs';
+import {findPath, idxToPos } from './pathfinding.mjs';
 
 export const state = {
-  order: {},
+  order: new Dict2D(),
   i: 0,
-  cameFrom: {},
-  gScore: {},
-  fScore: {},
+  cameFrom: new Dict2D(),
+  gScore: new Dict2D(),
+  fScore: new Dict2D(),
   a: null,
   b: null,
   /** @type {World} */
@@ -21,47 +22,56 @@ export const state = {
 export const tick = (dt) => {
   if(input.leftMouseDown()) {
     state.a = state.world.map.probeTile(worldToTile(state.renderer.camera.screenToWorld(input.mouse())));
-    // if(state.b) state.path = findPath(state.world, state.a, state.b, true);
+    if(state.b) findPath(state.world, state.a, state.b, true).then(p => {state.path = p});
+    console.log(state);
   }
 
   if(input.rightMouseDown()) {
     state.b = state.world.map.probeTile(worldToTile(state.renderer.camera.screenToWorld(input.mouse())));
-    if(state.a) state.path = findPath(state.world, state.a, state.b, true);
+    if(state.a) findPath(state.world, state.a, state.b, true).then(p => {state.path = p});
+    console.log(state);
   }
 }
 
 export const draw = (dt, ctx) => {
-  if(state.path) {
-    const off = new Vector(0.5, 0.5);
-    Object.entries(state.order).forEach(([k,v]) => {
-      const aa = idxToPos(k).mul(TILE_SIZE);
-      const bb = idxToPos(v).mul(TILE_SIZE);
+  const off = new Vector(0.5, 0.5);
+  if(state.order) {
+    state.order.entries().forEach(([k,v]) => {
+      const aa = k.clone().mul(TILE_SIZE);
       ctx.fillStyle = `rgba(255, ${Math.floor((1 - (v / state.i))*255)}, 0, .2)`; // 0 - 140
       ctx.fillRect(aa.x, aa.y, TILE_SIZE, TILE_SIZE);
     });
-    Object.entries(state.gScore).forEach(([k,v]) => {
-      const aa = idxToPos(k).mul(TILE_SIZE);
+  }
+  if(state.gScore) {
+    state.gScore.entries().forEach(([k,v]) => {
+      const aa = k.clone().mul(TILE_SIZE);
       ctx.font = "10px monospace";
       ctx.fillStyle = "black"; // 0 - 140
       ctx.fillText(v, aa.x, aa.y+10);
     });
-    Object.entries(state.fScore).forEach(([k,v]) => {
-      const aa = idxToPos(k).mul(TILE_SIZE);
+  }
+  if(state.fScore) {
+    state.fScore.entries().forEach(([k,v]) => {
+      const aa = k.clone().mul(TILE_SIZE);
       ctx.font = "10px monospace";
       ctx.fillStyle = "gray"; // 0 - 140
       ctx.fillText(v, aa.x, aa.y+TILE_SIZE-2);
     });
-    Object.entries(state.cameFrom).forEach(([k, v]) => {
+  }
+  if(state.cameFrom) {
+    state.cameFrom.entries().forEach(([k, v]) => {
       if(v == null) return;
       ctx.lineWidth = 1;
       ctx.strokeStyle = "blue";
       ctx.beginPath();
-      const aa = idxToPos(k).add(off).mul(TILE_SIZE);
-      const bb = idxToPos(v).add(off).mul(TILE_SIZE);
+      const aa = k.clone().add(off).mul(TILE_SIZE);
+      const bb = v.clone().add(off).mul(TILE_SIZE);
       ctx.moveTo(aa.x, aa.y);
       ctx.lineTo(bb.x, bb.y);
       ctx.stroke();
     });
+  }
+  if(state.path) {
     for(let i = state.path.length-1; i >= 1; i--) {
       ctx.lineWidth = 2;
       ctx.strokeStyle = "green";

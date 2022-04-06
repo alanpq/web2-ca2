@@ -1,4 +1,5 @@
 'use strict';
+import { Dict2D } from "../../lib/Dict2d.mjs";
 import { manhatten } from "../../math/mod.mjs";
 import Vector from "../../math/vector.mjs"
 import World from "../../world.mjs";
@@ -43,22 +44,6 @@ const constructPath = (cameFrom, cur) => {
 // TODO: investigate octile distance
 const dist = (a, b) => {
   return manhatten(a, b);
-}
-
-class Dict2D {
-  #map = {};
-  constructor(fallback) {
-    this.fallback = fallback;
-  }
-  set(pos, val) {
-    if(this.#map[pos.x] === undefined) this.#map[pos.x] = {};
-    this.#map[pos.x][pos.y] = val;
-  }
-  get(pos) {
-    if(this.#map[pos.x] === undefined) return this.fallback;
-    if(this.#map[pos.x][pos.y] === undefined) return this.fallback;
-    return this.#map[pos.x][pos.y];
-  }
 }
 
 // a* implemented with the help of https://en.wikipedia.org/wiki/A*_search_algorithm
@@ -115,7 +100,7 @@ export const findPath = async (world, a, b, debug=false) => {
   
   if(debug) {
     state.i = 0;
-    state.order = {};
+    state.order = new Dict2D();
   }
 
   /**
@@ -154,6 +139,8 @@ export const findPath = async (world, a, b, debug=false) => {
       state.cameFrom = cameFrom;
       state.fScore = fScore;
       state.gScore = gScore;
+      state.order.set(cur, state.i);
+      state.i += 1;
     }
     if (cur.x == bPos.x && cur.y == bPos.y) return constructPath(cameFrom, cur);
 
