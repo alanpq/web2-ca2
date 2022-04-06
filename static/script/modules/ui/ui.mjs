@@ -21,6 +21,24 @@ import { Flags, getFlag } from "./debug.mjs";
  * @prop {number} left
  */
 
+/**
+ * 
+ * @param {string} str 
+ */
+const removeBackspaces = (s) => {
+  let i = s.length-1;
+  let copy = [];
+  while(i>=0) {
+    if(s[i] === '\b') {
+      i-=2;
+      continue;
+    }
+    copy.push(s[i]);
+    i-=1;
+  }
+  return copy.reverse().join('');
+}
+
 export default class UI {
   /**
    * @type {PositioningContext[]}
@@ -168,6 +186,68 @@ export default class UI {
     this.ctx.restore();
     if (this.hidden) return value;
     return value ^ (hit && input.leftMouseDown(true));
+  }
+  #carat = 0; // FIXME: fix input() state
+  #iSelected = false;
+  #iSelectedAll = false;
+  input(value, width=null) {
+    const parent = this.top();
+    this.ctx.save();
+    this.#prepareFont();
+    
+    const mText = this.ctx.measureText(value);
+    const rect = parent.computeWidgetRect(
+      this.textPadding.left + this.textPadding.right + (width || mText.width),
+      this.font.size + this.textPadding.top + this.textPadding.bottom,
+    );
+    let hit = false;
+    if(!this.hidden) {
+      const clipRect = parent.computeClipRect(rect.width, rect.height);
+      this.#drawBounds(rect, clipRect);
+      this.#clipRect(clipRect);
+      hit = rect.containsPoint(input.mouse());
+      input.setMouseEat(hit);
+
+      if(hit && input.leftMouseDown(true)) {
+        this.#iSelected = true;
+        this.#iSelectedAll = true;
+      }
+
+      if(this.#iSelected) {
+        const n = input.rawFromQueue();
+        if(n.length > 0) {
+          if(this.#iSelectedAll == true) value = "";
+          this.#iSelectedAll = false;
+        }
+        value = removeBackspaces(value + n);
+      }
+
+      this.ctx.fillStyle = hit ? (input.leftMouse(true) ? "#9C9C9C" : "#C5C5C5"): "#F3F3F3";
+      this.ctx.strokeStyle = "#302f30";
+      this.ctx.lineWidth = 0.5;
+
+      this.ctx.fillRect  (rect.left, rect.top, rect.width, rect.height);
+      this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+      if(this.#iSelectedAll) {
+        this.ctx.fillStyle = "#9AB9D6";
+        this.ctx.fillRect  (rect.left + this.textPadding.left, rect.top + this.textPadding.top,
+          mText.width, rect.height - (this.textPadding.top + this.textPadding.bottom));
+      } else if(this.#iSelected) {
+        this.ctx.fillStyle = "black";
+        this.ctx.fillRect  (mText.width + rect.left + this.textPadding.left+1, rect.top + this.textPadding.top,
+          1, rect.height - (this.textPadding.top + this.textPadding.bottom));
+      }
+
+      this.ctx.fillStyle = "black";
+      this.ctx.fillText(
+        value,
+        rect.left + this.textPadding.left,
+        rect.top + mText.actualBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top,
+      );
+    }
+    parent.expand(rect);
+    this.ctx.restore();
+    return value;
   }
 
   button(label, width=null) {

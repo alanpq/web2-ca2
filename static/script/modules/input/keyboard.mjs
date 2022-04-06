@@ -23,7 +23,22 @@ const keys = {};
 // to be applied for the start of the next.
 let keyQueue = []; 
 
+let uiQueue = []; // argh terrible
+const uiBanned = {
+  "Enter": true,
+  "Backspace": true,
+};
+
+/**
+ * 
+ * @param {KeyboardEvent} e 
+ * @returns 
+ */
 const keydown = (e) => {
+  if(!e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey && !uiBanned[e.key])
+    uiQueue.push(e.key);
+  if(e.key == 'Backspace') uiQueue.push('\b');
+
   if(!buttonsRev[e.key]) return;
   e.preventDefault();
   keyQueue.push([e.key, true]);
@@ -34,6 +49,12 @@ const keyup = (e) => {
   e.preventDefault();
   keyQueue.push([e.key, false]);
 };
+
+export const rawFromQueue = () => {
+  const q = uiQueue.join('');
+  uiQueue = [];
+  return q;
+}
 
 /**
  * 

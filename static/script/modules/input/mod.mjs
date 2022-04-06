@@ -1,5 +1,5 @@
 'use strict';
-export {button, buttonDown, buttonUp} from "./keyboard.mjs";
+export {button, buttonDown, buttonUp, rawFromQueue} from "./keyboard.mjs";
 export {
   setMouseEat, isMouseEaten,
   mouse,
