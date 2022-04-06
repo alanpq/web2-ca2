@@ -1,6 +1,7 @@
 'use strict';
 import { ATTACK_COOLDOWN, COMBO_COOLDOWN, ENEMY_DAMAGE } from "../../constants.mjs";
 import Entity from "../../entity.mjs";
+import Sprite from "../../images.mjs";
 import { manhatten } from "../../math/mod.mjs";
 import Vector from "../../math/vector.mjs";
 import { Flags, registerDebug, removeDebug } from "../../ui/debug.mjs";
@@ -11,11 +12,14 @@ import * as pathfinding from "../pathfinding/pathfinding.mjs"
 import * as debug from './debug.mjs';
 
 export default class Enemy extends Entity {
+
+  #sprite = new Sprite('enemy.png', {interval: 0.1, cols: 6, tileSize: 32});
+
   #debug = {targetDir: null, d: 0};
   #debugIdx;
   #announcedDeath = false;
   constructor (position) {
-    super(position, new Vector(10, 10), 100);
+    super(position, new Vector(25, 25), 100);
     this.speed = 105;
     this.drag = 0.5;
 
@@ -64,7 +68,9 @@ export default class Enemy extends Entity {
   }
 
   tick(dt) {
+    super.tick(dt);
     if(this.dead) return;
+    this.#sprite.tick(dt);
     if(this.#playerDist <= 35) {
       if(this.#attackCooldown <= 0) {
         this.#attackCooldown = ATTACK_COOLDOWN;
@@ -142,8 +148,9 @@ export default class Enemy extends Entity {
    * @param {CanvasRenderingContext2D} ctx 2D Context
    */
   render(dt, ctx) {
-    ctx.fillStyle = this.dead ? "rgba(0,0,0,0.3)" : "black";
-    super.render(dt, ctx);
+    ctx.globalAlpha = this.dead ? 0.5 : 1.0;
+    this.#sprite.draw(ctx, Vector.sub(this.virtualPosition, new Vector(16, 16)));
+    ctx.globalAlpha = 1;
     if(!this.dead && this.health < this.maxHealth) {
       const ww = (this.rect.width*1.5);
       const w = ww * (this.health/this.maxHealth);
@@ -152,6 +159,5 @@ export default class Enemy extends Entity {
       ctx.fillStyle = "green";
       ctx.fillRect(this.virtualPosition.x - (ww)/2, this.virtualPosition.y - this.rect.height*1.1, w, 5);
     }
-    ctx.fillText(this.#playerDist, this.virtualPosition.x, this.virtualPosition.y - 30)
   }
 }

@@ -23,7 +23,7 @@ import Chunk from "./world/chunk.mjs";
 import { lerp } from "./math/mod.mjs";
 import { drawScoreboard } from "./scoreboard/ui.mjs";
 import {requestToken} from "./scoreboard/api.mjs";
-import { loadAllImages } from "./images.mjs";
+import { loadImage } from "./images.mjs";
 
 export default class Game {
   #loaded = false;
@@ -83,7 +83,9 @@ export default class Game {
       });
     })
 
-    await loadAllImages();
+    await Promise.allSettled([
+      loadImage('enemy.png'),
+    ]);
 
     this.#loaded = true;
     registerDebug(Flags.PATHFINDING, "draw", pathfinding.debug.draw);
