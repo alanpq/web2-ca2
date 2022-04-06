@@ -47,6 +47,7 @@ export default class World {
       if(!e) continue;
       e.tick(dt);
       if(e.dead) {
+        e.onDead();
         delete this.#entities[i];
         i--;
         len--;
