@@ -42,6 +42,7 @@ export default class Renderer {
     this.camera = new Camera();
 
     window.addEventListener("resize", () => {
+      if(document.fullscreenEnabled) return this.fullscreen_change();
       this.conformToParent();
       this.conformToParent();
     });
@@ -51,7 +52,7 @@ export default class Renderer {
     window.requestAnimationFrame(this.#loop.bind(this));
   }
 
-  fullscreen_change(e) {
+  fullscreen_change() {
     if(document.fullscreenElement) {
       const rect = this.canvas.getBoundingClientRect();
       this.setSize(rect.width, rect.height);
