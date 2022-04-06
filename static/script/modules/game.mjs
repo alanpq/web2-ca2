@@ -18,7 +18,8 @@ import { Align } from "./ui/positioningContext.mjs";
 import Entity from "./entity.mjs";
 import Dummy from "./ai/enemy/dummy.mjs";
 import Enemy from "./ai/enemy/enemy.mjs";
-import { CHUNK_SIZE, TILE_SIZE, worldToChunk } from "./world/map.mjs";
+import { CHUNK_SIZE, CHUNK_WORLD_SIZE, TILES, TILE_SIZE, worldToChunk, worldToTile } from "./world/map.mjs";
+import Chunk from "./world/chunk.mjs";
 
 export default class Game {
   #loaded = false;
@@ -178,6 +179,28 @@ export default class Game {
   #bottomRight;
 
   /**
+   * 
+   * @param {Chunk} chunk 
+   */
+  #safeSpot(chunk) {
+    while(true) {
+      const p = new Vector(Math.floor(Math.random() * CHUNK_SIZE),Math.floor(Math.random() * CHUNK_SIZE));
+      if(chunk.getTile(p.x, p.y) == TILES.FLOOR) return p.add(new Vector(0.5, 0.5).add(new Vector(chunk.x, chunk.y).mul(CHUNK_SIZE))).mul(TILE_SIZE).clone();
+    }
+  }
+  /**
+   * 
+   * @param {Chunk} chunk 
+   */
+  #populateChunk(chunk) {
+    if(chunk.populated) return;
+    for(let i = 0; i < 1; i++) {
+      this.#world.addEntity(new Enemy(this.#safeSpot(chunk)));
+    }
+    chunk.populated = true;
+  }
+
+  /**
    * Do a tick.
    */
   tick(dt) {
@@ -211,7 +234,9 @@ export default class Game {
     let count = 0;
     for(let x = this.#topLeft.x; x <= this.#bottomRight.x; x++) {
       for(let y = this.#topLeft.y-1; y <= this.#bottomRight.y; y++) {
-        this.#world.map.createChunk(new Vector(x,y));
+        if (this.#world.map.createChunk(new Vector(x,y))) {
+          this.#populateChunk(this.#world.map.getChunk(new Vector(x,y)));
+        };
         count++;
       }
     }

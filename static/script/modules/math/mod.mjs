@@ -13,6 +13,17 @@ export const lerp = (a,b,t) => {
   return a + t*(b-a);
 }
 
+/**
+ * Manhatten distance between a and b
+ * @param {Vector} a 
+ * @param {Vector} b 
+ * @returns {number}
+ */
+
+export const manhatten = (a,b) => {
+  return Math.abs(a.x-b.x) + Math.abs(a.y-b.y);
+}
+
 export const randRange = (min, max) => {
   return Math.floor(Math.random() * (max-min)) + min;
 }

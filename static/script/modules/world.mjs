@@ -7,6 +7,7 @@ import Player from "./player/player.mjs";
 import Map, { CHUNK_SIZE, TILES, TILE_SIZE, worldToTile } from "./world/map.mjs";
 import * as bullets from './weapons/bullets.mjs';
 import { randRange } from "./math/mod.mjs";
+import Entity from "./entity.mjs";
 
 export default class World {
   map = new Map();
@@ -38,7 +39,19 @@ export default class World {
    * @param {number} dt
    */
   tick(dt) {
-    this.#entities.forEach(e => e.tick(dt));
+    let i = -1;
+    let len = this.#entities.length;
+    while(i < len) {
+      i++;
+      const e = this.#entities[i];
+      if(!e) continue;
+      e.tick(dt);
+      if(e.dead) {
+        delete this.#entities[i];
+        i--;
+        len--;
+      }
+    }
   }
   
   /**
@@ -47,7 +60,7 @@ export default class World {
    * @param {World} world
    */
   physics(dt) {
-    this.#entities.forEach(e => e.physics(dt, this));
+    this.#entities.forEach(e => {if(!e) return; e.physics(dt, this);});
     this.player.physics(dt, this);
     bullets.physics(dt, this);
   }
@@ -55,6 +68,6 @@ export default class World {
   render(dt, ctx) {
     // this.map.render(dt, ctx);
     this.player.render(dt, ctx);
-    this.#entities.forEach(e => e.render(dt, ctx));
+    this.#entities.forEach(e => {if(!e) return; e.render(dt, ctx);});
   }
 }

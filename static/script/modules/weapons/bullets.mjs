@@ -102,6 +102,7 @@ export const physics = (dt, world) => {
             for(let i = 0; i < world.entities.length; i++) {
               /** @type {Entity} */
               const ent = world.entities[i];
+              if(!ent) continue;
               if(ent.virtualRect.lineIntersects(b.oldPos, b.pos)) {
                 ent.onHit(b);
                 b.life = 0;

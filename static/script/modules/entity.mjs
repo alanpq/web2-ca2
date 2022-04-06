@@ -39,6 +39,8 @@ export default class Entity {
   }
   
   get maxHealth() {return this.#maxHealth;}
+  
+  get dead() {return this.health <= 0;}
 
   /**
    * 
@@ -47,6 +49,10 @@ export default class Entity {
   onHit(bullet) {
     this.health -= bullet.damage;
     this.velocity.add(bullet.vel.clone().mul(0.05));
+  }
+
+  onDead() {
+    
   }
 
   /**

@@ -16,22 +16,23 @@ export const tick = (dt) => {
  * @param {CanvasRenderingContext2D} ctx 
  */
 export const draw = (state, dt, ctx) => {
-  ctx.fillText(state.enemy.velocity.toString(3), state.enemy.position.x, state.enemy.position.y-20);
-  ctx.fillText(state.enemy.position.toString(3), state.enemy.position.x, state.enemy.position.y-10);
-  ctx.fillText(state.debug.d, state.enemy.position.x, state.enemy.position.y);
-  if(state.debug.tile) {
-    ctx.fillStyle = "rgba(255,0,0,0.2)";
-    ctx.fillRect(state.debug.tile.worldX*TILE_SIZE, state.debug.tile.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
+  ctx.fillStyle = "black";
+  ctx.fillText(state.debug.curIdx, state.enemy.position.x+20, state.enemy.position.y-20);
+  ctx.fillText(state.enemy.position.toString(3), state.enemy.position.x+20, state.enemy.position.y-10);
+  ctx.fillText(state.debug.d, state.enemy.position.x+20, state.enemy.position.y);
+  // if(state.debug.tile) {
+  //   ctx.fillStyle = "rgba(255,0,0,0.2)";
+  //   ctx.fillRect(state.debug.tile.worldX*TILE_SIZE, state.debug.tile.worldY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  // }
 
-  if(state.debug.targetDir && state.debug.targetDir.sqrMagnitude > 0) {
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = "black";
-    ctx.beginPath();
-    ctx.moveTo(state.enemy.position.x, state.enemy.position.y);
-    ctx.lineTo(state.debug.targetDir.x + state.enemy.position.x, state.debug.targetDir.y + state.enemy.position.y);
-    ctx.stroke();
-  }
+  // if(state.debug.targetDir && state.debug.targetDir.sqrMagnitude > 0) {
+  //   ctx.lineWidth = 1;
+  //   ctx.strokeStyle = "black";
+  //   ctx.beginPath();
+  //   ctx.moveTo(state.enemy.position.x, state.enemy.position.y);
+  //   ctx.lineTo(state.debug.targetDir.x + state.enemy.position.x, state.debug.targetDir.y + state.enemy.position.y);
+  //   ctx.stroke();
+  // }
 
 
   if(state.debug.target) {
@@ -42,13 +43,13 @@ export const draw = (state, dt, ctx) => {
 
 
   if(!state.enemy.path || !state.debug.tile.chunk) return;
-  const off = new Vector(state.debug.tile.chunk.x + 0.5, state.debug.tile.chunk.y + 0.5);
+  const off = new Vector(0.5,0.5);
   for(let i = state.enemy.path.length-1; i >= 1; i--) {
     ctx.lineWidth = 1;
     ctx.strokeStyle = "red";
     ctx.beginPath();
-    const aa = idxToPos(state.enemy.path[i]).add(off).mul(TILE_SIZE);
-    const bb = idxToPos(state.enemy.path[i-1]).add(off).mul(TILE_SIZE);
+    const aa = state.enemy.path[i].clone().add(off).mul(TILE_SIZE);
+    const bb = state.enemy.path[i-1].clone().add(off).mul(TILE_SIZE);
     ctx.moveTo(aa.x, aa.y);
     ctx.lineTo(bb.x, bb.y);
     ctx.stroke();

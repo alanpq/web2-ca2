@@ -128,10 +128,11 @@ export default class Map {
         c.doored[1] = this.#glueEdge(c, this.getChunk(Vector.sub(pos, Vector.up)), true);
       if(!c.doored[0])
         c.doored[0] =  this.#glueEdge(c, this.getChunk(Vector.add(pos, Vector.left)), false);
-      return;
+      return false;
     }
     const c = new Chunk(pos.x, pos.y);
     this.#chunks[pos.y][pos.x] = c;
+    return true;
   }
 
   /**

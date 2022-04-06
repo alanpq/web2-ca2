@@ -1,4 +1,5 @@
 'use strict';
+import { manhatten } from "../../math/mod.mjs";
 import Vector from "../../math/vector.mjs"
 import World from "../../world.mjs";
 import Chunk from "../../world/chunk.mjs";
@@ -27,10 +28,6 @@ const diagonals = [
  * @returns {Vector}
  */
 export const idxToPos = (idx) => new Vector(idx % CHUNK_SIZE, Math.floor(idx / CHUNK_SIZE));
-
-const manhatten = (a,b) => {
-  return Math.abs(a.x-b.x) + Math.abs(a.y-b.y);
-}
 
 const constructPath = (cameFrom, cur) => {
   const path = [cur];
@@ -72,10 +69,9 @@ class Dict2D {
  * @param {import("../../world/map.mjs").DetailedTile} a 
  * @param {import("../../world/map.mjs").DetailedTile} b
  */
-export const findPath = (world, a, b, debug=false) => {
+export const findPath = async (world, a, b, debug=false) => {
   // FIXME: implement cross-chunk pathing
   // TODO: do bi-directional pathing to exit impossible paths earlier
-  console.debug('pathing from', a, 'to', b);
   if(!a || !b) return null;
   // if(a.chunk != b.chunk) return console.error("Pathfinding does not yet work across chunks!");
   if(b.tile == TILES.WALL) return null;
@@ -150,7 +146,7 @@ export const findPath = (world, a, b, debug=false) => {
     counter += 1;
     if(counter > CHUNK_AREA * 4) {
       console.error('potential infinite loop!');
-      break;
+      return null;
     }
     //TODO: use priority queue or min-heap to bring this down to O(logn)
     const cur = lowestFscore(openSet);

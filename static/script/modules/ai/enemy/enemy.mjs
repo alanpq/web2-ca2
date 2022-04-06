@@ -1,5 +1,6 @@
 'use strict';
 import Entity from "../../entity.mjs";
+import { manhatten } from "../../math/mod.mjs";
 import Vector from "../../math/vector.mjs";
 import { Flags, registerDebug } from "../../ui/debug.mjs";
 import World from "../../world.mjs";
@@ -17,7 +18,9 @@ export default class Enemy extends Entity {
 
     registerDebug(Flags.AI, "draw", debug.draw.bind(this, {enemy: this, debug: this.#debug}));
   }
+  
 
+  #tile; // current tile
   #target = new Vector(); // current world-space destination
   #destination = new Vector();           // tile-space path destination
   #targetTile;            // destination tile (usually the player)
@@ -30,12 +33,28 @@ export default class Enemy extends Entity {
 
   get path() { return this.#path; }
 
+  /**
+   * 
+   * @param {Vector} to 
+   * @returns {boolean}
+   */
+  needNewPath(to) {
+    const dist = manhatten(worldToTile(this.position), to);
+    // we only need to recalculate a path if we have none or have finished our current,
+    // or if the player has moved and we are within 20 tiles
+    return (dist < 100 && (!this.#path || this.#curIdx >= this.#path.length)) ||
+      (
+        dist < 50 && (this.#path.length-this.#curIdx) < 30 &&
+        (to.x != this.#destination.x || to.y != this.#destination.y)
+      );
+  }
+
   tick(dt) {
   }
 
-  newTarget() {
-    if(!this.#path || !this.#targetTile) return;
-    this.#target = tileToWorld(pathfinding.idxToPos(this.curTile).add(new Vector(0.5, 0.5)), this.#targetTile.chunk);
+  newTarget () {
+    if(!this.curTile) return;
+    this.#target = tileToWorld(this.curTile.clone().add(new Vector(0.5, 0.5)));
     this.#debug.target = this.#target;
   }
 
@@ -46,19 +65,23 @@ export default class Enemy extends Entity {
    */
   physics(dt, world) {
     const player = worldToTile(world.player.position);
-    const tile = world.map.probeTile(player);
-    this.#debug.tile = tile;
+    const playerTile = world.map.probeTile(player);
+    this.#debug.tile = playerTile;
     this.#debug.curIdx = this.#curIdx;
 
-    if((player.x != this.#destination.x || player.y != this.#destination.y) || !this.#path) {
-      // this.#testDone = true;
+    if(this.needNewPath(player)) { // player moved or no path
       this.#destination = player;
-      this.#targetTile = tile;
+      this.#targetTile = playerTile;
       const cur = world.map.probeTile(worldToTile(this.position));
-      this.#path = pathfinding.findPath(world, cur, tile);
-      this.#curIdx = 1;
-      this.newTarget();
-      console.log('new path');
+      pathfinding.findPath(world, cur, playerTile).then((path) => {
+        if(path == null) {
+          this.health = 0;
+          return;
+        }
+        this.#path = path || []; 
+        this.newTarget();
+        this.#curIdx = 1;
+      });
     }
     if(this.#path != null && this.#path.length > 1 && this.#target != null && this.#curIdx < this.#path.length) {
       let targetDir = Vector.sub(this.#target, this.position).div(TILE_SIZE);

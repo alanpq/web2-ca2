@@ -11,6 +11,7 @@ export default class Chunk {
   #map = []
 
   doored = [false, false];
+  populated = false;
 
   constructor(x, y) {
     this.x = x;
