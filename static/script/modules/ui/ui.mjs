@@ -243,7 +243,7 @@ export default class UI {
       this.ctx.fillText(
         value,
         rect.left + this.textPadding.left,
-        rect.top + mText.fontBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top,
+        rect.top + mText.fontBoundingBoxAscent + this.textPadding.top,
       );
     }
     parent.expand(rect);
