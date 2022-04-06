@@ -61,25 +61,25 @@ export const mouse = () => {
 }
 /** Get if left mouse button is held */
 export const leftMouse = (ignoreEat = false) => {
-  return (mouseState.left > 1) && (!mouseState.eaten ^ ignoreEat);
+  return (mouseState.left > 1) && (!mouseState.eaten || (ignoreEat&&mouseState.eaten));
 }
 /** Get if right mouse button is held */
 export const rightMouse = (ignoreEat = false) => {
-  return (mouseState.right > 1) && (!mouseState.eaten ^ ignoreEat);
+  return (mouseState.right > 1) && (!mouseState.eaten || (ignoreEat&&mouseState.eaten));
 }
 /** Get if left mouse button has just been pressed */
 export const leftMouseDown = (ignoreEat = false) => {
-  return (mouseState.left == 3) && (!mouseState.eaten ^ ignoreEat);
+  return (mouseState.left == 3) && (!mouseState.eaten || (ignoreEat&&mouseState.eaten));
 }
 /** Get if right mouse button has just been pressed */
 export const rightMouseDown = (ignoreEat = false) => {
-  return (mouseState.right == 3) && (!mouseState.eaten ^ ignoreEat);
+  return (mouseState.right == 3) && (!mouseState.eaten || (ignoreEat&&mouseState.eaten));
 }
 /** Get if left mouse button has just been released */
 export const leftMouseUp = (ignoreEat = false) => {
-  return (mouseState.left == 1) && (!mouseState.eaten ^ ignoreEat);
+  return (mouseState.left == 1) && (!mouseState.eaten || (ignoreEat&&mouseState.eaten));
 }
 /** Get if right mouse button has just been released */
 export const rightMouseUp = (ignoreEat = false) => {
-  return (mouseState.right == 1) && (!mouseState.eaten ^ ignoreEat);
+  return (mouseState.right == 1) && (!mouseState.eaten || (ignoreEat&&mouseState.eaten));
 }
