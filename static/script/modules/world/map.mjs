@@ -235,7 +235,13 @@ export default class Map {
     const out = [];
     const epsilon = 2;
     if (dir.sqrMagnitude <= 0) return [];
+    let scaryCounter = 0;
     while(true) { //tileX > 0 && tileX <= CHUNK_SIZE && tileY > 0 && tileY <= CHUNK_SIZE
+      scaryCounter += 1;
+      if(scaryCounter >= 10000) {
+        console.error('raycast went too long!')
+        break;
+      }
       if(out.length >= maxPoints) break;
       if(t >= length) break;
 
