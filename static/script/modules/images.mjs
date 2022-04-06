@@ -2,7 +2,7 @@ import Vector from "./math/vector.mjs";
 
 /** @type {Sprite[]} */
 const sprites = [];
-const images = {};
+export const images = {};
 
 export const loadImage = (src) => {
   if(images[src] !== undefined) return Promise.resolve(images[src]);

@@ -84,7 +84,10 @@ export default class Game {
     })
 
     await Promise.allSettled([
+      loadImage('head.png'),
+      loadImage('body.png'),
       loadImage('enemy.png'),
+      loadImage('tiles.png'),
     ]);
 
     this.#loaded = true;

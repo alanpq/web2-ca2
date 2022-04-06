@@ -82,7 +82,7 @@ export default class Renderer {
     }
     this.#ctx.resetTransform();
     this.#ctx.save();
-    this.#ctx.fillStyle = "black";
+    this.#ctx.fillStyle = "#9A9C9C";
     this.#ctx.fillRect(0,0, this.width, this.height);
     this.#ctx.restore();
     this.#ctx.save();

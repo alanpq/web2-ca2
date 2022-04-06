@@ -1,3 +1,4 @@
+import { images } from "../images.mjs";
 import { generateChunk } from "./generation.mjs";
 import { CHUNK_AREA, CHUNK_SIZE, CHUNK_WORLD_SIZE, TILES, TILE_COLORS, TILE_SIZE } from "./map.mjs";
 
@@ -32,9 +33,13 @@ export default class Chunk {
    */
   render(dt, ctx) {
     for(let i = 0; i < CHUNK_AREA; i++) {
+      if(this.#map[i] == TILES.FLOOR) continue;
       ctx.strokeStyle = "none";
       ctx.fillStyle = TILE_COLORS[this.#map[i]];
-      ctx.fillRect((i % CHUNK_SIZE) * TILE_SIZE + CHUNK_WORLD_SIZE*this.x, Math.floor(i / CHUNK_SIZE) * TILE_SIZE + CHUNK_WORLD_SIZE*this.y,
+      const sx = (this.#map[i] % 2) * TILE_SIZE;
+      const sy = Math.floor(this.#map[i] / 2) * TILE_SIZE;
+      ctx.drawImage(images["tiles.png"], sx, sy, TILE_SIZE, TILE_SIZE, (i % CHUNK_SIZE) * TILE_SIZE + CHUNK_WORLD_SIZE*this.x,
+                    Math.floor(i / CHUNK_SIZE) * TILE_SIZE + CHUNK_WORLD_SIZE*this.y,
                     TILE_SIZE+1, TILE_SIZE+1);
     }
   }
