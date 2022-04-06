@@ -208,9 +208,10 @@ export default class UI {
       hit = rect.containsPoint(input.mouse());
       input.setMouseEat(hit);
 
-      if(hit && input.leftMouseDown(true)) {
-        this.#iSelected = true;
-        this.#iSelectedAll = true;
+      if(input.leftMouseDown(true)) {
+        this.#iSelected = hit;
+        this.#iSelectedAll = hit;
+        input.rawFromQueue(); // clear input queue;
       }
 
       if(this.#iSelected) {
@@ -242,7 +243,7 @@ export default class UI {
       this.ctx.fillText(
         value,
         rect.left + this.textPadding.left,
-        rect.top + mText.actualBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top,
+        rect.top + mText.fontBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top,
       );
     }
     parent.expand(rect);
