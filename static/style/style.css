@@ -105,3 +105,11 @@ canvas {
   margin-top: 2em;
   height: 70vh;
 }
+
+table {
+  margin: auto;
+}
+
+table tr {
+  width: 20em;
+}
