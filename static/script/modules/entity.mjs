@@ -33,7 +33,7 @@ export default class Entity {
    */
   constructor(position, size, maxHealth=0) {
     this.position = position;
-    this.#virtualPos = position;
+    this.#virtualPos = position.clone();
     this.#rect = new Rect(0,0,size.x,size.y);
   
     this.#maxHealth = this.health = maxHealth;
@@ -65,7 +65,7 @@ export default class Entity {
    * @param {number} dt
    */
   tick(dt) {
-
+    this.#virtualPos = Vector.lerp(this.#virtualPos, this.position, 0.2);
   }
 
   /**
@@ -114,7 +114,6 @@ export default class Entity {
    * @param {CanvasRenderingContext2D} ctx 2D Context
    */
   render(dt, ctx) {
-    this.#virtualPos = Vector.lerp(this.#virtualPos, this.position, 0.2);
     ctx.fillRect(this.#virtualPos.x-this.#rect.width/2, this.#virtualPos.y-this.#rect.height/2, this.#rect.width, this.#rect.height);
   }
 }

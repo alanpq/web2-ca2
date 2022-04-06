@@ -13,6 +13,17 @@ export const lerp = (a,b,t) => {
   return a + t*(b-a);
 }
 
+// taken from https://gist.github.com/shaunlebron/8832585
+export const shortAngleDist = (a0,a1) => {
+  const max = Math.PI*2;
+  const da = (a1 - a0) % max;
+  return 2*da % max - da;
+}
+
+export const angleLerp = (a0,a1,t) => {
+  return a0 + shortAngleDist(a0,a1)*t;
+}
+
 /**
  * Manhatten distance between a and b
  * @param {Vector} a 

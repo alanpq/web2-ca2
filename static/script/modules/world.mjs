@@ -53,6 +53,7 @@ export default class World {
         e.onDead();
       }
     }
+    this.player.tick(dt);
   }
   
   /**
