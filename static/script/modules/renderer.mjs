@@ -80,6 +80,7 @@ export default class Renderer {
       this.#time -= PHYSICS_INTER; // consume time taken by the tick
       if(this.onPhysics) this.onPhysics(PHYSICS_INTER);
     }
+    this.#ctx.imageSmoothingEnabled = false;
     this.#ctx.resetTransform();
     this.#ctx.save();
     this.#ctx.fillStyle = "#9A9C9C";

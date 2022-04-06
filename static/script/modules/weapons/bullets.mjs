@@ -11,8 +11,6 @@ import { TILES, worldToTile } from "../world/map.mjs";
 export const ProjectileType = {
   UNKNOWN: 0,
   PHYSICS: 1,
-  HITSCAN: 2,
-  CUSTOM: 3,
 }
 
 /**
@@ -22,6 +20,7 @@ export const ProjectileType = {
  * @prop {string?} name
  * @prop {ProjectileType} type
  * @prop {PhysicsBulletParameters} params
+ * @prop {Function?} onDeath
  */
 
 /** 
@@ -88,7 +87,11 @@ export const physics = (dt, world) => {
     for(let j = 0; j < bullets.length; j++) {
       const b = bullets[j];
       if(!b) continue;
-      if(b.life <= 0) bullets[j] = null;
+      if(b.life <= 0) {
+        if(type.onDeath)
+          type.onDeath(b);
+        bullets[j] = null;
+      }
       b.life -= dt;
       switch (type.type) {
         case ProjectileType.PHYSICS:

@@ -24,6 +24,7 @@ import { lerp } from "./math/mod.mjs";
 import { drawScoreboard } from "./scoreboard/ui.mjs";
 import {requestToken} from "./scoreboard/api.mjs";
 import { loadImage } from "./images.mjs";
+import * as explosions from "./weapons/explosion.mjs";
 
 export default class Game {
   #loaded = false;
@@ -88,6 +89,7 @@ export default class Game {
       loadImage('body.png'),
       loadImage('enemy.png'),
       loadImage('tiles.png'),
+      loadImage('explosion.png'),
     ]);
 
     this.#loaded = true;
@@ -105,6 +107,22 @@ export default class Game {
         size: new Vector(2, 2),
         trailColor: "yellow",
         trailLength: 10,
+      }
+    });
+
+    bullets.registerBulletType("grenade", {
+      type: bullets.ProjectileType.PHYSICS,
+      params: {
+        drag: 0.6,
+        restitution: 0.7,
+        size: new Vector(2,2),
+      },
+      /**
+       * 
+       * @param {import("./weapons/bullets.mjs").Bullet} b 
+       */
+      onDeath: (b) => {
+        explosions.explode(b.pos, 1);
       }
     })
   }
@@ -259,6 +277,7 @@ export default class Game {
       ctx.fillRect(this.#laserHit.x-2.5, this.#laserHit.y-2.5, 5, 5);
     }
     this.#world.render(dt, ctx);
+    explosions.render(dt, ctx);
 
 
     if(this.#world.player.dead) {
@@ -336,6 +355,16 @@ export default class Game {
         })
         this.#gunTime = 0;
       }
+    }
+
+    if(input.rightMouseDown()) {
+      const d = Vector.sub(this.#crosshair, this.#world.player.position).normalized();
+      bullets.createBullet("grenade", {
+        pos: this.#world.player.position.clone().add(d.clone().mul(16)),
+        vel: d.mul(700).add(Vector.random().mul(TILE_SIZE*1.5)),
+        damage: 1,
+        life: 1,
+      })
     }
 
     this.#crosshair = this.#renderer.camera.screenToWorld(input.mouse());
