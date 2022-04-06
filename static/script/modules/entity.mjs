@@ -73,7 +73,7 @@ export default class Entity {
     for(let i = 0; i < world.entities.length; i++) {
       /** @type {Entity} */
       const ent = world.entities[i];
-      if(!ent) continue;
+      if(!ent || ent.dead) continue;
       const dir = Vector.sub(this.position, ent.position);
       const m = dir.magnitude;
       if(m < TILE_SIZE) {

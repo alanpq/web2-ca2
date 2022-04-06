@@ -56,6 +56,7 @@ export default class Enemy extends Entity {
   }
 
   tick(dt) {
+    if(this.dead) return;
   }
 
   newTarget () {
@@ -70,6 +71,7 @@ export default class Enemy extends Entity {
    * @param {World} world
    */
   physics(dt, world) {
+    if(this.dead) return;
     const player = worldToTile(world.player.position);
     const playerTile = world.map.probeTile(player);
     this.#debug.curIdx = this.#curIdx;
@@ -113,13 +115,15 @@ export default class Enemy extends Entity {
    * @param {CanvasRenderingContext2D} ctx 2D Context
    */
   render(dt, ctx) {
-    ctx.fillStyle = "black";
+    ctx.fillStyle = this.dead ? "rgba(0,0,0,0.3)" : "black";
     super.render(dt, ctx);
-    const ww = (this.rect.width*1.5);
-    const w = ww * (this.health/this.maxHealth);
-    ctx.fillStyle = "red";
-    ctx.fillRect(this.virtualPosition.x - (ww)/2, this.virtualPosition.y - this.rect.height*1.1, ww, 5);
-    ctx.fillStyle = "green";
-    ctx.fillRect(this.virtualPosition.x - (ww)/2, this.virtualPosition.y - this.rect.height*1.1, w, 5);
+    if(!this.dead && this.health < this.maxHealth) {
+      const ww = (this.rect.width*1.5);
+      const w = ww * (this.health/this.maxHealth);
+      ctx.fillStyle = "red";
+      ctx.fillRect(this.virtualPosition.x - (ww)/2, this.virtualPosition.y - this.rect.height*1.1, ww, 5);
+      ctx.fillStyle = "green";
+      ctx.fillRect(this.virtualPosition.x - (ww)/2, this.virtualPosition.y - this.rect.height*1.1, w, 5);
+    }
   }
 }

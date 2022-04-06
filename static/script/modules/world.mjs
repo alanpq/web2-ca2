@@ -45,12 +45,10 @@ export default class World {
       i++;
       const e = this.#entities[i];
       if(!e) continue;
+      const d = e.dead;
       e.tick(dt);
-      if(e.dead) {
+      if(e.dead && !d) {
         e.onDead();
-        delete this.#entities[i];
-        i--;
-        len--;
       }
     }
   }
@@ -68,7 +66,8 @@ export default class World {
 
   render(dt, ctx) {
     // this.map.render(dt, ctx);
+    this.#entities.forEach(e => {if(!e || !e.dead) return; e.render(dt, ctx);});
     this.player.render(dt, ctx);
-    this.#entities.forEach(e => {if(!e) return; e.render(dt, ctx);});
+    this.#entities.forEach(e => {if(!e || e.dead) return; e.render(dt, ctx);});
   }
 }
