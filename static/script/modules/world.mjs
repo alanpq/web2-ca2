@@ -70,6 +70,7 @@ export default class World {
   render(dt, ctx) {
     // this.map.render(dt, ctx);
     this.#entities.forEach(e => {if(!e || !e.dead) return; e.render(dt, ctx);});
+    bullets.draw(dt, ctx);
     this.player.render(dt, ctx);
     this.#entities.forEach(e => {if(!e || e.dead) return; e.render(dt, ctx);});
   }

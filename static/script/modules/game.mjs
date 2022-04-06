@@ -257,8 +257,6 @@ export default class Game {
     }
     this.#world.render(dt, ctx);
 
-    bullets.draw(dt, ctx);
-
 
     if(this.#world.player.dead) {
       this.#playing = false;
@@ -303,7 +301,7 @@ export default class Game {
    */
   #populateChunk(chunk) {
     if(chunk.populated) return;
-    for(let i = 0; i < 1; i++) {
+    for(let i = 0; i < 3; i++) {
       this.#world.addEntity(new Enemy(this.#safeSpot(chunk)));
     }
     chunk.populated = true;
@@ -326,9 +324,10 @@ export default class Game {
     if(input.leftMouse()) {
       this.#gunTime += dt;
       if(this.#gunTime > this.#gunInterval) {
+        const d = Vector.sub(this.#crosshair, this.#world.player.position).normalized();
         bullets.createBullet("pistol", {
-          pos: this.#world.player.position.clone(),
-          vel: Vector.sub(Vector.random().mul(TILE_SIZE*.4).add(this.#crosshair), this.#world.player.position).normalized().mul(600),
+          pos: this.#world.player.position.clone().add(d.clone().mul(16)),
+          vel: d.mul(600).add(Vector.random().mul(TILE_SIZE*1.5)),
           damage: 10,
           life: 5,
         })
@@ -339,7 +338,7 @@ export default class Game {
     this.#crosshair = this.#renderer.camera.screenToWorld(input.mouse());
     this.#renderer.camera.position = Vector.lerp(this.#world.player.position, this.#crosshair, 0.3);
 
-    const target = Vector.sub(this.#crosshair, this.#world.player.position).mul(100);
+    const target = Vector.add(this.#world.player.position, Vector.sub(this.#crosshair, this.#world.player.position).mul(100));
     this.#laserHit = this.#world.map.raycast(this.#world.player.position, target, 1)[0];
     if(!this.#laserHit)
       this.#laserHit = target;
