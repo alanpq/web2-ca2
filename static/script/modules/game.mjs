@@ -22,6 +22,7 @@ import { CHUNK_SIZE, CHUNK_WORLD_SIZE, TILES, TILE_SIZE, worldToChunk, worldToTi
 import Chunk from "./world/chunk.mjs";
 import { lerp } from "./math/mod.mjs";
 import { drawScoreboard } from "./scoreboard/ui.mjs";
+import {requestToken} from "./scoreboard/api.mjs";
 
 export default class Game {
   #loaded = false;
@@ -104,6 +105,8 @@ export default class Game {
     console.log('Starting game...');
     this.#playing = true;
     this.#timer = GAME_TIMER;
+    
+    requestToken();
     // this.#world.addEntity(new Dummy(new Vector(TILE_SIZE*5.5,TILE_SIZE*5.5)));
     // this.#world.addEntity(new Enemy(new Vector(TILE_SIZE*6.5,TILE_SIZE*6.5)));
     console.log('Game started!');
@@ -193,7 +196,7 @@ export default class Game {
       ui.text("GAME OVER");
       ui.font.size = 30;
       ui.text(`You got ${this.#score} points.`)
-      drawScoreboard(dt, ui);
+      drawScoreboard(dt, ui, this.#score);
       ui.endVertical();
       ui.endArea();
       ui.font.size = 12;
