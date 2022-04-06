@@ -170,6 +170,44 @@ export default class UI {
     return value ^ (hit && input.leftMouseDown(true));
   }
 
+  button(label, width=null) {
+    const parent = this.top();
+    this.ctx.save();
+    this.#prepareFont();
+    
+    const mText = this.ctx.measureText(label);
+    const rect = parent.computeWidgetRect(
+      this.textPadding.left + this.textPadding.right + (width || mText.width),
+      mText.actualBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top + this.textPadding.bottom,
+    );
+    let hit = false;
+    if(!this.hidden) {
+      const clipRect = parent.computeClipRect(rect.width, rect.height);
+      this.#drawBounds(rect, clipRect);
+      this.#clipRect(clipRect);
+      hit = rect.containsPoint(input.mouse());
+      input.setMouseEat(hit);
+
+      this.ctx.fillStyle = hit ? (input.leftMouse(true) ? "#818181" : "#C5C5C5"): "#F3F3F3";
+      this.ctx.strokeStyle = "#302f30";
+      this.ctx.lineWidth = 0.5;
+
+      this.ctx.fillRect  (rect.left, rect.top, rect.width, rect.height);
+      this.ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+
+      this.ctx.fillStyle = "black";
+      this.ctx.fillText(
+        label,
+        rect.left + this.textPadding.left,
+        rect.top + mText.actualBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top,
+      );
+    }
+    parent.expand(rect);
+    this.ctx.restore();
+    if (this.hidden) return value;
+    return (hit && input.leftMouseDown(true));
+  }
+
   /**
    * 
    * @param {Rect} rect 
