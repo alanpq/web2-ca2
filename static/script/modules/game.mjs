@@ -252,7 +252,11 @@ export default class Game {
     bullets.draw(dt, ctx);
 
 
-    this.#timer -= dt;
+    if(this.#world.player.dead) {
+      this.#playing = false;
+    }
+    if(this.#playing)
+      this.#timer -= dt;
     if(this.#timer <= 0) {
       this.#timer = 0;
       this.#playing = false;

@@ -48,8 +48,12 @@ export default class Entity {
    * @param {import("./weapons/bullets.mjs").Bullet} bullet 
    */
   onHit(bullet) {
-    this.health -= bullet.damage;
+    this.hurt(bullet.damage);
     this.velocity.add(bullet.vel.clone().mul(0.05));
+  }
+
+  hurt(damage) {
+    this.health -= damage;
   }
 
   onDead() {

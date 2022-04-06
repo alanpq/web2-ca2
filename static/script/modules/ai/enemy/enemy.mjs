@@ -1,4 +1,5 @@
 'use strict';
+import { ATTACK_COOLDOWN, COMBO_COOLDOWN, ENEMY_DAMAGE } from "../../constants.mjs";
 import Entity from "../../entity.mjs";
 import { manhatten } from "../../math/mod.mjs";
 import Vector from "../../math/vector.mjs";
@@ -31,6 +32,12 @@ export default class Enemy extends Entity {
   #targetTile;            // destination tile (usually the player)
   #path;                  // path to destination tile
   #lastKnown;
+
+  #playerDist;
+  #player;
+
+  #attackCooldown = COMBO_COOLDOWN;
+
   get curTile() {
     if(!this.#path) return null;
     return this.#path[this.#path.length - (this.#curIdx+1)];
@@ -58,6 +65,15 @@ export default class Enemy extends Entity {
 
   tick(dt) {
     if(this.dead) return;
+    if(this.#playerDist <= 35) {
+      if(this.#attackCooldown <= 0) {
+        this.#attackCooldown = ATTACK_COOLDOWN;
+        console.log('bam');
+        this.#player.hurt(ENEMY_DAMAGE);
+      }
+    }
+    if(this.#attackCooldown > 0)
+      this.#attackCooldown -= dt;
   }
 
   newTarget () {
@@ -80,6 +96,7 @@ export default class Enemy extends Entity {
       return;
     }
     const player = worldToTile(world.player.position);
+    this.#player = world.player;
     const playerTile = world.map.probeTile(player);
     this.#debug.curIdx = this.#curIdx;
 
@@ -116,6 +133,8 @@ export default class Enemy extends Entity {
       // this.input = this.#target.sub(this.position).normalized();
       this.velocity.add(targetDir.mul(dt*100));
     }
+
+    this.#playerDist = Vector.sub(world.player.position, this.position).magnitude;
     super.physics(dt, world);
   }
   /**
@@ -133,5 +152,6 @@ export default class Enemy extends Entity {
       ctx.fillStyle = "green";
       ctx.fillRect(this.virtualPosition.x - (ww)/2, this.virtualPosition.y - this.rect.height*1.1, w, 5);
     }
+    ctx.fillText(this.#playerDist, this.virtualPosition.x, this.virtualPosition.y - 30)
   }
 }
