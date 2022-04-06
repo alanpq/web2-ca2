@@ -79,6 +79,7 @@ const room = (map, rect, depth) => {
       door = randRange(rect.left+1, rect.right);
       if(door != wallOff+1) break;
     } while(true);
+    doors.push([new Vector(door-1, rect.top + Math.floor(w)), orient]);
     doors.push([new Vector(door, rect.top + Math.floor(w)), orient]);
   }
   return doors;
