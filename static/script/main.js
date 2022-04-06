@@ -56,4 +56,11 @@ spa.addEventListener("game", "close", () => {
   if(game)
     game.destroy();
 });
-spa.goto('game');
+
+
+if(window.location.pathname) {
+  const p = window.location.pathname.split('/');
+  spa.goto(p[p.length-1] == '' ? 'game' : p[p.length-1]);
+} else {
+  spa.goto('game');
+}

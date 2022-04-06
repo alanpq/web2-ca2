@@ -13,8 +13,9 @@ app.config["SESSION_TYPE"] = "filesystem"
 
 Session(app)
 
-@app.route('/')
-def index():
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def index(path):
   return render_template("index.html")
 
 @app.route('/score/token', methods=['POST'])
