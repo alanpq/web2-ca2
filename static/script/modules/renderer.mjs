@@ -43,6 +43,7 @@ export default class Renderer {
 
     window.addEventListener("resize", () => {
       this.conformToParent();
+      this.conformToParent();
     });
     canvas.addEventListener("fullscreenchange", this.fullscreen_change.bind(this));
     canvas.addEventListener("mozfullscreenchange", this.fullscreen_change.bind(this));
