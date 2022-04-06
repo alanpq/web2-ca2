@@ -23,14 +23,16 @@ spa.addEventListener("game", "open", async () => {
   game = new Game(renderer);
   await game.load();
   game.start();
+  setTimeout(() => {
+    // no idea why this needs to be here twice, but it works so i dont care
+    renderer.conformToParent();
+    renderer.conformToParent();
+  }, 0);
 });
 
 spa.addEventListener("game", "close", () => {
   if(game)
     game.destroy();
 });
-spa.goto('game').then(() => {
-  // no idea why this needs to be here twice, but it works so i dont care
-  renderer.conformToParent();
-  renderer.conformToParent();
+spa.goto('help').then(() => {
 })
