@@ -14,6 +14,8 @@ export default class Renderer {
   get width() { return this.#w; }
   get height() { return this.#h; }
 
+  get canvas() {return this.#canvas};
+
   camera;
 
   /** @type {UI} */
@@ -42,7 +44,19 @@ export default class Renderer {
     window.addEventListener("resize", () => {
       this.conformToParent();
     });
+    canvas.addEventListener("fullscreenchange", this.fullscreen_change.bind(this));
+    canvas.addEventListener("mozfullscreenchange", this.fullscreen_change.bind(this));
+    canvas.addEventListener("webkitfullscreenchange", this.fullscreen_change.bind(this));
     window.requestAnimationFrame(this.#loop.bind(this));
+  }
+
+  fullscreen_change(e) {
+    if(document.fullscreenElement) {
+      const rect = this.canvas.getBoundingClientRect();
+      this.setSize(rect.width, rect.height);
+    } else {
+      this.conformToParent();
+    }
   }
 
   listen(draw, ui, tick, physics) {
