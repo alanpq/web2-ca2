@@ -8,6 +8,8 @@ instance/*
 .webassets-cache
 .env
 
+*.db
+
 ### Flask Session ###
 flask_session/
 
