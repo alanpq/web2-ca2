@@ -46,7 +46,7 @@ export default class UI {
   font = {
     size: 12,
     unit: "px",
-    family: "",
+    family: "monospace",
     color: "white",
   };
   get fontString () {
@@ -101,7 +101,7 @@ export default class UI {
     const mText = this.ctx.measureText(text);
     const rect = parent.computeWidgetRect( // TODO: think widget rect should be actual bounding box, clip rect should be its own thing
       mText.width + this.textPadding.left + this.textPadding.right,
-      mText.actualBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top + this.textPadding.bottom,
+      mText.fontBoundingBoxDescent + mText.fontBoundingBoxAscent + this.textPadding.top + this.textPadding.bottom,
     );
     if(!this.hidden) {
       const clipRect = parent.computeClipRect(rect.width, rect.height);
@@ -110,7 +110,7 @@ export default class UI {
       this.ctx.fillText(
         text,
         rect.left + this.textPadding.left,
-        rect.top + mText.actualBoundingBoxAscent + this.textPadding.top,
+        rect.top + mText.fontBoundingBoxAscent + this.textPadding.top,
       );
     }
     parent.expand(rect);
