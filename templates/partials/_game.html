@@ -4,6 +4,34 @@
   </section>
 
   <section>
-    <h1>What should I expect?</h1>
+    <h1>I'm trying to grade this assignment, what should I expect?</h1>
+    <p>The game is packed with the following base features:</p>
+    <ul>
+      <li>Smooth player movement with camera system (wrapper for canvas affine matrix).</li>
+      <li>Input system with virtual button mappings (allowing for multiple keys bound to the same input, etc).
+        <ul>
+          <li>Also supports virtual axes, which range from [-1, 1]. An example is the axis <code>vertical</code>, which is 1 when <code>up</code> is held, and -1 when <code>down</code> is held.</li>
+        </ul>
+      </li>
+      <li><em>Infinite</em> grid-based world with procedurally generated rooms and enemies.</li>
+      <li>UI system inspired by <a href='https://github.com/ocornut/imgui'>imgui</a>.
+        <ul>
+          <li>While inspired, I don't actually know how imgui is implemented, so I made it up as I went along.</li>
+        </ul>
+      </li>
+      <li>Enemy pathfinding implemented using <a href="https://en.wikipedia.org/wiki/A*_search_algorithm">A* search.</a></li>
+    </ul>
+
+    <h1>Other technical details</h1>
+    <ul>
+      <li>This site is a Single Page Application (SPA), hacked into existence by toggling classes.</li>
+      <li>The Player/Enemy classes inherit from Entity, which handles all physics and collisions.</li>
+    </ul>
+
+    <h1>Where is <var>X</var> implemented?</h1>
+    <ul>
+      <li>Keyboard/mouse functionality is encapsulated by the modules in <code>input/</code>
+      <li>The Debug event handler is implemented in <code>ui/debug.mjs</code>, with many other <code>debug.mjs</code> modules present that are hooked into this event handler.</li>
+    </ul>
   </section>
 </article>
