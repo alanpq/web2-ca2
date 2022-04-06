@@ -13,6 +13,8 @@ export default class World {
   map = new Map();
   player;
 
+  onKill;
+
   /** @type {Camera} */
   camera; // i hate this but cant be bothered
   constructor(camera) {

@@ -1,5 +1,5 @@
 'use strict';
-import { FONTS, PHYSICS_INTER } from "./constants.mjs";
+import { COMBO_COOLDOWN, FONTS, GAME_TIMER, KILL_SCORE, MAX_COMBO, PHYSICS_INTER } from "./constants.mjs";
 import Player, { PLAYER_SIZE, PLAYER_SIZE_HALF } from "./player/player.mjs";
 import Renderer from "./renderer.mjs";
 
@@ -20,6 +20,8 @@ import Dummy from "./ai/enemy/dummy.mjs";
 import Enemy from "./ai/enemy/enemy.mjs";
 import { CHUNK_SIZE, CHUNK_WORLD_SIZE, TILES, TILE_SIZE, worldToChunk, worldToTile } from "./world/map.mjs";
 import Chunk from "./world/chunk.mjs";
+import { lerp } from "./math/mod.mjs";
+import { drawScoreboard } from "./scoreboard/ui.mjs";
 
 export default class Game {
   #loaded = false;
@@ -27,6 +29,15 @@ export default class Game {
   #renderer;
   /** @type {World} */
   #world;
+
+  #score = 0;
+  #combo = 0;
+  #comboTimer = 0;
+  #timer = 0;
+
+  #playing = false;
+
+  #time = 0;
 
 
   get loaded() {
@@ -37,6 +48,12 @@ export default class Game {
     this.#renderer = renderer;
     
     this.#world = new World(this.#renderer.camera);
+
+    this.#world.onKill = (e) => {
+      this.#comboTimer = COMBO_COOLDOWN;
+      this.#combo = Math.min(MAX_COMBO, this.#combo + 1);
+      this.#score += KILL_SCORE * this.#combo;
+    }
 
     this.#renderer.camera.position = this.#world.player.position;
 
@@ -85,6 +102,8 @@ export default class Game {
 
   start() {
     console.log('Starting game...');
+    this.#playing = true;
+    this.#timer = GAME_TIMER;
     // this.#world.addEntity(new Dummy(new Vector(TILE_SIZE*5.5,TILE_SIZE*5.5)));
     // this.#world.addEntity(new Enemy(new Vector(TILE_SIZE*6.5,TILE_SIZE*6.5)));
     console.log('Game started!');
@@ -98,12 +117,14 @@ export default class Game {
   ////// ACTUAL GAME STUFF
 
   #debug = false; // FIXME: make this false by default before prod
+  #comboSize = 12;
   /**
    * 
    * @param {number} dt Deltatime in seconds
    * @param {UI} ui UI Object
    */
   ui(dt, ui) {
+    this.#time += dt;
     // debugMenu(dt, ui);
 
     if(this.#debug) {
@@ -138,6 +159,46 @@ export default class Game {
       ui.endVertical();
       ui.endArea();
     }
+    if(this.#playing) {
+      ui.startArea(new Rect(0,0,ui.ctx.canvas.width, ui.ctx.canvas.height), Align.CENTER);
+      ui.startVertical();
+      ui.font.size = 50;
+      ui.space();
+      ui.text(this.#timer.toFixed(2));
+      ui.font.size = 30;
+      ui.text(this.#score);
+
+      
+      const w = 200 * (this.#comboTimer/COMBO_COOLDOWN);
+      ui.ctx.fillStyle = "white";
+      ui.ctx.fillRect(ui.ctx.canvas.width/2-w/2, 150, w, 7);
+
+      if(this.#combo > 0) {
+        this.#comboSize = lerp(this.#comboSize, 20 + (this.#combo/MAX_COMBO) * (40-20), 0.1);
+        ui.font.size = this.#comboSize;
+        ui.text('x' + this.#combo);
+      } else {
+        this.#comboSize = 0;
+      }
+      ui.font.size = 12;
+      ui.endVertical();
+      ui.endArea();
+    } else {
+      ui.ctx.fillStyle = "rgba(0,0,0,0.5)";
+      ui.ctx.fillRect(0,0, ui.ctx.canvas.width, ui.ctx.canvas.height);
+      ui.startArea(new Rect(0,0,ui.ctx.canvas.width, ui.ctx.canvas.height), Align.CENTER);
+      ui.startVertical();
+      ui.font.size = 50;
+      ui.space();
+      ui.text("GAME OVER");
+      ui.font.size = 30;
+      ui.text(`You got ${this.#score} points.`)
+      drawScoreboard(dt, ui);
+      ui.endVertical();
+      ui.endArea();
+      ui.font.size = 12;
+    }
+
     if(!document.fullscreenElement) {
       ui.textPadding.top = 5;
       ui.textPadding.bottom = 5;
@@ -145,6 +206,8 @@ export default class Game {
       if(ui.button("Fullscreen")) {
         ui.ctx.canvas.requestFullscreen();
       }
+      ui.textPadding.top = 2;
+      ui.textPadding.bottom = 2;
       ui.endArea();
     }
   }
@@ -170,21 +233,33 @@ export default class Game {
       }
     }
 
-    if(this.#laserHit) {
+    if(this.#laserHit && this.#playing) {
       ctx.strokeStyle = "rgba(255,0,0,0.2";
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(this.#world.player.virtualPosition.x, this.#world.player.virtualPosition.y);
       ctx.lineTo(this.#laserHit.x, this.#laserHit.y);
       ctx.stroke();
+
+      ctx.fillStyle = "red";
+      ctx.fillRect(this.#laserHit.x-2.5, this.#laserHit.y-2.5, 5, 5);
     }
     this.#world.render(dt, ctx);
 
     bullets.draw(dt, ctx);
 
-    ctx.fillStyle = "red";
-    ctx.fillRect(this.#crosshair.x-2.5, this.#crosshair.y-2.5, 5, 5);
 
+    this.#timer -= dt;
+    if(this.#timer <= 0) {
+      this.#timer = 0;
+      this.#playing = false;
+    }
+    if(this.#comboTimer > 0)
+      this.#comboTimer -= dt;
+    if(this.#comboTimer < 0) {
+      this.#combo = 0;
+      this.#comboTimer = 0;
+    }
   }
 
   /** @type {Vector} */
@@ -223,11 +298,13 @@ export default class Game {
    * Do a tick.
    */
   tick(dt) {
-    this.#world.tick(dt);
     if(input.buttonDown("debug")) {
       this.#debug ^= true;
     }
 
+    if(!this.#playing) return;
+    
+    this.#world.tick(dt);
     if(input.leftMouseDown()) this.#audio.play();
     if(input.leftMouseUp()) {this.#audio.pause();this.#audio.currentTime = 0;}
 

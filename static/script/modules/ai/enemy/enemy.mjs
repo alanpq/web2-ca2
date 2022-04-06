@@ -12,6 +12,7 @@ import * as debug from './debug.mjs';
 export default class Enemy extends Entity {
   #debug = {targetDir: null, d: 0};
   #debugIdx;
+  #announcedDeath = false;
   constructor (position) {
     super(position, new Vector(10, 10), 100);
     this.speed = 105;
@@ -71,7 +72,13 @@ export default class Enemy extends Entity {
    * @param {World} world
    */
   physics(dt, world) {
-    if(this.dead) return;
+    if(this.dead) {
+      if(this.#announcedDeath) return;
+      this.#announcedDeath = true;
+      if(world.onKill)
+        world.onKill(this);
+      return;
+    }
     const player = worldToTile(world.player.position);
     const playerTile = world.map.probeTile(player);
     this.#debug.curIdx = this.#curIdx;
@@ -84,6 +91,7 @@ export default class Enemy extends Entity {
       pathfinding.findPath(world, cur, playerTile).then((path) => {
         if(path == null) {
           this.health = 0;
+          this.#announcedDeath = true;
           return;
         }
         this.#path = path || []; 

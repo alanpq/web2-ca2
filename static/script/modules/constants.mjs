@@ -9,3 +9,8 @@ export const FONTS = {
   SANS: "Noto Sans, sans-serif",
   SERIF: "Playfair Display, Times New Roman, serif",
 };
+
+export const GAME_TIMER = 1;
+export const COMBO_COOLDOWN = 5;
+export const MAX_COMBO = 10;
+export const KILL_SCORE = 100;
