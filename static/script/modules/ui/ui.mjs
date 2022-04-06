@@ -119,7 +119,7 @@ export default class UI {
     const mText = this.ctx.measureText(text);
     const rect = parent.computeWidgetRect( // TODO: think widget rect should be actual bounding box, clip rect should be its own thing
       mText.width + this.textPadding.left + this.textPadding.right,
-      mText.fontBoundingBoxDescent + mText.fontBoundingBoxAscent + this.textPadding.top + this.textPadding.bottom,
+      (mText.fontBoundingBoxDescent || mText.actualBoundingBoxDescent) + (mText.fontBoundingBoxAscent || mText.actualBoundingBoxAscent) + this.textPadding.top + this.textPadding.bottom,
     );
     if(!this.hidden) {
       const clipRect = parent.computeClipRect(rect.width, rect.height);
@@ -128,7 +128,7 @@ export default class UI {
       this.ctx.fillText(
         text,
         rect.left + this.textPadding.left,
-        rect.top + mText.fontBoundingBoxAscent + this.textPadding.top,
+        rect.top + (mText.fontBoundingBoxAscent || mText.actualBoundingBoxAscent) + this.textPadding.top,
       );
     }
     parent.expand(rect);
@@ -198,7 +198,7 @@ export default class UI {
     const mText = this.ctx.measureText(value);
     const rect = parent.computeWidgetRect(
       this.textPadding.left + this.textPadding.right + (width || mText.width),
-      mText.fontBoundingBoxAscent + mText.fontBoundingBoxDescent + this.textPadding.top + this.textPadding.bottom,
+      (mText.fontBoundingBoxDescent || mText.actualBoundingBoxDescent) + (mText.fontBoundingBoxAscent || mText.actualBoundingBoxAscent)  + this.textPadding.top + this.textPadding.bottom,
     );
     let hit = false;
     if(!this.hidden) {
@@ -243,7 +243,7 @@ export default class UI {
       this.ctx.fillText(
         value,
         rect.left + this.textPadding.left,
-        rect.top + mText.fontBoundingBoxAscent + this.textPadding.top,
+        rect.top + (mText.fontBoundingBoxAscent || mText.actualBoundingBoxAscent) + this.textPadding.top,
       );
     }
     parent.expand(rect);

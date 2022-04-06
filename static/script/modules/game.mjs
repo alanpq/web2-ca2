@@ -122,7 +122,7 @@ export default class Game {
 
   ////// ACTUAL GAME STUFF
 
-  #debug = false; // FIXME: make this false by default before prod
+  #debug = true; // FIXME: make this false by default before prod
   #comboSize = 12;
   /**
    * 
@@ -134,8 +134,10 @@ export default class Game {
     // debugMenu(dt, ui);
 
     if(this.#debug) {
+      ui.hidden = false;
       ui.font.color = "white";
       ui.font.family = FONTS.MONO;
+      ui.font.size = 12;
       ui.startArea(new Rect(0,0, ui.ctx.canvas.width/3, ui.ctx.canvas.height), Align.START);
       ui.startVertical();
       ui.text(`frametime: ${(dt*1000).toFixed(3).padStart(6)}ms`);
@@ -166,6 +168,7 @@ export default class Game {
       ui.endArea();
     }
     if(this.#playing) {
+      ui.hidden = false;
       ui.startArea(new Rect(0,0,ui.ctx.canvas.width, ui.ctx.canvas.height), Align.CENTER);
       ui.startVertical();
       ui.font.size = 50;

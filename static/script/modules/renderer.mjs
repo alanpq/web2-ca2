@@ -58,6 +58,7 @@ export default class Renderer {
       this.setSize(rect.width, rect.height);
     } else {
       this.conformToParent();
+      this.conformToParent();
     }
   }
 
@@ -80,12 +81,16 @@ export default class Renderer {
       if(this.onPhysics) this.onPhysics(PHYSICS_INTER);
     }
     this.#ctx.resetTransform();
+    this.#ctx.save();
     this.#ctx.fillStyle = "black";
     this.#ctx.fillRect(0,0, this.width, this.height);
+    this.#ctx.restore();
+    this.#ctx.save();
     this.camera.setTransform(this.#ctx);
     if(this.onDraw) this.onDraw(dt, this.#ctx);
     debug.draw(dt, this.#ctx);
     
+    this.#ctx.restore();
     this.#ctx.resetTransform();
     if(this.onUI) this.onUI(dt, this.#ui);
     debug.ui(dt, this.#ui);
