@@ -2,7 +2,7 @@
 import Entity from "../../entity.mjs";
 import { manhatten } from "../../math/mod.mjs";
 import Vector from "../../math/vector.mjs";
-import { Flags, registerDebug } from "../../ui/debug.mjs";
+import { Flags, registerDebug, removeDebug } from "../../ui/debug.mjs";
 import World from "../../world.mjs";
 import { tileToWorld, TILE_SIZE, worldToTile } from "../../world/map.mjs";
 
@@ -11,20 +11,25 @@ import * as debug from './debug.mjs';
 
 export default class Enemy extends Entity {
   #debug = {targetDir: null, d: 0};
+  #debugIdx;
   constructor (position) {
     super(position, new Vector(10, 10), 100);
     this.speed = 105;
     this.drag = 0.5;
 
-    registerDebug(Flags.AI, "draw", debug.draw.bind(this, {enemy: this, debug: this.#debug}));
+    this.#debugIdx = registerDebug(Flags.AI, "draw", debug.draw.bind(this, {enemy: this, debug: this.#debug}));
   }
   
+  onDead() {
+    removeDebug(Flags.AI, "draw", this.#debugIdx);
+  }
 
   #tile; // current tile
   #target = new Vector(); // current world-space destination
   #destination = new Vector();           // tile-space path destination
   #targetTile;            // destination tile (usually the player)
   #path;                  // path to destination tile
+  #lastKnown;
   get curTile() {
     if(!this.#path) return null;
     return this.#path[this.#path.length - (this.#curIdx+1)];
@@ -39,6 +44,7 @@ export default class Enemy extends Entity {
    * @returns {boolean}
    */
   needNewPath(to) {
+    if(!to) return false;
     const dist = manhatten(worldToTile(this.position), to);
     // we only need to recalculate a path if we have none or have finished our current,
     // or if the player has moved and we are within 20 tiles
@@ -66,12 +72,12 @@ export default class Enemy extends Entity {
   physics(dt, world) {
     const player = worldToTile(world.player.position);
     const playerTile = world.map.probeTile(player);
-    this.#debug.tile = playerTile;
     this.#debug.curIdx = this.#curIdx;
 
     if(this.needNewPath(player)) { // player moved or no path
       this.#destination = player;
-      this.#targetTile = playerTile;
+      this.#targetTile = world.map.probeTile(player);
+      this.#debug.tile = this.#targetTile;
       const cur = world.map.probeTile(worldToTile(this.position));
       pathfinding.findPath(world, cur, playerTile).then((path) => {
         if(path == null) {
