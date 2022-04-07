@@ -65,8 +65,14 @@ export const worldToChunk = (pos) => {
   VOID: 0,
   FLOOR: 1,
   WALL: 2,
-  DOOR: 3,
+  DAMAGED_FLOOR: 3,
+  DAMAGED_WALL: 4,
 }
+
+export const IS_SOLID = [
+  false, false, true, false, true,
+];
+
 /**
  * Enum for Tile colors.
  * @readonly
@@ -179,6 +185,17 @@ export default class Map {
 
   /**
    * 
+   * @param {Vector} pos 
+   * @param {Tile} tile 
+   */
+  setTile(pos, tile) {
+    const c = this.getChunk(tileToChunk(pos));
+    if(!c) return;
+    c.setTile(pos.x-c.x*CHUNK_SIZE, pos.y-c.y*CHUNK_SIZE, tile);
+  }
+
+  /**
+   * 
    * @param {Rect} rect 
    */
   tileCollides(rect) {
@@ -190,7 +207,7 @@ export default class Map {
       for(let y = top; y <= bottom; y++) {
         const v = new Vector(x,y);
         // console.log(v.toString(),this.getTile(v));
-        if(this.getTile(v) == TILES.WALL) {
+        if(IS_SOLID[this.getTile(v)]) {
           return v.mul(1/TILE_SIZE);
         }
         
@@ -251,7 +268,7 @@ export default class Map {
       const testA = this.getTile(worldToTile(point));
       const testB = this.getTile(worldToTile(Vector.sub(point, new Vector(epsilon, 0))));
       const testC = this.getTile(worldToTile(Vector.sub(point, new Vector(0, epsilon))));
-      if(testA == TILES.WALL || testB == TILES.WALL || testC == TILES.WALL) {
+      if(IS_SOLID[testA] || IS_SOLID[testB] || IS_SOLID[testC]) {
         out.push(point);
       }
 

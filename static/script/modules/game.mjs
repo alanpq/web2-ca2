@@ -20,7 +20,7 @@ import Dummy from "./ai/enemy/dummy.mjs";
 import Enemy from "./ai/enemy/enemy.mjs";
 import { CHUNK_SIZE, CHUNK_WORLD_SIZE, TILES, TILE_SIZE, worldToChunk, worldToTile } from "./world/map.mjs";
 import Chunk from "./world/chunk.mjs";
-import { lerp } from "./math/mod.mjs";
+import {lerp } from "./math/mod.mjs";
 import { drawScoreboard } from "./scoreboard/ui.mjs";
 import {requestToken} from "./scoreboard/api.mjs";
 import { loadImage } from "./images.mjs";
@@ -122,7 +122,7 @@ export default class Game {
        * @param {import("./weapons/bullets.mjs").Bullet} b 
        */
       onDeath: (b) => {
-        explosions.explode(b.pos, 1);
+        explosions.explode(b.pos, 1, this.#world);
       }
     })
   }
@@ -266,7 +266,7 @@ export default class Game {
     }
 
     if(this.#laserHit && this.#playing) {
-      ctx.strokeStyle = "rgba(255,0,0,0.2";
+      ctx.strokeStyle = "rgba(255,0,0,0.2)";
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(this.#world.player.virtualPosition.x, this.#world.player.virtualPosition.y);

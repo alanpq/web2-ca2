@@ -4,7 +4,7 @@ import { manhatten } from "../../math/mod.mjs";
 import Vector from "../../math/vector.mjs"
 import World from "../../world.mjs";
 import Chunk from "../../world/chunk.mjs";
-import { CHUNK_AREA, CHUNK_SIZE, TILES } from "../../world/map.mjs";
+import { CHUNK_AREA, CHUNK_SIZE, IS_SOLID, TILES } from "../../world/map.mjs";
 import { state } from "./debug.mjs";
 
 export * as debug from './debug.mjs';
@@ -59,7 +59,7 @@ export const findPath = async (world, a, b, debug=false) => {
   // TODO: do bi-directional pathing to exit impossible paths earlier
   if(!a || !b) return null;
   // if(a.chunk != b.chunk) return console.error("Pathfinding does not yet work across chunks!");
-  if(b.tile == TILES.WALL) return null;
+  if(IS_SOLID[b.tile]) return null;
 
   const lowestFscore = (set) => {
     // console.debug('fscore =======');
@@ -112,13 +112,13 @@ export const findPath = async (world, a, b, debug=false) => {
     const lst = [];
     horizontals.forEach((off) => {
       const pos = Vector.add(off, tile);
-      if(openSet.has(tile) || world.map.getTile(pos) == TILES.WALL) return;
+      if(openSet.has(tile) || IS_SOLID[world.map.getTile(pos)]) return;
       lst.push(pos);
     });
     diagonals.forEach((off) => {
       const pos = Vector.add(off, tile);
-      if(openSet.has(tile) || world.map.getTile(pos) == TILES.WALL) return;
-      if(world.map.getTile(new Vector(pos.x, tile.y)) == TILES.WALL && world.map.getTile(new Vector(tile.x, pos.y)) == TILES.WALL) {
+      if(openSet.has(tile) || IS_SOLID[world.map.getTile(pos)]) return;
+      if(IS_SOLID[world.map.getTile(new Vector(pos.x, tile.y))] && IS_SOLID[world.map.getTile(new Vector(tile.x, pos.y))]) {
         return;
       }
       lst.push(pos);

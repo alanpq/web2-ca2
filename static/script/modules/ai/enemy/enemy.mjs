@@ -95,6 +95,7 @@ export default class Enemy extends Entity {
    */
   physics(dt, world) {
     if(this.dead) {
+      super.physics(dt, world);
       if(this.#announcedDeath) return;
       this.#announcedDeath = true;
       if(world.onKill)

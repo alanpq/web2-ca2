@@ -74,16 +74,18 @@ export default class Entity {
    * @param {World} world
    */
   physics(dt, world) {
-    for(let i = 0; i < world.entities.length; i++) {
-      /** @type {Entity} */
-      const ent = world.entities[i];
-      if(!ent || ent.dead) continue;
-      const dir = Vector.sub(this.position, ent.position);
-      let m = dir.sqrMagnitude;
-      if(m > 100000) continue;
-      m = Math.sqrt(m);
-      if(m < TILE_SIZE) {
-        this.velocity.add(dir.normalized());
+    if(!this.dead) {
+      for(let i = 0; i < world.entities.length; i++) {
+        /** @type {Entity} */
+        const ent = world.entities[i];
+        if(!ent || ent.dead) continue;
+        const dir = Vector.sub(this.position, ent.position);
+        let m = dir.sqrMagnitude;
+        if(m > 100000) continue;
+        m = Math.sqrt(m);
+        if(m < TILE_SIZE) {
+          this.velocity.add(dir.normalized());
+        }
       }
     }
 
