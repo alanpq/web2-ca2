@@ -114,8 +114,8 @@ export default class Game {
       type: bullets.ProjectileType.PHYSICS,
       params: {
         drag: 0.6,
-        restitution: 0.7,
-        size: new Vector(2,2),
+        restitution: 0.9,
+        size: new Vector(8,8),
       },
       /**
        * 

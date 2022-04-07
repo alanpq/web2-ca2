@@ -6,18 +6,24 @@ const explosions = [];
 
 const LIFETIME = .5;
 
+/**
+ * 
+ * @param {Vector} pos 
+ * @param {number} damage 
+ * @param {World} world 
+ */
 export const explode = (pos, damage, world) => {
   explosions.push([pos, LIFETIME]);
-  for(const e of world.entities) {
+  for(const e of world.entities.concat(world.player)) {
     if(!e) continue;
     const dir = Vector.sub(e.position, pos);
     let m = dir.sqrMagnitude;
-    if(m > 70000) continue;
+    if(m > 14400) continue;
     const d = Math.sqrt(m);
     const v = dir.normalized().mul(70000).div(m);
     e.hurt(10)
     e.velocity.add(v);
-    if(d < 128) e.hurt(10000);
+    if(d < 70) e.hurt(10000);
   }
   const center = worldToTile(pos);
   const top    = center.y - 3;

@@ -114,7 +114,10 @@ export const physics = (dt, world) => {
             const hits = world.map.raycast(b.oldPos, b.pos, 1);
             if(hits.length > 0) {
               b.pos = hits[0];
-              b.life = 0;
+              if(type.params.restitution > 0) {
+                // not accurate
+                b.vel = Vector.mul(b.vel, -type.params.restitution);
+              } else b.life = 0;
             }
           }
         break;
