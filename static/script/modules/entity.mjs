@@ -49,7 +49,7 @@ export default class Entity {
    */
   onHit(bullet) {
     this.hurt(bullet.damage);
-    this.velocity.add(bullet.vel.clone().mul(0.05));
+    this.velocity.add(bullet.vel.clone().mul(0.02));
   }
 
   hurt(damage) {
