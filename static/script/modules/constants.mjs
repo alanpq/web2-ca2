@@ -10,7 +10,7 @@ export const FONTS = {
   SERIF: "Playfair Display, Times New Roman, serif",
 };
 
-export const GAME_TIMER = Infinity;
+export const GAME_TIMER = 120;
 export const COMBO_COOLDOWN = 5;
 export const MAX_COMBO = 10;
 export const KILL_SCORE = 100;
