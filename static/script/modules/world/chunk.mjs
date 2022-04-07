@@ -13,6 +13,7 @@ export default class Chunk {
 
   doored = [false, false];
   populated = false;
+  dirty = false;
 
   constructor(x, y) {
     this.x = x;
@@ -55,6 +56,7 @@ export default class Chunk {
   setTile(x,y, tile) {
     const i = y * CHUNK_SIZE + x;
     this.setTileFromIdx(i, tile);
+    this.dirty = true;
   }
 
   setTileFromIdx(i, tile) {

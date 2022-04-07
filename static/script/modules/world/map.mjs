@@ -101,6 +101,14 @@ export default class Map {
     c.render(dt, ctx);
   }
 
+  cleanChunks() {
+    for(const obj of Object.values(this.#chunks)) {
+      for(const c of Object.values(obj)) {
+        c.dirty = false;
+      }
+    }
+  }
+
   /**
    * 
    * @param {Chunk} a 

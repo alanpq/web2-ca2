@@ -6,7 +6,7 @@ import { manhatten } from "../../math/mod.mjs";
 import Vector from "../../math/vector.mjs";
 import { Flags, registerDebug, removeDebug } from "../../ui/debug.mjs";
 import World from "../../world.mjs";
-import { tileToWorld, TILE_SIZE, worldToTile } from "../../world/map.mjs";
+import { tileToWorld, TILE_SIZE, worldToChunk, worldToTile } from "../../world/map.mjs";
 
 import * as pathfinding from "../pathfinding/pathfinding.mjs"
 import * as debug from './debug.mjs';
@@ -62,8 +62,8 @@ export default class Enemy extends Entity {
     // or if the player has moved and we are within 20 tiles
     return (dist < 100 && (!this.#path || this.#curIdx >= this.#path.length)) ||
       (
-        dist < 50 && (this.#path.length-this.#curIdx) < 30 &&
-        (to.x != this.#destination.x || to.y != this.#destination.y)
+        dist < 50 && (this.#path.length-this.#curIdx) < 30 && // we are within 50 tiles and our paths remaining are short
+        (to.x != this.#destination.x || to.y != this.#destination.y) // player has moved
       );
   }
 
@@ -106,7 +106,10 @@ export default class Enemy extends Entity {
     const playerTile = world.map.probeTile(player);
     this.#debug.curIdx = this.#curIdx;
 
-    if(this.needNewPath(player)) { // player moved or no path
+    const c = world.map.getChunkFromWorld(this.position);
+
+    if(c && (this.needNewPath(player) || c.dirty)) { // player moved or no path
+      if(c.dirty) console.debug('enemy smelt dirt');
       this.#destination = player;
       this.#targetTile = world.map.probeTile(player);
       this.#debug.tile = this.#targetTile;

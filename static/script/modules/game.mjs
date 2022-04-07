@@ -326,6 +326,7 @@ export default class Game {
 
     if(!this.#playing) return;
     
+
     this.#world.tick(dt);
 
     if(input.leftMouse()) {
@@ -382,6 +383,7 @@ export default class Game {
    * @param {number} dt
    */
   physics(dt) {
+    this.#world.map.cleanChunks();
     this.#world.physics(dt);
     debugPhysics(dt, this.#world);
   }

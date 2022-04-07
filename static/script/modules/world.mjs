@@ -54,6 +54,7 @@ export default class World {
       }
     }
     this.player.tick(dt);
+
   }
   
   /**
