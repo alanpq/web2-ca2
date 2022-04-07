@@ -25,6 +25,8 @@ import { drawScoreboard } from "./scoreboard/ui.mjs";
 import {requestToken} from "./scoreboard/api.mjs";
 import { loadImage } from "./images.mjs";
 import * as explosions from "./weapons/explosion.mjs";
+import { initSounds, Sounds, triggerSound } from "./audio/Sound.mjs";
+import { startAudio } from "./audio.mjs";
 
 export default class Game {
   #loaded = false;
@@ -63,6 +65,7 @@ export default class Game {
       if(this.#killCount >= 2) {
         this.#grenades += 1;
         this.#killCount = 0;
+        triggerSound(Sounds.PICKUP_A);
       }
     }
 
@@ -78,19 +81,9 @@ export default class Game {
       (dt) => {this.physics(dt)},
     )
   }
-  /** @type {HTMLAudioElement} */
-  #audio;
   async load() {
     if(this.#loaded) return;
     console.debug("Loading game...");
-
-    this.#audio = new Audio(URL_BASE + "/static/sound/machine-gun.mp3");
-    this.#audio.loop = true;
-    await new Promise((resolve, reject) => {
-      this.#audio.addEventListener("canplaythrough", e => {
-        resolve();
-      });
-    })
 
     await Promise.allSettled([
       loadImage('head.png'),
@@ -99,6 +92,9 @@ export default class Game {
       loadImage('tiles.png'),
       loadImage('explosion.png'),
     ]);
+
+    startAudio();
+    await initSounds();
 
     this.#loaded = true;
     registerDebug(Flags.PATHFINDING, "draw", pathfinding.debug.draw);
@@ -131,6 +127,7 @@ export default class Game {
        */
       onDeath: (b) => {
         explosions.explode(b.pos, 1, this.#world);
+        triggerSound(Sounds.EXPLOSION);
       }
     })
   }
@@ -358,8 +355,6 @@ export default class Game {
     if(!this.#playing) return;
     
     this.#world.tick(dt);
-    if(input.leftMouseDown()) this.#audio.play();
-    if(input.leftMouseUp()) {this.#audio.pause();this.#audio.currentTime = 0;}
 
     if(input.leftMouse()) {
       this.#gunTime += dt;
@@ -372,6 +367,7 @@ export default class Game {
           life: 5,
         })
         this.#gunTime = 0;
+        triggerSound(Sounds.SHOOT);
       }
     }
 
