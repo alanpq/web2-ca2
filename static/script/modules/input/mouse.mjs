@@ -1,5 +1,6 @@
 'use strict';
 import Vector from "../math/vector.mjs";
+import { ui } from "../ui/debug.mjs";
 
 /**
  * Same state as {@link keyMap}
@@ -18,6 +19,12 @@ export const init = (el) => {
     mouseState.pos.x = e.offsetX;
     mouseState.pos.y = e.offsetY;
   });
+  
+  // window.addEventListener("mousemove", (e) => {
+  //   if(!document.fullscreenElement) return;
+  //   mouseState.pos.x = e.offsetX;
+  //   mouseState.pos.y = e.offsetY;
+  // });
   
   // prevent context menu when clicking on canvas
   el.addEventListener("contextmenu", (e) => {e.preventDefault()});

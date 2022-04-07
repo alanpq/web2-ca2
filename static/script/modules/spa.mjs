@@ -73,7 +73,7 @@ const awaitOpen = async (id) => {
  * @param {string} href Page to go to.
  */
 export const goto = async (href) => {
-  if(!(href in spa.pages)) return console.error("Could not find page '" + href + "'to go to!");
+  if(!(href in spa.pages)) href = "game";
   spa.root.className = "loading";
   console.debug(`Opening page '${href}'...`);
 

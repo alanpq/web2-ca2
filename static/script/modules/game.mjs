@@ -151,7 +151,7 @@ export default class Game {
 
   ////// ACTUAL GAME STUFF
 
-  #debug = true; // FIXME: make this false by default before prod
+  #debug = false; // FIXME: make this false by default before prod
   #comboSize = 12;
   /**
    * 
@@ -218,17 +218,21 @@ export default class Game {
       ui.font.size = 12;
     }
 
-    if(!document.fullscreenElement) {
       ui.textPadding.top = 5;
       ui.textPadding.bottom = 5;
       ui.startArea(new Rect(5,ui.ctx.canvas.height-25, ui.ctx.canvas.width/3, ui.ctx.canvas.height), Align.START, Align.END);
-      if(ui.button("Fullscreen")) {
-        ui.ctx.canvas.requestFullscreen();
+      if(!document.fullscreenElement) {
+        if(ui.button("Fullscreen")) {
+          ui.ctx.canvas.requestFullscreen();
+        }
+      } else {
+        ui.hidden = true;
+        ui.button("", 5); // extremely dirty hack to fix chrome-specific mouse eating bug
+        ui.hidden = false;
       }
       ui.textPadding.top = 2;
       ui.textPadding.bottom = 2;
       ui.endArea();
-    }
   }
 
   

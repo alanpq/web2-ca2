@@ -1,3 +1,8 @@
+"""
+IMPORTANT NOTE:
+  Bad server performance means Apache seems to miss sending mime type for some module js requests. Make sure to refresh if any mime related errors show up in console.
+"""
+
 from flask_session import Session
 from flask import Flask, render_template, request
 import json

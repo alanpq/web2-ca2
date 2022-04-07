@@ -262,13 +262,13 @@ export default class UI {
       mText.actualBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top + this.textPadding.bottom,
     );
     let hit = false;
-    if(!this.hidden) {
-      const clipRect = parent.computeClipRect(rect.width, rect.height);
-      this.#drawBounds(rect, clipRect);
-      this.#clipRect(clipRect);
-      hit = rect.containsPoint(input.mouse());
-      input.setMouseEat(hit);
+    const clipRect = parent.computeClipRect(rect.width, rect.height);
+    this.#drawBounds(rect, clipRect);
+    this.#clipRect(clipRect);
+    hit = rect.containsPoint(input.mouse());
+    input.setMouseEat(hit);
 
+    if(!this.hidden) {
       this.ctx.fillStyle = hit ? (input.leftMouse(true) ? "#818181" : "#C5C5C5"): "#F3F3F3";
       this.ctx.strokeStyle = "#302f30";
       this.ctx.lineWidth = 0.5;
@@ -282,10 +282,10 @@ export default class UI {
         rect.left + this.textPadding.left,
         rect.top + mText.actualBoundingBoxAscent + mText.actualBoundingBoxDescent + this.textPadding.top,
       );
-    }
+    } 
     parent.expand(rect);
     this.ctx.restore();
-    if (this.hidden) return value;
+    if (this.hidden) return false;
     return (hit && input.leftMouseDown(true));
   }
 

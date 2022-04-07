@@ -1,6 +1,6 @@
 'use strict';
 import * as input from '../../input/mod.mjs';
-import { Dict2D } from '../../lib/Dict2d.mjs';
+import { Dict2D } from '../../lib/Dict2D.mjs';
 import Vector from '../../math/vector.mjs';
 import World from '../../world.mjs';
 import { CHUNK_WORLD_SIZE, TILE_SIZE, worldToTile } from '../../world/map.mjs';
