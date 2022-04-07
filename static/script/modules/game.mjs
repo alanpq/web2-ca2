@@ -65,7 +65,7 @@ export default class Game {
       if(this.#killCount >= 2) {
         this.#grenades += 1;
         this.#killCount = 0;
-        triggerSound(Sounds.PICKUP_A);
+        triggerSound(Sounds.PICKUP_B);
       }
     }
 
