@@ -19,7 +19,7 @@ const loadScoreboard = async () => {
 
   scoreboardPromise.then((s) => {
     console.debug("fetched");
-    scoreboard = s;
+    scoreboard = s.slice(0,5);
     console.debug(s);
   }).catch((reason) => {
     console.error(reason);
