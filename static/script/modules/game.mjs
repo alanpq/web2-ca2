@@ -42,6 +42,9 @@ export default class Game {
 
   #time = 0;
 
+  #grenades = 3;
+  #killCount = 0;
+
 
   get loaded() {
     return this.#loaded;
@@ -56,6 +59,11 @@ export default class Game {
       this.#comboTimer = COMBO_COOLDOWN;
       this.#combo = Math.min(MAX_COMBO, this.#combo + 1);
       this.#score += KILL_SCORE * this.#combo;
+      this.#killCount++;
+      if(this.#killCount >= 2) {
+        this.#grenades += 1;
+        this.#killCount = 0;
+      }
     }
 
     this.#renderer.camera.position = this.#world.player.position;
@@ -215,6 +223,16 @@ export default class Game {
       ui.font.size = 12;
       ui.endVertical();
       ui.endArea();
+
+      ui.startArea(new Rect(0, ui.ctx.canvas.height - 70, ui.ctx.canvas.width, ui.ctx.canvas.height), Align.CENTER);
+      ui.startVertical();
+      ui.font.size = 30;
+      ui.text(this.#grenades);
+      ui.font.size = 20;
+      ui.text("GRENADES");
+      ui.font.size = 12;
+      ui.endVertical();
+      ui.endArea();
     } else {
       ui.ctx.fillStyle = "rgba(0,0,0,0.5)";
       ui.ctx.fillRect(0,0, ui.ctx.canvas.width, ui.ctx.canvas.height);
@@ -357,7 +375,8 @@ export default class Game {
       }
     }
 
-    if(input.rightMouseDown()) {
+    if(input.rightMouseDown() && this.#grenades > 0) {
+      this.#grenades -= 1;
       const d = Vector.sub(this.#crosshair, this.#world.player.position).normalized();
       bullets.createBullet("grenade", {
         pos: this.#world.player.position.clone().add(d.clone().mul(16)),
