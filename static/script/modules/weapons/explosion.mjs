@@ -51,6 +51,9 @@ export const explode = (pos, damage, world) => {
                 world.map.setTile(p, TILES.DAMAGED_FLOOR);
               else
             break;
+            case TILES.DAMAGED_WALL:
+              world.map.setTile(p, TILES.FLOOR);
+            break;
           }
         }
       }
