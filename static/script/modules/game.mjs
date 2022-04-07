@@ -27,6 +27,7 @@ import { loadImage } from "./images.mjs";
 import * as explosions from "./weapons/explosion.mjs";
 import { initSounds, Sounds, triggerSound } from "./audio/Sound.mjs";
 import { startAudio } from "./audio.mjs";
+import { debugUI } from "./debug/game.mjs";
 
 export default class Game {
   #loaded = false;
@@ -162,45 +163,16 @@ export default class Game {
     // debugMenu(dt, ui);
 
     if(this.#debug) {
-      ui.hidden = false;
-      ui.font.color = "white";
-      ui.font.family = FONTS.MONO;
-      ui.font.size = 12;
-      ui.startArea(new Rect(0,0, ui.ctx.canvas.width/3, ui.ctx.canvas.height), Align.START);
-      ui.startVertical();
-      ui.text(`frametime: ${(dt*1000).toFixed(3).padStart(6)}ms`);
-
-      ui.space();
-
-      ui.text(`pos: ${this.#world.player.position.toString(3)}`);
-      ui.text('vel: ' + this.#world.player.velocity.toString(3));
-
-      ui.space();
-
-      ui.text('DEBUG FLAGS');
-      setFlag(Flags.PATHFINDING, ui.checkbox(getFlag(Flags.PATHFINDING), "pathfinding visualisation"));
-      setFlag(Flags.PLAYER, ui.checkbox(getFlag(Flags.PLAYER), "player debug"));
-      setFlag(Flags.UI, ui.checkbox(getFlag(Flags.UI), "ui debug"));
-      setFlag(Flags.AI, ui.checkbox(getFlag(Flags.AI), "ai debug"));
-      setFlag(Flags.COLLISION, ui.checkbox(getFlag(Flags.COLLISION), "collision debug"));
-
-      ui.space();
-      
-      ui.hidden = !getFlag(Flags.PATHFINDING);
-      ui.text('PATHFINDING VIS:');
-      ui.text('Left click to place point A.');
-      ui.text('Right click to place point B.');
-      ui.hidden = false;
-      
-      ui.endVertical();
-      ui.endArea();
+      debugUI(dt, ui, this.#world);
     }
     if(this.#playing) {
+      ui.font.family = FONTS.SANS;
+      ui.textPadding.top = 2;
+      ui.textPadding.bottom = 0;
       ui.hidden = false;
       ui.startArea(new Rect(0,0,ui.ctx.canvas.width, ui.ctx.canvas.height), Align.CENTER);
       ui.startVertical();
       ui.font.size = 50;
-      ui.space();
       ui.text(this.#timer.toFixed(2));
       ui.font.size = 30;
       ui.text(this.#score);
@@ -208,7 +180,7 @@ export default class Game {
       
       const w = 200 * (this.#comboTimer/COMBO_COOLDOWN);
       ui.ctx.fillStyle = "white";
-      ui.ctx.fillRect(ui.ctx.canvas.width/2-w/2, 150, w, 7);
+      ui.ctx.fillRect(ui.ctx.canvas.width/2-w/2, 110, w, 7);
 
       if(this.#combo > 0) {
         this.#comboSize = lerp(this.#comboSize, 20 + (this.#combo/MAX_COMBO) * (40-20), 0.1);
@@ -221,7 +193,7 @@ export default class Game {
       ui.endVertical();
       ui.endArea();
 
-      ui.startArea(new Rect(0, ui.ctx.canvas.height - 70, ui.ctx.canvas.width, ui.ctx.canvas.height), Align.CENTER);
+      ui.startArea(new Rect(0, ui.ctx.canvas.height - 80, ui.ctx.canvas.width, ui.ctx.canvas.height), Align.CENTER);
       ui.startVertical();
       ui.font.size = 30;
       ui.text(this.#grenades);
