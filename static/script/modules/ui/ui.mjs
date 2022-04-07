@@ -198,7 +198,7 @@ export default class UI {
     const mText = this.ctx.measureText(value);
     const rect = parent.computeWidgetRect(
       this.textPadding.left + this.textPadding.right + (width || mText.width),
-      (mText.fontBoundingBoxDescent || mText.actualBoundingBoxDescent) + (mText.fontBoundingBoxAscent || mText.actualBoundingBoxAscent)  + this.textPadding.top + this.textPadding.bottom,
+      ((mText.fontBoundingBoxDescent + mText.fontBoundingBoxAscent) || this.font.size)  + this.textPadding.top + this.textPadding.bottom,
     );
     let hit = false;
     if(!this.hidden) {
