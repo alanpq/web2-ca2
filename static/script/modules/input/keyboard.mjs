@@ -27,6 +27,7 @@ let uiQueue = []; // argh terrible
 const uiBanned = {
   "Enter": true,
   "Backspace": true,
+  "Escape": true,
 };
 
 /**
