@@ -74,7 +74,6 @@ export default class Enemy extends Entity {
     if(this.#playerDist <= 35) {
       if(this.#attackCooldown <= 0) {
         this.#attackCooldown = ATTACK_COOLDOWN;
-        console.log('bam');
         this.#player.hurt(ENEMY_DAMAGE);
       }
     }
