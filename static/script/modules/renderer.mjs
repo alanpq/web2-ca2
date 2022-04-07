@@ -28,6 +28,8 @@ export default class Renderer {
   onTick;
   onPhysics;
   onUI;
+
+  #blurred = false;
   /**
    * @param {HTMLCanvasElement} canvas 
    */
@@ -40,6 +42,13 @@ export default class Renderer {
     this.#ui = new UI(this.#ctx);
 
     this.camera = new Camera();
+
+    window.addEventListener("focus", () => {
+      this.#blurred = false;
+      this.#then = null;
+      window.requestAnimationFrame(this.#loop.bind(this));
+    })
+    window.addEventListener("blur", () => {this.#blurred = true;})
 
     window.addEventListener("resize", () => {
       if(document.fullscreenEnabled) return this.fullscreen_change();
@@ -70,6 +79,7 @@ export default class Renderer {
   }
 
   #loop(now) {
+    if(this.#blurred) return;
     if(!this.#then) {
       this.#then = now;
     }
