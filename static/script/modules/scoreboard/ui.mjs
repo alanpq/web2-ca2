@@ -20,7 +20,6 @@ const loadScoreboard = async () => {
   scoreboardPromise.then((s) => {
     console.debug("fetched");
     scoreboard = s.slice(0,5);
-    console.debug(s);
   }).catch((reason) => {
     console.error(reason);
     scoreboardState = "Could not load leaderboards.";
