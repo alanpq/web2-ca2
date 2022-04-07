@@ -34,7 +34,7 @@ def submit():
   if len(db.execute("SELECT * FROM tokens WHERE token == ?", (body["token"],)).fetchall()) < 1:
     return "Error", 401
   db.execute("DELETE FROM tokens WHERE token == ?", (body["token"],))
-  db.execute("INSERT INTO scores (username, score) VALUES (?,?)", (body["username"], body["score"]))
+  db.execute("INSERT INTO scores (username, score) VALUES (?,?)", (body["username"][:20], body["score"]))
   db.commit()
   return "Success"
 
