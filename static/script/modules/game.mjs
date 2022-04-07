@@ -371,8 +371,8 @@ export default class Game {
     this.#bottomRight = worldToChunk(this.#renderer.camera.viewportToWorld(Vector.one));
     // console.debug(topLeft.toString(), bottomRight.toString())
     let count = 0;
-    for(let x = this.#topLeft.x; x <= this.#bottomRight.x; x++) {
-      for(let y = this.#topLeft.y-1; y <= this.#bottomRight.y; y++) {
+    for(let x = this.#topLeft.x-1; x <= this.#bottomRight.x+1; x++) {
+      for(let y = this.#topLeft.y-2; y <= this.#bottomRight.y+1; y++) {
         if (this.#world.map.createChunk(new Vector(x,y))) {
           this.#populateChunk(this.#world.map.getChunk(new Vector(x,y)));
         };
